@@ -1,36 +1,29 @@
 /**
- * IndustrySelector Component для Universal Calculator
+ * IndustrySelector Component - Упрощенная версия
  * Первый шаг формы - выбор отрасли бизнеса
  * 
  * @class IndustrySelector
  * @author Steamphony Digital Agency
  */
+
+import { getAllIndustries, getPopularIndustries } from '../data/industries.js';
+
 class IndustrySelector {
-  /**
-   * Создает экземпляр IndustrySelector
-   * 
-   * @param {HTMLElement} container - DOM элемент для размещения компонента
-   * @param {Object} options - Опции конфигурации
-   */
   constructor(container, options = {}) {
-    // Валидация входных параметров
     if (!container || !(container instanceof HTMLElement)) {
       throw new Error('IndustrySelector: container должен быть DOM элементом');
     }
 
-    // Основные свойства
     this.container = container;
     this.selectedIndustry = null;
     this.filteredIndustries = [];
     this.searchTerm = '';
     this.isRendered = false;
 
-    // Колбэки
     this.onSelect = options.onSelect || (() => {});
     this.onNext = options.onNext || (() => {});
     this.onSearch = options.onSearch || (() => {});
 
-    // Конфигурация
     this.options = {
       showPopularSection: true,
       enableSearch: true,
@@ -40,306 +33,86 @@ class IndustrySelector {
       ...options
     };
 
-    // Hardcoded данные 8 отраслей
-    this.industries = {
-      restaurant: {
-        key: 'restaurant',
-        icon: '🍽️',
-        title: 'Ресторанный бизнес',
-        description: 'Рестораны, кафе, бары, доставка еды',
-        examples: 'Привлечение гостей, бронирования столиков, онлайн-заказы',
-        popular: true,
-        searchTerms: ['ресторан', 'кафе', 'бар', 'еда', 'доставка', 'общепит', 'питание'],
-        metrics: {
-          avgBudget: 150000,
-          avgSavings: 30,
-          roiMultiplier: 1.2
-        }
-      },
-      beauty: {
-        key: 'beauty',
-        icon: '💅',
-        title: 'Красота и wellness',
-        description: 'Салоны красоты, СПА, фитнес, массаж',
-        examples: 'Запись клиентов, продвижение услуг, лояльность',
-        popular: true,
-        searchTerms: ['салон', 'красота', 'спа', 'фитнес', 'массаж', 'косметология', 'wellness'],
-        metrics: {
-          avgBudget: 120000,
-          avgSavings: 35,
-          roiMultiplier: 1.4
-        }
-      },
-      retail: {
-        key: 'retail',
-        icon: '🛍️',
-        title: 'Ритейл и торговля',
-        description: 'Магазины, интернет-магазины, маркетплейсы',
-        examples: 'Продажи, конверсия, удержание клиентов',
-        popular: true,
-        searchTerms: ['магазин', 'торговля', 'ритейл', 'ecommerce', 'интернет-магазин', 'маркетплейс'],
-        metrics: {
-          avgBudget: 200000,
-          avgSavings: 25,
-          roiMultiplier: 1.3
-        }
-      },
-      services: {
-        key: 'services',
-        icon: '🏥',
-        title: 'Услуги',
-        description: 'Медицина, образование, консалтинг, ремонт',
-        examples: 'Поиск клиентов, доверие, экспертность',
-        popular: true,
-        searchTerms: ['медицина', 'образование', 'консалтинг', 'услуги', 'ремонт', 'стоматология'],
-        metrics: {
-          avgBudget: 180000,
-          avgSavings: 40,
-          roiMultiplier: 1.6
-        }
-      },
-      b2b: {
-        key: 'b2b',
-        icon: '🏗️',
-        title: 'B2B сфера',
-        description: 'Производство, логистика, IT, оборудование',
-        examples: 'Лидогенерация, длинный цикл продаж, экспертность',
-        popular: false,
-        searchTerms: ['производство', 'логистика', 'it', 'b2b', 'оборудование', 'промышленность'],
-        metrics: {
-          avgBudget: 300000,
-          avgSavings: 45,
-          roiMultiplier: 1.8
-        }
-      },
-      realestate: {
-        key: 'realestate',
-        icon: '🏠',
-        title: 'Недвижимость',
-        description: 'Агентства, девелопмент, аренда, управление',
-        examples: 'Продажи объектов, доверие, геотаргетинг',
-        popular: false,
-        searchTerms: ['недвижимость', 'агентство', 'девелопмент', 'аренда', 'квартиры', 'дома'],
-        metrics: {
-          avgBudget: 250000,
-          avgSavings: 35,
-          roiMultiplier: 1.5
-        }
-      },
-      finance: {
-        key: 'finance',
-        icon: '💼',
-        title: 'Финансы',
-        description: 'Банки, страхование, инвестиции, кредиты',
-        examples: 'Привлечение клиентов, доверие, финансовая грамотность',
-        popular: false,
-        searchTerms: ['банк', 'финансы', 'страхование', 'кредит', 'инвестиции', 'займы'],
-        metrics: {
-          avgBudget: 400000,
-          avgSavings: 30,
-          roiMultiplier: 1.7
-        }
-      },
-      other: {
-        key: 'other',
-        icon: '🎯',
-        title: 'Другое',
-        description: 'Укажите вашу отрасль',
-        examples: 'Индивидуальный подход и персонализация',
-        popular: false,
-        searchTerms: ['другое', 'прочее', 'иное', 'специфическое'],
-        metrics: {
-          avgBudget: 150000,
-          avgSavings: 30,
-          roiMultiplier: 1.2
-        },
-        customInput: true
-      }
-    };
-
-    // Обработчики событий
     this.handleSearch = this.handleSearch.bind(this);
     this.handleCardClick = this.handleCardClick.bind(this);
-    this.handleCardKeydown = this.handleCardKeydown.bind(this);
     this.handleNextClick = this.handleNextClick.bind(this);
-    this.handleCustomInput = this.handleCustomInput.bind(this);
+    this.handleKeydown = this.handleKeydown.bind(this);
 
-    // Инициализация
     this.init();
   }
 
   /**
    * Инициализация компонента
-   * @private
    */
   init() {
     try {
-      this.filteredIndustries = Object.values(this.industries);
+      this.industries = getAllIndustries();
+      this.filteredIndustries = this.industries;
       this.render();
       this.attachEventListeners();
-      
-      // Dispatch готовности компонента
-      this.dispatchEvent('industrySelectorReady', {
-        totalIndustries: Object.keys(this.industries).length,
-        popularIndustries: this.getPopularIndustries().length
-      });
+      this.trackEvent('step_1_viewed');
     } catch (error) {
-      console.error('IndustrySelector: Ошибка инициализации:', error);
-      this.renderError(error.message);
+      this.handleError('INIT_ERROR', error);
     }
   }
 
   /**
-   * Рендеринг HTML структуры
-   * @private
+   * Рендеринг компонента
    */
   render() {
-    const selectorHTML = `
-      <div class="industry-selector" role="region" aria-label="Выбор отрасли бизнеса">
-        <!-- Header -->
+    this.container.innerHTML = `
+      <div class="industry-selector">
         <div class="selector-header">
-          <h2 class="selector-title">Выберите вашу отрасль</h2>
-          <p class="selector-description">
-            Это поможет нам подготовить персонализированный расчет экономии для вашего бизнеса
-          </p>
+          <h2>Выберите вашу отрасль</h2>
+          <p>Это поможет нам дать более точные рекомендации</p>
         </div>
 
-        <!-- Search -->
         ${this.options.enableSearch ? this.renderSearch() : ''}
 
-        <!-- Popular Industries -->
         ${this.options.showPopularSection ? this.renderPopularSection() : ''}
 
-        <!-- All Industries -->
-        <div class="industries-section">
-          <h3 class="section-title">Все отрасли</h3>
-          <div class="industries-grid" role="grid" aria-label="Список отраслей">
-            ${this.renderIndustryCards()}
-          </div>
+        <div class="industries-grid">
+          ${this.renderIndustryCards()}
         </div>
 
-        <!-- Custom Input (hidden by default) -->
-        <div class="custom-input-section" id="custom-input-section" style="display: none;">
-          <div class="custom-input-wrapper">
-            <label for="custom-industry-input" class="form-label">
-              Укажите вашу отрасль
-            </label>
-            <input 
-              type="text" 
-              id="custom-industry-input" 
-              class="form-input custom-industry-input"
-              placeholder="Например: Автосервис, Туризм, Транспорт..."
-              maxlength="50"
-              aria-describedby="custom-input-help"
-            >
-            <div id="custom-input-help" class="form-help">
-              Опишите специфику вашего бизнеса в 2-3 словах
-            </div>
-            <div class="custom-input-error" id="custom-input-error" role="alert" aria-live="polite"></div>
-          </div>
-        </div>
-
-        <!-- Next Button -->
-        <div class="selector-actions">
-          <button 
-            type="button" 
-            class="btn btn-primary btn-lg selector-next-btn" 
-            id="industry-next-btn"
-            disabled
-            aria-describedby="next-btn-help"
-          >
-            Продолжить
-            <svg class="btn-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-              <path d="M5 12h14M12 5l7 7-7 7"/>
-            </svg>
-          </button>
-          <div id="next-btn-help" class="form-help">
-            Выберите отрасль для продолжения
-          </div>
-        </div>
-
-        <!-- Trust Signals -->
-        <div class="selector-trust">
-          <div class="trust-item">
-            <span class="trust-icon">🔒</span>
-            <span class="trust-text">100% конфиденциально</span>
-          </div>
-          <div class="trust-item">
-            <span class="trust-icon">⚡</span>
-            <span class="trust-text">Расчет за 3 минуты</span>
-          </div>
-          <div class="trust-item">
-            <span class="trust-icon">🎯</span>
-            <span class="trust-text">Персонализированный результат</span>
-          </div>
+        <div class="step-navigation">
+          <button type="button" class="btn btn-primary next-btn" disabled>Далее</button>
         </div>
       </div>
     `;
 
-    this.container.innerHTML = selectorHTML;
-    this.cacheElements();
     this.isRendered = true;
   }
 
   /**
-   * Рендеринг search секции
-   * @private
-   * @returns {string} HTML search секции
+   * Рендеринг поиска
    */
   renderSearch() {
     return `
-      <div class="search-section">
-        <div class="search-wrapper">
-          <div class="search-input-wrapper">
-            <svg class="search-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-              <circle cx="11" cy="11" r="8"/>
-              <path d="m21 21-4.35-4.35"/>
-            </svg>
-            <input 
-              type="text" 
-              class="search-input" 
-              id="industry-search"
-              placeholder="Поиск по отрасли..."
-              aria-label="Поиск отрасли"
-              autocomplete="off"
-            >
-            <button 
-              type="button" 
-              class="search-clear" 
-              id="search-clear"
-              aria-label="Очистить поиск"
-              style="display: none;"
-            >
-              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                <line x1="18" y1="6" x2="6" y2="18"/>
-                <line x1="6" y1="6" x2="18" y2="18"/>
-              </svg>
-            </button>
-          </div>
+      <div class="search-container">
+        <div class="search-input-wrapper">
+          <input type="text" 
+                 class="search-input" 
+                 placeholder="Поиск отрасли..."
+                 aria-label="Поиск отрасли">
+          <button type="button" class="search-clear" style="display: none;">✕</button>
         </div>
       </div>
     `;
   }
 
   /**
-   * Рендеринг секции популярных отраслей
-   * @private
-   * @returns {string} HTML популярных отраслей
+   * Рендеринг популярных отраслей
    */
   renderPopularSection() {
-    const popularIndustries = this.getPopularIndustries();
+    const popularIndustries = getPopularIndustries().slice(0, this.options.popularLimit);
     
-    if (popularIndustries.length === 0) {
-      return '';
-    }
+    if (popularIndustries.length === 0) return '';
 
     return `
       <div class="popular-section">
-        <h3 class="section-title">
-          <span class="section-icon">🔥</span>
-          Популярные отрасли
-        </h3>
-        <div class="popular-grid" role="grid" aria-label="Популярные отрасли">
+        <h3>Популярные отрасли</h3>
+        <div class="popular-grid">
           ${popularIndustries.map(industry => this.renderIndustryCard(industry, true)).join('')}
         </div>
       </div>
@@ -348,628 +121,440 @@ class IndustrySelector {
 
   /**
    * Рендеринг карточек отраслей
-   * @private
-   * @returns {string} HTML карточек
    */
   renderIndustryCards() {
-    return this.filteredIndustries
-      .filter(industry => !industry.popular || !this.options.showPopularSection)
-      .map(industry => this.renderIndustryCard(industry))
-      .join('');
+    if (this.filteredIndustries.length === 0) {
+      return `
+        <div class="no-results">
+          <p>По вашему запросу ничего не найдено</p>
+          <button type="button" class="btn btn-secondary clear-search">Очистить поиск</button>
+        </div>
+      `;
+    }
+
+    return this.filteredIndustries.map(industry => this.renderIndustryCard(industry)).join('');
   }
 
   /**
-   * Рендеринг отдельной карточки отрасли
-   * @private
-   * @param {Object} industry - Данные отрасли
-   * @param {boolean} isPopular - Является ли популярной
-   * @returns {string} HTML карточки
+   * Рендеринг карточки отрасли
    */
   renderIndustryCard(industry, isPopular = false) {
     const isSelected = this.selectedIndustry?.key === industry.key;
-    const cardClasses = [
-      'industry-card',
-      isSelected ? 'selected' : '',
-      isPopular ? 'popular' : '',
-      industry.key === 'other' ? 'custom' : ''
-    ].filter(Boolean).join(' ');
-
+    const cardClass = `industry-card ${isPopular ? 'popular' : ''} ${isSelected ? 'selected' : ''}`;
+    
     return `
-      <div 
-        class="${cardClasses}"
-        data-industry="${industry.key}"
-        role="button"
-        tabindex="0"
-        aria-pressed="${isSelected}"
-        aria-describedby="industry-${industry.key}-desc"
-      >
-        <div class="card-header">
-          <div class="card-icon" role="img" aria-label="${industry.title}">${industry.icon}</div>
-          ${isSelected ? '<div class="card-checkmark" aria-hidden="true">✓</div>' : ''}
-          ${isPopular ? '<div class="card-badge">Популярно</div>' : ''}
-        </div>
-        
+      <div class="${cardClass}" 
+           data-industry-key="${industry.key}" 
+           tabindex="0" 
+           role="button" 
+           aria-label="Выбрать ${industry.displayName}">
+        <div class="card-icon">${industry.icon}</div>
         <div class="card-content">
-          <h4 class="card-title">${industry.title}</h4>
-          <p class="card-description" id="industry-${industry.key}-desc">
-            ${industry.description}
-          </p>
-          <div class="card-examples">
-            <span class="examples-label">Задачи:</span>
-            <span class="examples-text">${industry.examples}</span>
-          </div>
+          <h3 class="card-title">${industry.displayName}</h3>
+          <p class="card-description">${industry.description}</p>
+          <p class="card-examples">${industry.examples}</p>
         </div>
-
-        <div class="card-footer">
-          <div class="card-metrics">
-            <div class="metric">
-              <span class="metric-value">${industry.metrics.avgSavings}%</span>
-              <span class="metric-label">средняя экономия</span>
-            </div>
-            <div class="metric">
-              <span class="metric-value">${industry.metrics.roiMultiplier}x</span>
-              <span class="metric-label">ROI</span>
-            </div>
-          </div>
-        </div>
+        ${isSelected ? '<div class="selection-indicator">✓</div>' : ''}
       </div>
     `;
   }
 
   /**
-   * Кэширование DOM элементов
-   * @private
-   */
-  cacheElements() {
-    this.elements = {
-      searchInput: this.container.querySelector('#industry-search'),
-      searchClear: this.container.querySelector('#search-clear'),
-      industryCards: this.container.querySelectorAll('.industry-card'),
-      industriesGrid: this.container.querySelector('.industries-grid'),
-      popularGrid: this.container.querySelector('.popular-grid'),
-      nextBtn: this.container.querySelector('#industry-next-btn'),
-      customInputSection: this.container.querySelector('#custom-input-section'),
-      customInput: this.container.querySelector('#custom-industry-input'),
-      customInputError: this.container.querySelector('#custom-input-error'),
-      nextBtnHelp: this.container.querySelector('#next-btn-help')
-    };
-  }
-
-  /**
-   * Подключение обработчиков событий
-   * @private
+   * Прикрепление обработчиков событий
    */
   attachEventListeners() {
-    // Search functionality
-    if (this.elements.searchInput) {
-      this.elements.searchInput.addEventListener('input', this.handleSearch);
-      this.elements.searchClear.addEventListener('click', () => this.clearSearch());
+    const searchInput = this.container.querySelector('.search-input');
+    const searchClear = this.container.querySelector('.search-clear');
+    const clearSearch = this.container.querySelector('.clear-search');
+    const industryCards = this.container.querySelectorAll('.industry-card');
+    const nextBtn = this.container.querySelector('.next-btn');
+
+    if (searchInput) {
+      searchInput.addEventListener('input', this.handleSearch);
+      searchInput.addEventListener('keydown', this.handleKeydown);
     }
 
-    // Industry cards
-    this.elements.industryCards.forEach(card => {
+    if (searchClear) {
+      searchClear.addEventListener('click', () => this.clearSearch());
+    }
+
+    if (clearSearch) {
+      clearSearch.addEventListener('click', () => this.clearSearch());
+    }
+
+    industryCards.forEach(card => {
       card.addEventListener('click', this.handleCardClick);
-      card.addEventListener('keydown', this.handleCardKeydown);
+      card.addEventListener('keydown', this.handleKeydown);
     });
 
-    // Next button
-    if (this.elements.nextBtn) {
-      this.elements.nextBtn.addEventListener('click', this.handleNextClick);
+    if (nextBtn) {
+      nextBtn.addEventListener('click', this.handleNextClick);
     }
 
-    // Custom input
-    if (this.elements.customInput) {
-      this.elements.customInput.addEventListener('input', this.handleCustomInput);
-      this.elements.customInput.addEventListener('blur', this.validateCustomInput.bind(this));
-    }
+    document.addEventListener('keydown', this.handleKeydown);
   }
 
   /**
    * Обработка поиска
-   * @private
-   * @param {Event} event - Событие input
    */
   handleSearch(event) {
-    const query = event.target.value.trim().toLowerCase();
+    const query = event.target.value.trim();
     this.searchTerm = query;
-
-    // Показать/скрыть кнопку очистки
-    if (this.elements.searchClear) {
-      this.elements.searchClear.style.display = query ? 'flex' : 'none';
+    
+    const searchClear = this.container.querySelector('.search-clear');
+    if (searchClear) {
+      searchClear.style.display = query ? 'block' : 'none';
     }
 
-    // Фильтрация отраслей
-    this.filterIndustries(query);
-    
-    // Dispatch события поиска
-    this.dispatchEvent('searchPerformed', {
-      query,
-      resultsCount: this.filteredIndustries.length
-    });
+    if (query.length >= this.options.minSearchLength) {
+      this.filterIndustries(query);
+    } else {
+      this.filteredIndustries = this.industries;
+    }
+
+    this.updateIndustriesDisplay();
+    this.onSearch(query);
   }
 
   /**
-   * Фильтрация отраслей по поисковому запросу
-   * @private
-   * @param {string} query - Поисковый запрос
+   * Фильтрация отраслей
    */
   filterIndustries(query) {
-    if (!query || query.length < this.options.minSearchLength) {
-      this.filteredIndustries = Object.values(this.industries);
-    } else {
-      this.filteredIndustries = Object.values(this.industries).filter(industry => {
-        const searchableText = [
-          industry.title,
-          industry.description,
-          industry.examples,
-          ...industry.searchTerms
-        ].join(' ').toLowerCase();
-        
-        return searchableText.includes(query);
-      });
-    }
-
-    // Обновить отображение
-    this.updateIndustriesDisplay();
+    const lowerQuery = query.toLowerCase();
+    
+    this.filteredIndustries = this.industries.filter(industry => {
+      // Поиск по названию
+      if (industry.displayName.toLowerCase().includes(lowerQuery)) {
+        return true;
+      }
+      
+      // Поиск по описанию
+      if (industry.description.toLowerCase().includes(lowerQuery)) {
+        return true;
+      }
+      
+      // Поиск по примерам
+      if (industry.examples.toLowerCase().includes(lowerQuery)) {
+        return true;
+      }
+      
+      // Поиск по ключевым словам
+      if (industry.searchTerms && industry.searchTerms.some(term => 
+        term.toLowerCase().includes(lowerQuery)
+      )) {
+        return true;
+      }
+      
+      return false;
+    });
   }
 
   /**
    * Обновление отображения отраслей
-   * @private
    */
   updateIndustriesDisplay() {
-    if (!this.elements.industriesGrid) return;
-
-    const filteredNonPopular = this.filteredIndustries.filter(
-      industry => !industry.popular || !this.options.showPopularSection
-    );
-
-    this.elements.industriesGrid.innerHTML = 
-      filteredNonPopular.map(industry => this.renderIndustryCard(industry)).join('');
-
-    // Перезапуск обработчиков для новых элементов
-    this.reattachCardListeners();
-
-    // Показать сообщение "не найдено"
-    if (this.filteredIndustries.length === 0) {
-      this.showNoResults();
+    const industriesGrid = this.container.querySelector('.industries-grid');
+    if (industriesGrid) {
+      industriesGrid.innerHTML = this.renderIndustryCards();
+      this.reattachCardListeners();
     }
   }
 
   /**
-   * Перезапуск обработчиков для карточек
-   * @private
+   * Повторное прикрепление обработчиков карточек
    */
   reattachCardListeners() {
-    this.elements.industryCards = this.container.querySelectorAll('.industry-card');
-    this.elements.industryCards.forEach(card => {
+    const industryCards = this.container.querySelectorAll('.industry-card');
+    industryCards.forEach(card => {
       card.addEventListener('click', this.handleCardClick);
-      card.addEventListener('keydown', this.handleCardKeydown);
+      card.addEventListener('keydown', this.handleKeydown);
     });
   }
 
   /**
-   * Показать сообщение "не найдено"
-   * @private
-   */
-  showNoResults() {
-    const noResultsHTML = `
-      <div class="no-results">
-        <div class="no-results-icon">🔍</div>
-        <h3 class="no-results-title">Не найдено</h3>
-        <p class="no-results-text">
-          Попробуйте изменить поисковый запрос или выберите "Другое" для индивидуального расчета
-        </p>
-        <button type="button" class="btn btn-outline btn-sm" onclick="this.parentElement.parentElement.querySelector('#industry-search').value = ''; this.parentElement.parentElement.querySelector('#industry-search').dispatchEvent(new Event('input'))">
-          Очистить поиск
-        </button>
-      </div>
-    `;
-    
-    this.elements.industriesGrid.innerHTML = noResultsHTML;
-  }
-
-  /**
    * Очистка поиска
-   * @private
    */
   clearSearch() {
-    if (this.elements.searchInput) {
-      this.elements.searchInput.value = '';
-      this.elements.searchInput.focus();
+    const searchInput = this.container.querySelector('.search-input');
+    if (searchInput) {
+      searchInput.value = '';
+      this.searchTerm = '';
     }
     
-    if (this.elements.searchClear) {
-      this.elements.searchClear.style.display = 'none';
+    const searchClear = this.container.querySelector('.search-clear');
+    if (searchClear) {
+      searchClear.style.display = 'none';
     }
     
-    this.searchTerm = '';
-    this.filterIndustries('');
+    this.filteredIndustries = this.industries;
+    this.updateIndustriesDisplay();
   }
 
   /**
    * Обработка клика по карточке
-   * @private
-   * @param {Event} event - Событие клика
    */
   handleCardClick(event) {
     const card = event.currentTarget;
-    const industryKey = card.dataset.industry;
-    
-    if (industryKey) {
-      this.selectIndustry(industryKey);
-    }
+    const industryKey = card.dataset.industryKey;
+    this.selectIndustry(industryKey);
   }
 
   /**
-   * Обработка клавиатурной навигации по карточкам
-   * @private
-   * @param {KeyboardEvent} event - Событие клавиатуры
+   * Обработка нажатия клавиш
    */
-  handleCardKeydown(event) {
-    if (event.key === 'Enter' || event.key === ' ') {
-      event.preventDefault();
-      this.handleCardClick(event);
+  handleKeydown(event) {
+    if (event.key === 'Enter') {
+      if (event.target.classList.contains('industry-card')) {
+        const industryKey = event.target.dataset.industryKey;
+        this.selectIndustry(industryKey);
+      } else if (this.selectedIndustry) {
+        this.handleNextClick();
+      }
+    } else if (event.key === 'Escape') {
+      this.clearSearch();
     }
   }
 
   /**
    * Выбор отрасли
-   * @public
-   * @param {string} industryKey - Ключ отрасли
    */
   selectIndustry(industryKey) {
-    const industry = this.industries[industryKey];
-    
-    if (!industry) {
-      console.warn(`IndustrySelector: Неизвестная отрасль ${industryKey}`);
-      return;
-    }
+    const industry = this.industries.find(ind => ind.key === industryKey);
+    if (!industry) return;
 
-    // Сохранить выбор
     this.selectedIndustry = industry;
-
-    // Обновить визуальные состояния
     this.updateSelectionState();
-
-    // Показать/скрыть custom input
-    if (industry.customInput) {
-      this.showCustomInput();
-    } else {
-      this.hideCustomInput();
-    }
-
-    // Активировать кнопку Next
     this.enableNextButton();
-
-    // Вызвать колбэк
-    this.onSelect(industryKey, industry);
-
-    // Dispatch события
-    this.dispatchEvent('industrySelected', {
-      industryKey,
-      industry,
-      hasCustomInput: !!industry.customInput
-    });
+    this.onSelect(industry);
+    this.trackIndustrySelection(industry);
   }
 
   /**
-   * Обновление визуального состояния выбора
-   * @private
+   * Обновление состояния выбора
    */
   updateSelectionState() {
-    this.elements.industryCards.forEach(card => {
-      const isSelected = card.dataset.industry === this.selectedIndustry?.key;
-      
+    const industryCards = this.container.querySelectorAll('.industry-card');
+    
+    industryCards.forEach(card => {
+      const isSelected = card.dataset.industryKey === this.selectedIndustry?.key;
       card.classList.toggle('selected', isSelected);
-      card.setAttribute('aria-pressed', isSelected);
       
-      // Обновить checkmark
-      const existingCheckmark = card.querySelector('.card-checkmark');
-      if (isSelected && !existingCheckmark) {
-        const checkmark = document.createElement('div');
-        checkmark.className = 'card-checkmark';
-        checkmark.setAttribute('aria-hidden', 'true');
-        checkmark.textContent = '✓';
-        card.querySelector('.card-header').appendChild(checkmark);
-      } else if (!isSelected && existingCheckmark) {
-        existingCheckmark.remove();
+      const indicator = card.querySelector('.selection-indicator');
+      if (isSelected) {
+        if (!indicator) {
+          card.insertAdjacentHTML('beforeend', '<div class="selection-indicator">✓</div>');
+        }
+      } else {
+        if (indicator) {
+          indicator.remove();
+        }
       }
     });
   }
 
   /**
-   * Показать custom input
-   * @private
-   */
-  showCustomInput() {
-    if (this.elements.customInputSection) {
-      this.elements.customInputSection.style.display = 'block';
-      this.elements.customInput.focus();
-    }
-  }
-
-  /**
-   * Скрыть custom input
-   * @private
-   */
-  hideCustomInput() {
-    if (this.elements.customInputSection) {
-      this.elements.customInputSection.style.display = 'none';
-      this.elements.customInput.value = '';
-      this.clearCustomInputError();
-    }
-  }
-
-  /**
-   * Обработка ввода в custom input
-   * @private
-   * @param {Event} event - Событие input
-   */
-  handleCustomInput(event) {
-    const value = event.target.value.trim();
-    
-    if (this.selectedIndustry?.customInput) {
-      this.selectedIndustry.customValue = value;
-      this.selectedIndustry.title = value || 'Другое';
-      
-      // Валидация
-      if (value.length >= 2) {
-        this.enableNextButton();
-        this.clearCustomInputError();
-      } else {
-        this.disableNextButton();
-        this.showCustomInputError('Укажите отрасль (минимум 2 символа)');
-      }
-    }
-  }
-
-  /**
-   * Валидация custom input
-   * @private
-   */
-  validateCustomInput() {
-    if (!this.selectedIndustry?.customInput) return true;
-    
-    const value = this.elements.customInput.value.trim();
-    
-    if (value.length < 2) {
-      this.showCustomInputError('Укажите отрасль (минимум 2 символа)');
-      return false;
-    }
-    
-    if (value.length > 50) {
-      this.showCustomInputError('Слишком длинное название (максимум 50 символов)');
-      return false;
-    }
-    
-    this.clearCustomInputError();
-    return true;
-  }
-
-  /**
-   * Показать ошибку custom input
-   * @private
-   * @param {string} message - Сообщение об ошибке
-   */
-  showCustomInputError(message) {
-    if (this.elements.customInputError) {
-      this.elements.customInputError.textContent = message;
-      this.elements.customInputError.style.display = 'block';
-    }
-    
-    if (this.elements.customInput) {
-      this.elements.customInput.classList.add('error');
-    }
-  }
-
-  /**
-   * Очистить ошибку custom input
-   * @private
-   */
-  clearCustomInputError() {
-    if (this.elements.customInputError) {
-      this.elements.customInputError.style.display = 'none';
-    }
-    
-    if (this.elements.customInput) {
-      this.elements.customInput.classList.remove('error');
-    }
-  }
-
-  /**
-   * Активировать кнопку Next
-   * @private
+   * Включение кнопки "Далее"
    */
   enableNextButton() {
-    if (this.elements.nextBtn) {
-      this.elements.nextBtn.disabled = false;
-      this.elements.nextBtn.classList.add('enabled');
-    }
-    
-    if (this.elements.nextBtnHelp) {
-      this.elements.nextBtnHelp.textContent = 'Нажмите для продолжения';
+    const nextBtn = this.container.querySelector('.next-btn');
+    if (nextBtn) {
+      nextBtn.disabled = false;
     }
   }
 
   /**
-   * Деактивировать кнопку Next
-   * @private
+   * Выключение кнопки "Далее"
    */
   disableNextButton() {
-    if (this.elements.nextBtn) {
-      this.elements.nextBtn.disabled = true;
-      this.elements.nextBtn.classList.remove('enabled');
-    }
-    
-    if (this.elements.nextBtnHelp) {
-      this.elements.nextBtnHelp.textContent = 'Выберите отрасль для продолжения';
+    const nextBtn = this.container.querySelector('.next-btn');
+    if (nextBtn) {
+      nextBtn.disabled = true;
     }
   }
 
   /**
-   * Обработка клика по кнопке Next
-   * @private
-   * @param {Event} event - Событие клика
+   * Обработка нажатия "Далее"
    */
   handleNextClick(event) {
-    event.preventDefault();
-    
     if (!this.selectedIndustry) {
-      this.showError('Выберите отрасль для продолжения');
+      this.showValidationError('Пожалуйста, выберите отрасль');
       return;
     }
-    
-    // Валидация custom input
-    if (this.selectedIndustry.customInput && !this.validateCustomInput()) {
-      return;
+
+    try {
+      const industryData = this.prepareIndustryData();
+      this.saveDataToApp(industryData);
+      this.trackStepCompletion();
+      this.onNext(industryData);
+    } catch (error) {
+      this.handleError('NEXT_ERROR', error);
     }
-    
-    const selectionData = {
-      industryKey: this.selectedIndustry.key,
-      industry: this.selectedIndustry,
-      customValue: this.selectedIndustry.customValue || null,
-      metrics: this.selectedIndustry.metrics,
-      timestamp: new Date().toISOString()
-    };
-    
-    // Вызвать колбэк
-    this.onNext(selectionData);
-    
-    // Dispatch события
-    this.dispatchEvent('industryConfirmed', selectionData);
   }
 
   /**
-   * Получение популярных отраслей
-   * @private
-   * @returns {Array} Массив популярных отраслей
+   * Подготовка данных отрасли
    */
-  getPopularIndustries() {
-    return Object.values(this.industries)
-      .filter(industry => industry.popular)
-      .slice(0, this.options.popularLimit);
+  prepareIndustryData() {
+    return {
+      key: this.selectedIndustry.key,
+      title: this.selectedIndustry.displayName,
+      icon: this.selectedIndustry.icon,
+      description: this.selectedIndustry.description,
+      examples: this.selectedIndustry.examples,
+      popular: this.selectedIndustry.popular,
+      searchTerms: this.selectedIndustry.searchTerms
+    };
   }
 
   /**
-   * Получение данных выбранной отрасли
-   * @public
-   * @returns {Object|null} Данные отрасли или null
+   * Сохранение данных в приложение
+   */
+  saveDataToApp(industryData) {
+    if (window.app && window.app.appState) {
+      window.app.appState.updateField('industry', industryData);
+    }
+  }
+
+  /**
+   * Показ ошибки валидации
+   */
+  showValidationError(message) {
+    const errorElement = this.container.querySelector('.validation-error');
+    if (errorElement) {
+      errorElement.textContent = message;
+      errorElement.style.display = 'block';
+    }
+  }
+
+  /**
+   * Скрытие ошибки валидации
+   */
+  hideValidationError() {
+    const errorElement = this.container.querySelector('.validation-error');
+    if (errorElement) {
+      errorElement.style.display = 'none';
+    }
+  }
+
+  /**
+   * Отслеживание события
+   */
+  trackEvent(eventName, params = {}) {
+    try {
+      if (window.gtag) {
+        window.gtag('event', eventName, {
+          step: 1,
+          ...params
+        });
+      }
+    } catch (error) {
+      console.error('Ошибка отслеживания события:', error);
+    }
+  }
+
+  /**
+   * Отслеживание выбора отрасли
+   */
+  trackIndustrySelection(industry) {
+    this.trackEvent('industry_selected', {
+      industry_key: industry.key,
+      industry_name: industry.displayName,
+      is_popular: industry.popular
+    });
+  }
+
+  /**
+   * Отслеживание завершения шага
+   */
+  trackStepCompletion() {
+    this.trackEvent('step_completed', {
+      step_name: 'industry_selection',
+      selected_industry: this.selectedIndustry?.key
+    });
+  }
+
+  /**
+   * Обработка ошибок
+   */
+  handleError(errorCode, error) {
+    console.error(`IndustrySelector Error [${errorCode}]:`, error);
+    this.showError(`Ошибка: ${error.message}`);
+  }
+
+  /**
+   * Показ ошибки
+   */
+  showError(message) {
+    const errorContainer = this.container.querySelector('.error-container');
+    if (errorContainer) {
+      errorContainer.innerHTML = `
+        <div class="error-message">
+          <h3>Ошибка</h3>
+          <p>${message}</p>
+        </div>
+      `;
+      errorContainer.style.display = 'block';
+    }
+  }
+
+  /**
+   * Получение выбранной отрасли
    */
   getSelectedIndustry() {
     return this.selectedIndustry;
   }
 
   /**
-   * Программная установка выбранной отрасли
-   * @public
-   * @param {string} industryKey - Ключ отрасли
+   * Установка отрасли
    */
   setSelectedIndustry(industryKey) {
     this.selectIndustry(industryKey);
   }
 
   /**
-   * Сброс выбора
-   * @public
+   * Показ компонента
+   */
+  show() {
+    this.container.style.display = 'block';
+  }
+
+  /**
+   * Скрытие компонента
+   */
+  hide() {
+    this.container.style.display = 'none';
+  }
+
+  /**
+   * Сброс компонента
    */
   reset() {
     this.selectedIndustry = null;
-    this.clearSearch();
-    this.hideCustomInput();
-    this.disableNextButton();
-    this.updateSelectionState();
-  }
-
-  /**
-   * Показать ошибку
-   * @private
-   * @param {string} message - Сообщение об ошибке
-   */
-  showError(message) {
-    // Можно добавить toast notification или другой способ отображения ошибок
-    console.error('IndustrySelector:', message);
-  }
-
-  /**
-   * Отправка пользовательского события
-   * @private
-   * @param {string} eventName - Название события
-   * @param {Object} detail - Данные события
-   */
-  dispatchEvent(eventName, detail = {}) {
-    const event = new CustomEvent(eventName, {
-      detail,
-      bubbles: true,
-      cancelable: true
-    });
+    this.searchTerm = '';
+    this.filteredIndustries = this.industries;
     
-    this.container.dispatchEvent(event);
-  }
-
-  /**
-   * Рендеринг ошибки
-   * @private
-   * @param {string} message - Сообщение об ошибке
-   */
-  renderError(message) {
-    this.container.innerHTML = `
-      <div class="industry-selector-error">
-        <div class="error-icon">⚠️</div>
-        <div class="error-message">
-          <h3>Ошибка загрузки селектора отраслей</h3>
-          <p>${message}</p>
-          <button onclick="location.reload()" class="btn btn-primary btn-sm">
-            Обновить страницу
-          </button>
-        </div>
-      </div>
-    `;
+    const searchInput = this.container.querySelector('.search-input');
+    if (searchInput) {
+      searchInput.value = '';
+    }
+    
+    this.updateSelectionState();
+    this.disableNextButton();
+    this.updateIndustriesDisplay();
   }
 
   /**
    * Уничтожение компонента
-   * @public
    */
   destroy() {
-    // Удаление обработчиков событий
-    if (this.elements.searchInput) {
-      this.elements.searchInput.removeEventListener('input', this.handleSearch);
+    try {
+      document.removeEventListener('keydown', this.handleKeydown);
+      this.container.innerHTML = '';
+      this.isRendered = false;
+    } catch (error) {
+      console.error('Ошибка уничтожения IndustrySelector:', error);
     }
-    
-    if (this.elements.searchClear) {
-      this.elements.searchClear.removeEventListener('click', this.clearSearch);
-    }
-    
-    this.elements.industryCards.forEach(card => {
-      card.removeEventListener('click', this.handleCardClick);
-      card.removeEventListener('keydown', this.handleCardKeydown);
-    });
-    
-    if (this.elements.nextBtn) {
-      this.elements.nextBtn.removeEventListener('click', this.handleNextClick);
-    }
-    
-    if (this.elements.customInput) {
-      this.elements.customInput.removeEventListener('input', this.handleCustomInput);
-    }
-    
-    // Очистка DOM
-    this.container.innerHTML = '';
-    
-    // Dispatch события уничтожения
-    this.dispatchEvent('industrySelectorDestroyed', {
-      selectedIndustry: this.selectedIndustry
-    });
   }
 }
 
-// Экспорт для использования в других модулях
-if (typeof module !== 'undefined' && module.exports) {
-  module.exports = IndustrySelector;
-}
-
-// Глобальная доступность
-if (typeof window !== 'undefined') {
-  window.IndustrySelector = IndustrySelector;
-} 
+export default IndustrySelector; 
