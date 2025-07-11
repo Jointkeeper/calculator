@@ -7,7 +7,7 @@
  */
 
 // Импорт основных компонентов
-import { UniversalSavingsCalculator } from './components/Calculator.js';
+// UniversalSavingsCalculator заменен на модульный calculator
 
 // Импорт Analytics и CookieBanner
 import Analytics from './services/Analytics.js';
@@ -463,11 +463,8 @@ class App {
    */
   async initializeCalculator() {
     try {
-      this.calculator = new UniversalSavingsCalculator({
-        enableAnalytics: true,
-        validationStrict: true,
-        steamphonyDiscount: 0.35
-      });
+      // Используем модульный калькулятор
+      this.calculator = calculator;
       
       console.log('✅ Calculator инициализирован');
       
