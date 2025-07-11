@@ -2,8 +2,102 @@
  * ===== GDPR COMPLIANCE TESTS =====
  * 
  * Тесты соответствия GDPR Article 7 и privacy-first принципам
- * Запуск: копируйте код в браузерную консоль после загрузки страницы
+ * Поддерживает запуск в браузере и Node.js (с jsdom)
  */
+
+// Check if running in Node.js environment
+if (typeof window === 'undefined') {
+    // Node.js environment - setup jsdom
+    const { JSDOM } = await import('jsdom');
+    const dom = new JSDOM(`
+        <!DOCTYPE html>
+        <html>
+            <head>
+                <title>GDPR Test</title>
+            </head>
+            <body>
+                <div id="app"></div>
+            </body>
+        </html>
+    `);
+    
+    global.window = dom.window;
+    global.document = dom.window.document;
+    // navigator is read-only in Node.js, so we need to mock it differently
+    Object.defineProperty(global, 'navigator', {
+        value: dom.window.navigator,
+        writable: false,
+        configurable: true
+    });
+    global.localStorage = {
+        getItem: (key) => null,
+        setItem: (key, value) => {},
+        removeItem: (key) => {},
+        clear: () => {}
+    };
+    
+    // Mock app object for testing
+    const analyticsMock = {
+        hasConsent: false,
+        isGA4Loaded: false,
+        eventQueue: [],
+        config: {
+            anonymizeIP: true,
+            dataRetention: 30
+        },
+        setCookieConsent: function(consent) {
+            this.hasConsent = consent;
+        },
+        trackEvent: function(event, data) {
+            this.eventQueue.push({ event, data });
+        }
+    };
+
+    const cookieBannerMock = {
+        showBanner: () => {
+            const banner = document.createElement('div');
+            banner.className = 'cookie-banner';
+            banner.innerHTML = `
+                <button class="cookie-banner__accept">Accept All</button>
+                <button class="cookie-banner__decline">Decline</button>
+                <button class="cookie-banner__customize">Customize</button>
+            `;
+            document.body.appendChild(banner);
+        },
+        hideBanner: () => {
+            const banner = document.querySelector('.cookie-banner');
+            if (banner) banner.remove();
+        },
+        acceptAllCookies: () => {
+            localStorage.setItem('steamphony_cookie_preferences', JSON.stringify({
+                analytics: true,
+                timestamp: Date.now()
+            }));
+        },
+        resetConsent: () => {
+            localStorage.setItem('steamphony_cookie_preferences', JSON.stringify({
+                analytics: false,
+                timestamp: Date.now()
+            }));
+        },
+        getPreferences: () => {
+            const stored = localStorage.getItem('steamphony_cookie_preferences');
+            return stored ? JSON.parse(stored) : { analytics: false };
+        }
+    };
+
+    global.app = {
+        getAnalytics: () => analyticsMock,
+        getCookieBanner: () => cookieBannerMock
+    };
+    
+    // Mock STEAMPHONY_CONFIG
+    global.STEAMPHONY_CONFIG = {
+        cookieBanner: {
+            respectDNT: true
+        }
+    };
+}
 
 (function() {
     'use strict';

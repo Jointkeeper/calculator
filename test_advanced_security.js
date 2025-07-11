@@ -6,7 +6,7 @@
 
 // Mock DOM environment for Node.js testing
 if (typeof document === 'undefined') {
-    const { JSDOM } = require('jsdom');
+    const { JSDOM } = await import('jsdom');
     const dom = new JSDOM(`
         <!DOCTYPE html>
         <html>
@@ -24,7 +24,12 @@ if (typeof document === 'undefined') {
     `);
     global.document = dom.window.document;
     global.window = dom.window;
-    global.navigator = dom.window.navigator;
+    // navigator is read-only in Node.js, so we need to mock it differently
+    Object.defineProperty(global, 'navigator', {
+        value: dom.window.navigator,
+        writable: false,
+        configurable: true
+    });
     global.localStorage = {
         getItem: () => '[]',
         setItem: () => {},
@@ -32,11 +37,10 @@ if (typeof document === 'undefined') {
     };
 }
 
-// Import security modules
+// Import security modules using ES6 imports
 let CSPConfig, SecurityHeaders, ThreatDetector, SecurityMonitor;
 
 try {
-    // Try ES6 imports first
     const cspModule = await import('./src/security/CSPConfig.js');
     const headersModule = await import('./src/security/SecurityHeaders.js');
     const threatModule = await import('./src/security/ThreatDetector.js');
@@ -47,11 +51,8 @@ try {
     ThreatDetector = threatModule.default;
     SecurityMonitor = monitorModule.default;
 } catch (error) {
-    // Fallback to CommonJS
-    CSPConfig = require('./src/security/CSPConfig.js');
-    SecurityHeaders = require('./src/security/SecurityHeaders.js');
-    ThreatDetector = require('./src/security/ThreatDetector.js');
-    SecurityMonitor = require('./src/security/SecurityMonitor.js');
+    console.error('Failed to import security modules:', error);
+    throw new Error(`Security module import failed: ${error.message}`);
 }
 
 class AdvancedSecurityTestSuite {

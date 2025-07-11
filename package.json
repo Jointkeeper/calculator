@@ -2,11 +2,16 @@
   "name": "steamphony-calculator-universal",
   "version": "1.0.0",
   "description": "Universal business savings calculator",
+  "type": "module",
   "main": "src/main.js",
   "scripts": {
     "dev": "live-server public --port=3000",
     "build": "npm run css:build",
-    "css:build": "tailwindcss -o public/styles.css --watch"
+    "css:build": "tailwindcss -o public/styles.css --watch",
+    "test": "node test_advanced_security.js && node test_performance_optimization.js && node test_gdpr_compliance.js",
+    "test:security": "node test_advanced_security.js",
+    "test:performance": "node test_performance_optimization.js",
+    "test:gdpr": "node test_gdpr_compliance.js"
   },
   "dependencies": {
     "jsdom": "^26.1.0",

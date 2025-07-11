@@ -566,9 +566,5 @@ class CacheManager {
     }
 }
 
-// Export for use in other modules
-if (typeof module !== 'undefined' && module.exports) {
-    module.exports = CacheManager;
-} else {
-    window.CacheManager = CacheManager;
-} 
+// Export for ES modules
+export default CacheManager; 

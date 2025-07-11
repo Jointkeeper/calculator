@@ -638,8 +638,5 @@ class SecurityMonitor {
 }
 
 // Export for use in other modules
-if (typeof module !== 'undefined' && module.exports) {
-    module.exports = SecurityMonitor;
-} else {
-    window.SecurityMonitor = SecurityMonitor;
-} 
+// Export for ES modules
+export default SecurityMonitor; 

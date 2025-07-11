@@ -538,8 +538,5 @@ class ThreatDetector {
 }
 
 // Export for use in other modules
-if (typeof module !== 'undefined' && module.exports) {
-    module.exports = ThreatDetector;
-} else {
-    window.ThreatDetector = ThreatDetector;
-} 
+// Export for ES modules
+export default ThreatDetector; 

@@ -650,9 +650,5 @@ class PerformanceMonitor {
     }
 }
 
-// Export for use in other modules
-if (typeof module !== 'undefined' && module.exports) {
-    module.exports = PerformanceMonitor;
-} else {
-    window.PerformanceMonitor = PerformanceMonitor;
-} 
+// Export for ES modules
+export default PerformanceMonitor; 

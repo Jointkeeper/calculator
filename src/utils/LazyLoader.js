@@ -349,9 +349,5 @@ class LazyLoader {
     }
 }
 
-// Export for use in other modules
-if (typeof module !== 'undefined' && module.exports) {
-    module.exports = LazyLoader;
-} else {
-    window.LazyLoader = LazyLoader;
-} 
+// Export for ES modules
+export default LazyLoader; 

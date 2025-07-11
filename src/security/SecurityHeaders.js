@@ -388,8 +388,5 @@ class SecurityHeaders {
 }
 
 // Export for use in other modules
-if (typeof module !== 'undefined' && module.exports) {
-    module.exports = SecurityHeaders;
-} else {
-    window.SecurityHeaders = SecurityHeaders;
-} 
+// Export for ES modules
+export default SecurityHeaders; 

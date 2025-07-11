@@ -243,9 +243,5 @@ class CSPConfig {
     }
 }
 
-// Export for use in other modules
-if (typeof module !== 'undefined' && module.exports) {
-    module.exports = CSPConfig;
-} else {
-    window.CSPConfig = CSPConfig;
-} 
+// Export for ES modules
+export default CSPConfig; 

@@ -3,7 +3,8 @@
  * Comprehensive testing for LazyLoader, CacheManager, and PerformanceMonitor
  */
 
-const { JSDOM } = require('jsdom');
+// Use ES6 imports for Node.js 22+ compatibility
+const { JSDOM } = await import('jsdom');
 
 // Create a DOM environment for testing
 const dom = new JSDOM(`
@@ -149,13 +150,22 @@ const dom = new JSDOM(`
 
 global.window = dom.window;
 global.document = dom.window.document;
-global.navigator = dom.window.navigator;
+// navigator is read-only in Node.js, so we need to mock it differently
+Object.defineProperty(global, 'navigator', {
+    value: dom.window.navigator,
+    writable: false,
+    configurable: true
+});
 global.location = dom.window.location;
 
-// Import the modules to test
-const LazyLoader = require('./src/utils/LazyLoader.js');
-const CacheManager = require('./src/utils/CacheManager.js');
-const PerformanceMonitor = require('./src/utils/PerformanceMonitor.js');
+// Import the modules to test using ES6 imports
+const LazyLoaderModule = await import('./src/utils/LazyLoader.js');
+const CacheManagerModule = await import('./src/utils/CacheManager.js');
+const PerformanceMonitorModule = await import('./src/utils/PerformanceMonitor.js');
+
+const LazyLoader = LazyLoaderModule.default;
+const CacheManager = CacheManagerModule.default;
+const PerformanceMonitor = PerformanceMonitorModule.default;
 
 console.log('🧪 Starting Performance Optimization Test Suite...\n');
 
