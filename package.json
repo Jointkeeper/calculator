@@ -1,0 +1,26 @@
+{
+  "name": "steamphony-calculator-universal",
+  "version": "1.0.0",
+  "description": "Universal business savings calculator",
+  "main": "src/main.js",
+  "scripts": {
+    "dev": "live-server public --port=3000",
+    "build": "npm run css:build",
+    "css:build": "tailwindcss -o public/styles.css --watch"
+  },
+  "dependencies": {
+    "tailwindcss": "^3.3.0"
+  },
+  "devDependencies": {
+    "live-server": "^1.2.2"
+  },
+  "keywords": [
+    "calculator",
+    "business",
+    "marketing",
+    "roi",
+    "steamphony"
+  ],
+  "author": "Steamphony Digital Agency",
+  "license": "MIT"
+}

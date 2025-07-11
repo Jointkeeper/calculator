@@ -1,0 +1,359 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Универсальный калькулятор экономии для бизнеса. Рассчитайте потенциальную экономию от работы с Steamphony Digital Agency">
+    <meta name="keywords" content="калькулятор экономии, маркетинг ROI, оптимизация бюджета, digital агентство">
+    <meta name="author" content="Steamphony Digital Agency">
+    
+    <!-- Open Graph / Facebook -->
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="https://calculator.steamphony.com/">
+    <meta property="og:title" content="Калькулятор экономии | Steamphony">
+    <meta property="og:description" content="Рассчитайте потенциальную экономию от оптимизации маркетинга">
+    <meta property="og:image" content="/assets/og-image.jpg">
+    
+    <!-- Twitter -->
+    <meta property="twitter:card" content="summary_large_image">
+    <meta property="twitter:url" content="https://calculator.steamphony.com/">
+    <meta property="twitter:title" content="Калькулятор экономии | Steamphony">
+    <meta property="twitter:description" content="Рассчитайте потенциальную экономию от оптимизации маркетинга">
+    <meta property="twitter:image" content="/assets/twitter-image.jpg">
+    
+    <title>Калькулятор экономии маркетингового бюджета | Steamphony Digital Agency</title>
+    
+    <!-- Preload critical resources -->
+    <link rel="preload" href="styles.css" as="style">
+    <link rel="preload" href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" as="style">
+    
+    <!-- Favicon -->
+    <link rel="icon" href="/favicon.ico" type="image/x-icon">
+    <link rel="apple-touch-icon" sizes="180x180" href="/assets/apple-touch-icon.png">
+    
+    <!-- Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    
+    <!-- Styles -->
+    <link href="styles.css" rel="stylesheet">
+    
+    <!-- Structured data -->
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "WebApplication",
+      "name": "Калькулятор экономии маркетингового бюджета",
+      "description": "Рассчитайте потенциальную экономию от оптимизации маркетинга",
+      "provider": {
+        "@type": "Organization",
+        "name": "Steamphony Digital Agency"
+      },
+      "applicationCategory": "BusinessApplication"
+    }
+    </script>
+</head>
+
+<body class="antialiased bg-gray-50 text-gray-900">
+    <!-- Skip navigation link for accessibility -->
+    <a href="#main-content" class="sr-only focus:not-sr-only focus:absolute focus:top-4 focus:left-4 bg-steamphony-blue text-white px-4 py-2 rounded-md z-50">
+        Перейти к основному содержанию
+    </a>
+
+    <div id="app" class="min-h-screen flex flex-col">
+        <!-- Header -->
+        <header role="banner" class="bg-white shadow-sm border-b border-gray-200">
+            <div class="max-w-4xl mx-auto px-4 py-4">
+                <div class="flex items-center justify-between">
+                    <!-- Logo -->
+                    <div class="flex items-center space-x-3">
+                        <div class="w-10 h-10 bg-steamphony-blue rounded-lg flex items-center justify-center">
+                            <svg class="w-6 h-6 text-white" fill="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+                                <path d="M12 2L2 7v10c0 5.55 3.84 9.74 9 9.74s9-4.19 9-9.74V7L12 2z"/>
+                            </svg>
+                        </div>
+                        <div>
+                            <h1 class="text-xl font-bold text-gray-900">Steamphony</h1>
+                            <p class="text-sm text-gray-600">Digital Agency</p>
+                        </div>
+                    </div>
+                    
+                    <!-- Contact info -->
+                    <div class="hidden md:flex items-center space-x-6 text-sm text-gray-600">
+                        <a href="tel:+78001234567" class="hover:text-steamphony-blue transition-colors">
+                            +7 (800) 123-45-67
+                        </a>
+                        <a href="mailto:hello@steamphony.com" class="hover:text-steamphony-blue transition-colors">
+                            hello@steamphony.com
+                        </a>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Progress bar container -->
+            <div id="progress-container" class="bg-gray-100 border-t border-gray-200">
+                <div class="max-w-4xl mx-auto px-4 py-3">
+                    <div id="progress-bar" role="progressbar" aria-valuemin="0" aria-valuemax="100" aria-valuenow="16" aria-label="Прогресс заполнения калькулятора">
+                        <!-- Progress bar will be populated by JavaScript -->
+                        <div class="flex items-center justify-between text-sm text-gray-600 mb-2">
+                            <span>Шаг 1 из 6</span>
+                            <span>16% завершено</span>
+                        </div>
+                        <div class="w-full bg-gray-200 rounded-full h-2">
+                            <div class="bg-steamphony-blue h-2 rounded-full transition-all duration-500" style="width: 16%"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </header>
+
+        <!-- Main content -->
+        <main id="main-content" role="main" class="flex-1">
+            <!-- Hero section -->
+            <section class="bg-gradient-to-br from-steamphony-blue to-indigo-700 text-white py-12 md:py-16">
+                <div class="max-w-4xl mx-auto px-4 text-center">
+                    <h2 class="text-3xl md:text-4xl lg:text-5xl font-bold mb-4">
+                        Калькулятор экономии маркетингового бюджета
+                    </h2>
+                    <p class="text-xl md:text-2xl text-blue-100 mb-6">
+                        Узнайте, сколько вы сможете сэкономить с нашей помощью
+                    </p>
+                    <div class="flex flex-wrap justify-center gap-4 text-sm">
+                        <div class="flex items-center space-x-2">
+                            <svg class="w-5 h-5 text-green-400" fill="currentColor" viewBox="0 0 20 20" aria-hidden="true">
+                                <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/>
+                            </svg>
+                            <span>Бесплатный расчет</span>
+                        </div>
+                        <div class="flex items-center space-x-2">
+                            <svg class="w-5 h-5 text-green-400" fill="currentColor" viewBox="0 0 20 20" aria-hidden="true">
+                                <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/>
+                            </svg>
+                            <span>За 5 минут</span>
+                        </div>
+                        <div class="flex items-center space-x-2">
+                            <svg class="w-5 h-5 text-green-400" fill="currentColor" viewBox="0 0 20 20" aria-hidden="true">
+                                <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/>
+                            </svg>
+                            <span>Персональные рекомендации</span>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Calculator container -->
+            <section class="py-8 md:py-12">
+                <div class="max-w-4xl mx-auto px-4">
+                    <!-- Calculator form container - populated by JavaScript -->
+                    <div id="calculator-container" class="bg-white rounded-xl shadow-lg border border-gray-200 p-6 md:p-8">
+                        <!-- Loading state -->
+                        <div id="loading-state" class="text-center py-12">
+                            <div class="loading-spinner mx-auto mb-4"></div>
+                            <p class="text-gray-600">Загружаем калькулятор...</p>
+                        </div>
+                        
+                        <!-- Error state -->
+                        <div id="error-state" class="hidden text-center py-12">
+                            <div class="text-red-500 mb-4">
+                                <svg class="w-12 h-12 mx-auto" fill="currentColor" viewBox="0 0 20 20" aria-hidden="true">
+                                    <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z" clip-rule="evenodd"/>
+                                </svg>
+                            </div>
+                            <h3 class="text-lg font-semibold text-gray-900 mb-2">Ошибка загрузки</h3>
+                            <p class="text-gray-600 mb-4">Попробуйте обновить страницу</p>
+                            <button onclick="location.reload()" class="btn btn-primary">
+                                Обновить страницу
+                            </button>
+                        </div>
+                        
+                        <!-- Calculator content will be inserted here by JavaScript -->
+                        <div id="calculator-content" class="hidden">
+                            <!-- Form content container -->
+                            <div id="form-content">
+                                <!-- Dynamic form steps will be inserted here -->
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Trust signals -->
+            <section class="bg-gray-100 py-12" aria-labelledby="trust-heading">
+                <div class="max-w-4xl mx-auto px-4">
+                    <h2 id="trust-heading" class="text-2xl font-bold text-center text-gray-900 mb-8">
+                        Нам доверяют
+                    </h2>
+                    <div class="grid grid-cols-2 md:grid-cols-4 gap-8 items-center">
+                        <!-- Client logos placeholders -->
+                        <div class="bg-white p-4 rounded-lg shadow-sm flex items-center justify-center h-16">
+                            <span class="text-gray-400">Client 1</span>
+                        </div>
+                        <div class="bg-white p-4 rounded-lg shadow-sm flex items-center justify-center h-16">
+                            <span class="text-gray-400">Client 2</span>
+                        </div>
+                        <div class="bg-white p-4 rounded-lg shadow-sm flex items-center justify-center h-16">
+                            <span class="text-gray-400">Client 3</span>
+                        </div>
+                        <div class="bg-white p-4 rounded-lg shadow-sm flex items-center justify-center h-16">
+                            <span class="text-gray-400">Client 4</span>
+                        </div>
+                    </div>
+                    
+                    <!-- Statistics -->
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mt-12">
+                        <div class="text-center">
+                            <div class="text-3xl font-bold text-steamphony-blue mb-2">150+</div>
+                            <div class="text-gray-600">Успешных проектов</div>
+                        </div>
+                        <div class="text-center">
+                            <div class="text-3xl font-bold text-steamphony-blue mb-2">35%</div>
+                            <div class="text-gray-600">Средняя экономия бюджета</div>
+                        </div>
+                        <div class="text-center">
+                            <div class="text-3xl font-bold text-steamphony-blue mb-2">4.8</div>
+                            <div class="text-gray-600">Средний ROI наших клиентов</div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+        </main>
+
+        <!-- Footer -->
+        <footer role="contentinfo" class="bg-gray-900 text-white py-8 md:py-12">
+            <div class="max-w-4xl mx-auto px-4">
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+                    <!-- Company info -->
+                    <div>
+                        <h3 class="text-lg font-semibold mb-4">Steamphony Digital Agency</h3>
+                        <p class="text-gray-400 text-sm mb-4">
+                            Помогаем бизнесу расти с помощью эффективного digital-маркетинга и оптимизации бюджетов.
+                        </p>
+                        <div class="flex space-x-4">
+                            <!-- Social links -->
+                            <a href="#" class="text-gray-400 hover:text-white transition-colors" aria-label="Telegram">
+                                <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+                                    <path d="M12 0C5.374 0 0 5.374 0 12s5.374 12 12 12 12-5.374 12-12S18.626 0 12 0zm5.568 8.16l-1.58 7.44c-.12.54-.44.67-.89.42l-2.46-1.81-1.18 1.14c-.13.13-.24.24-.49.24l.17-2.44 4.47-4.03c.19-.17-.04-.27-.3-.1l-5.52 3.47-2.38-.74c-.52-.16-.53-.52.11-.77l9.3-3.58c.43-.16.81.1.67.64z"/>
+                                </svg>
+                            </a>
+                            <a href="#" class="text-gray-400 hover:text-white transition-colors" aria-label="WhatsApp">
+                                <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+                                    <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893A11.821 11.821 0 0020.885 3.488"/>
+                                </svg>
+                            </a>
+                        </div>
+                    </div>
+                    
+                    <!-- Contact info -->
+                    <div>
+                        <h3 class="text-lg font-semibold mb-4">Контакты</h3>
+                        <div class="space-y-2 text-sm text-gray-400">
+                            <div>
+                                <span class="font-medium">Телефон:</span>
+                                <a href="tel:+78001234567" class="hover:text-white transition-colors">
+                                    +7 (800) 123-45-67
+                                </a>
+                            </div>
+                            <div>
+                                <span class="font-medium">Email:</span>
+                                <a href="mailto:hello@steamphony.com" class="hover:text-white transition-colors">
+                                    hello@steamphony.com
+                                </a>
+                            </div>
+                            <div>
+                                <span class="font-medium">Время работы:</span>
+                                <span>Пн-Пт 9:00-18:00 МСК</span>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Services -->
+                    <div>
+                        <h3 class="text-lg font-semibold mb-4">Услуги</h3>
+                        <ul class="space-y-2 text-sm text-gray-400">
+                            <li><a href="#" class="hover:text-white transition-colors">Аудит маркетинга</a></li>
+                            <li><a href="#" class="hover:text-white transition-colors">Контекстная реклама</a></li>
+                            <li><a href="#" class="hover:text-white transition-colors">SEO продвижение</a></li>
+                            <li><a href="#" class="hover:text-white transition-colors">Социальные сети</a></li>
+                            <li><a href="#" class="hover:text-white transition-colors">Веб-аналитика</a></li>
+                        </ul>
+                    </div>
+                </div>
+                
+                <!-- Copyright -->
+                <div class="border-t border-gray-800 mt-8 pt-6 text-center text-sm text-gray-400">
+                    <p>&copy; 2024 Steamphony Digital Agency. Все права защищены.</p>
+                    <div class="flex justify-center space-x-6 mt-2">
+                        <a href="#" class="hover:text-white transition-colors">Политика конфиденциальности</a>
+                        <a href="#" class="hover:text-white transition-colors">Пользовательское соглашение</a>
+                    </div>
+                </div>
+            </div>
+        </footer>
+    </div>
+
+    <!-- Analytics placeholder -->
+    <script>
+        // Analytics initialization will be added by JavaScript modules
+        console.log('📊 Analytics placeholder - will be initialized by main.js');
+    </script>
+    
+    <!-- Analytics Configuration -->
+    <script>
+        window.STEAMPHONY_CONFIG = {
+            analytics: {
+                measurementId: 'G-PLACEHOLDER',
+                debugMode: true,
+                consentRequired: true,
+                autoInitialize: false,
+                trackingOptOut: false,
+                anonymizeIP: true,
+                dataRetention: 14
+            },
+            cookieBanner: {
+                autoShow: true,
+                position: 'bottom',
+                theme: 'light',
+                respectDNT: true,
+                language: 'ru',
+                cookieExpiry: 365,
+                privacyPolicyUrl: '/privacy',
+                contactEmail: 'privacy@steamphony.com',
+                companyName: 'Steamphony Digital Agency'
+            }
+        };
+    </script>
+
+    <!-- Component Scripts (Non-Module) -->
+    <script src="src/components/ProgressBar.js"></script>
+    <script src="src/components/IndustrySelector.js"></script>
+    <script src="src/components/BusinessSizeStep.js"></script>
+    <script src="src/components/MarketingBudgetStep.js"></script>
+    <script src="src/components/MarketingToolsStep.js"></script>
+    <script src="src/components/MarketingTeamStep.js"></script>
+    <script src="src/components/ContactFormStep.js"></script>
+    <script src="src/components/Calculator.js"></script>
+    
+    <!-- Module imports for global access -->
+    <script type="module">
+        try {
+            const { default: Analytics } = await import('./src/services/Analytics.js');
+            const { default: CookieBanner } = await import('./src/components/CookieBanner.js');
+            
+            // Global access for debugging and testing
+            window.SteamphonyAnalytics = Analytics;
+            window.SteamphonyCookieBanner = CookieBanner;
+            
+            console.log('✅ Analytics and CookieBanner classes loaded globally');
+        } catch (error) {
+            console.warn('⚠️ Failed to load Analytics/CookieBanner globally:', error);
+        }
+    </script>
+    
+    <!-- Application entry point -->
+    <script type="module" src="src/main.js"></script>
+    <!-- Marketing Tools Step -->
+    <div id="marketing-tools-step" class="step-container" style="display: none;">
+      <!-- MarketingToolsStep.js will render content here -->
+    </div>
+
+  </body>
+</html> 
