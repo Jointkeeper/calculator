@@ -3,7 +3,7 @@
  * Универсальный калькулятор экономии маркетингового бюджета
  * 
  * @author Steamphony Digital Agency
- * @version 1.0.0
+ * @version 3.0.0 - Modular architecture with managers
  */
 
 // Импорт основных компонентов
@@ -16,58 +16,24 @@ import CookieBanner from './components/CookieBanner.js';
 // Импорт Security Layer
 import { SecurityLayer } from './security/index.js';
 
-// Импорт Advanced Security Features
-import CSPConfig from './security/CSPConfig.js';
-import SecurityHeaders from './security/SecurityHeaders.js';
-import ThreatDetector from './security/ThreatDetector.js';
-import SecurityMonitor from './security/SecurityMonitor.js';
-
-// Импорт Performance Optimization Features
-import { LazyLoader } from './utils/LazyLoader.js';
-import { CacheManager } from './utils/CacheManager.js';
-import { PerformanceMonitor } from './utils/PerformanceMonitor.js';
+// Импорт новых модулей
+import { AppState } from './core/AppState.js';
+import { NavigationManager } from './managers/NavigationManager.js';
 
 /**
  * Главный класс приложения
- * Управляет инициализацией и связыванием всех компонентов
+ * Координирует работу всех модулей и менеджеров
  */
 class App {
   constructor() {
-    // Основные компоненты
-    this.progressBar = null;
-    this.industrySelector = null;
-    this.businessSizeStep = null;
-    this.marketingBudgetStep = null;
-    this.calculator = null;
+    // Инициализация состояния приложения
+    this.appState = new AppState();
     
-    // Данные формы
-    this.formData = {
-      industry: null,
-      businessSize: null,
-      marketingBudget: null,
-      marketingTools: null,
-      hasMarketer: null,
-      tools: []
-    };
-    
-    // Состояние приложения
-    this.currentStep = 1;
-    this.totalSteps = 6;
-    this.isInitialized = false;
+    // Инициализация менеджеров
+    this.navigationManager = new NavigationManager(this.appState);
     
     // Security layer
     this.securityLayer = SecurityLayer;
-    
-    // Advanced Security Features
-    this.cspConfig = null;
-    this.securityHeaders = null;
-    this.threatDetector = null;
-    this.securityMonitor = null;
-    
-    // Performance Optimization Features
-    this.lazyLoader = null;
-    this.cacheManager = null;
-    this.performanceMonitor = null;
     
     // Инициализация
     this.init();
@@ -102,10 +68,8 @@ class App {
     try {
       console.log('🚀 Инициализация приложения...');
       
-      // Инициализация Advanced Security Features
+      // Инициализация компонентов (оставляем существующую логику)
       await this.initializeAdvancedSecurity();
-      
-      // Инициализация Performance Optimization Features
       await this.initializePerformanceOptimization();
       
       // Скрыть экран загрузки
@@ -114,32 +78,20 @@ class App {
       // Показать контент калькулятора
       this.showCalculatorContent();
       
-      // Инициализация ProgressBar
+      // Инициализация компонентов
       await this.initializeProgressBar();
-      
-      // Инициализация IndustrySelector
       await this.initializeIndustrySelector();
-      
-      // Инициализация BusinessSizeStep
       await this.initializeBusinessSizeStep();
-      
-      // Инициализация MarketingBudgetStep
       await this.initializeMarketingBudgetStep();
-      
-      // Инициализация MarketingTeamStep
       await this.initializeMarketingTeamStep();
-      
-      // Инициализация ContactFormStep
       await this.initializeContactFormStep();
-      
-      // Инициализация Calculator
       await this.initializeCalculator();
       
       // Настройка связей между компонентами
       this.setupComponentConnections();
       
       // Маркировка как инициализированное
-      this.isInitialized = true;
+      this.appState.setInitialized(true);
       
       // Переподключение Analytics к компонентам после их инициализации
       this.connectAnalyticsEvents();
@@ -152,26 +104,7 @@ class App {
       console.log('✅ Приложение успешно инициализировано');
       
       // Dispatch события готовности
-      this.dispatchEvent('appReady', {
-        components: {
-          progressBar: !!this.progressBar,
-          industrySelector: !!this.industrySelector,
-          calculator: !!this.calculator,
-          analytics: !!this.analytics,
-          cookieBanner: !!this.cookieBanner,
-          security: {
-            csp: !!this.cspConfig,
-            headers: !!this.securityHeaders,
-            threatDetector: !!this.threatDetector,
-            securityMonitor: !!this.securityMonitor
-          },
-          performance: {
-            lazyLoader: !!this.lazyLoader,
-            cacheManager: !!this.cacheManager,
-            performanceMonitor: !!this.performanceMonitor
-          }
-        }
-      });
+      this.dispatchEvent('appReady', this.appState.getAppState());
       
     } catch (error) {
       console.error('App: Ошибка инициализации компонентов:', error);
@@ -950,23 +883,23 @@ class App {
    * @public
    */
   nextStep() {
-    if (this.currentStep < this.totalSteps) {
-      this.currentStep++;
-      this.updateStep(this.currentStep);
-      
-      // Analytics tracking
-      if (this.analytics && this.currentStep > 0) {
-        try {
-          this.analytics.trackCalculatorStep(this.currentStep, {
-            direction: 'forward',
-            timestamp: Date.now(),
-            previous_step: this.currentStep - 1
-          });
-        } catch (error) {
-          console.warn('⚠️ Ошибка отслеживания перехода к следующему шагу:', error);
-        }
+    const success = this.navigationManager.nextStep();
+    
+    // Analytics tracking
+    if (success && this.analytics) {
+      try {
+        const currentStep = this.appState.getCurrentStep();
+        this.analytics.trackCalculatorStep(currentStep, {
+          direction: 'forward',
+          timestamp: Date.now(),
+          previous_step: currentStep - 1
+        });
+      } catch (error) {
+        console.warn('⚠️ Ошибка отслеживания перехода к следующему шагу:', error);
       }
     }
+    
+    return success;
   }
 
   /**
@@ -974,23 +907,23 @@ class App {
    * @public
    */
   previousStep() {
-    if (this.currentStep > 1) {
-      this.currentStep--;
-      this.updateStep(this.currentStep);
-      
-      // Analytics tracking
-      if (this.analytics && this.currentStep >= 0) {
-        try {
-          this.analytics.trackCalculatorStep(this.currentStep, {
-            direction: 'backward',
-            timestamp: Date.now(),
-            previous_step: this.currentStep + 1
-          });
-        } catch (error) {
-          console.warn('⚠️ Ошибка отслеживания перехода к предыдущему шагу:', error);
-        }
+    const success = this.navigationManager.previousStep();
+    
+    // Analytics tracking
+    if (success && this.analytics) {
+      try {
+        const currentStep = this.appState.getCurrentStep();
+        this.analytics.trackCalculatorStep(currentStep, {
+          direction: 'backward',
+          timestamp: Date.now(),
+          previous_step: currentStep + 1
+        });
+      } catch (error) {
+        console.warn('⚠️ Ошибка отслеживания перехода к предыдущему шагу:', error);
       }
     }
+    
+    return success;
   }
 
   /**
@@ -1211,7 +1144,7 @@ class App {
    * @returns {Object} Данные формы
    */
   getFormData() {
-    return { ...this.formData };
+    return this.appState.getFormData();
   }
 
   /**
@@ -1220,20 +1153,8 @@ class App {
    * @returns {Object} Состояние приложения
    */
   getAppState() {
-    return {
-      isInitialized: this.isInitialized,
-      currentStep: this.currentStep,
-      totalSteps: this.totalSteps,
-      formData: this.getFormData(),
-      components: {
-        progressBar: !!this.progressBar,
-        industrySelector: !!this.industrySelector,
-        businessSizeStep: !!this.businessSizeStep,
-        marketingBudgetStep: !!this.marketingBudgetStep,
-        calculator: !!this.calculator,
-        analytics: !!this.analytics,
-        cookieBanner: !!this.cookieBanner
-      },
+    return this.appState.getAppState();
+  }
       analytics: this.analytics ? {
         hasConsent: this.analytics.hasConsent,
         isGA4Loaded: this.analytics.isGA4Loaded,
