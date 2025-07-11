@@ -19,6 +19,9 @@ import { SecurityLayer } from './security/index.js';
 // Импорт новых модулей
 import { AppState } from './core/AppState.js';
 import { NavigationManager } from './managers/NavigationManager.js';
+import { calculator } from './core/Calculator.js';
+import { eventHandlers } from './handlers/EventHandlers.js';
+import { uiManager } from './components/UIManager.js';
 
 /**
  * Главный класс приложения
@@ -27,10 +30,15 @@ import { NavigationManager } from './managers/NavigationManager.js';
 class App {
   constructor() {
     // Инициализация состояния приложения
-    this.appState = new AppState();
+    this.appState = AppState.getInstance();
     
     // Инициализация менеджеров
-    this.navigationManager = new NavigationManager(this.appState);
+    this.navigationManager = NavigationManager.getInstance();
+    
+    // Инициализация калькулятора и обработчиков событий
+    this.calculator = calculator;
+    this.eventHandlers = eventHandlers;
+    this.uiManager = uiManager;
     
     // Security layer
     this.securityLayer = SecurityLayer;
@@ -78,17 +86,11 @@ class App {
       // Показать контент калькулятора
       this.showCalculatorContent();
       
-      // Инициализация компонентов
-      await this.initializeProgressBar();
-      await this.initializeIndustrySelector();
-      await this.initializeBusinessSizeStep();
-      await this.initializeMarketingBudgetStep();
-      await this.initializeMarketingTeamStep();
-      await this.initializeContactFormStep();
-      await this.initializeCalculator();
+      // Инициализация UI менеджера
+      await this.uiManager.initialize();
       
-      // Настройка связей между компонентами
-      this.setupComponentConnections();
+      // Инициализация калькулятора
+      await this.initializeCalculator();
       
       // Маркировка как инициализированное
       this.appState.setInitialized(true);
@@ -451,141 +453,9 @@ class App {
     }
   }
 
-  /**
-   * Инициализация ProgressBar
-   * @private
-   */
-  async initializeProgressBar() {
-    try {
-      const progressContainer = document.getElementById('progress-container');
-      
-      if (!progressContainer) {
-        throw new Error('Не найден контейнер #progress-container для ProgressBar');
-      }
-      
-      // ProgressBar доступен через window (не ES6 модуль)
-      if (typeof window.ProgressBar === 'undefined') {
-        throw new Error('ProgressBar класс не найден в window');
-      }
-      
-      this.progressBar = new window.ProgressBar(progressContainer, this.totalSteps, {
-        allowClickNavigation: true,
-        showPercentage: true,
-        enableKeyboardNavigation: true,
-        trackAnalytics: true
-      });
-      
-      console.log('✅ ProgressBar инициализирован');
-      
-    } catch (error) {
-      console.error('Ошибка инициализации ProgressBar:', error);
-      throw error;
-    }
-  }
 
-  /**
-   * Инициализация IndustrySelector
-   * @private
-   */
-  async initializeIndustrySelector() {
-    try {
-      const formContent = document.getElementById('form-content');
-      
-      if (!formContent) {
-        // Создаем form-content если его нет
-        const calculatorContent = document.getElementById('calculator-content');
-        if (calculatorContent) {
-          calculatorContent.innerHTML = '<div id="form-content"></div>';
-        } else {
-          throw new Error('Не найден контейнер для размещения формы');
-        }
-      }
-      
-      const formContainer = document.getElementById('form-content');
-      
-      // IndustrySelector доступен через window (не ES6 модуль)
-      if (typeof window.IndustrySelector === 'undefined') {
-        throw new Error('IndustrySelector класс не найден в window');
-      }
-      
-      this.industrySelector = new window.IndustrySelector(formContainer, {
-        onSelect: (industry) => this.handleIndustrySelect(industry),
-        onNext: (selectionData) => this.handleIndustryNext(selectionData),
-        showPopularSection: true,
-        enableSearch: true
-      });
-      
-      console.log('✅ IndustrySelector инициализирован');
-      
-    } catch (error) {
-      console.error('Ошибка инициализации IndustrySelector:', error);
-      throw error;
-    }
-  }
 
-  /**
-   * Инициализация BusinessSizeStep
-   * @private
-   */
-  async initializeBusinessSizeStep() {
-    try {
-      const formContent = document.getElementById('form-content');
-      
-      if (!formContent) {
-        throw new Error('Не найден контейнер #form-content для BusinessSizeStep');
-      }
-      
-      // BusinessSizeStep доступен через window (не ES6 модуль)
-      if (typeof window.BusinessSizeStep === 'undefined') {
-        throw new Error('BusinessSizeStep класс не найден в window');
-      }
-      
-      this.businessSizeStep = new window.BusinessSizeStep(formContent, {
-        onSelect: (size) => this.handleBusinessSizeSelect(size),
-        onNext: (data) => this.handleBusinessSizeNext(data),
-        onBack: (data) => this.handleBusinessSizeBack(data),
-        trackAnalytics: true
-      });
-      
-      console.log('✅ BusinessSizeStep инициализирован');
-      
-    } catch (error) {
-      console.error('Ошибка инициализации BusinessSizeStep:', error);
-      throw error;
-    }
-  }
 
-  /**
-   * Инициализация MarketingBudgetStep
-   * @private
-   */
-  async initializeMarketingBudgetStep() {
-    try {
-      const formContent = document.getElementById('form-content');
-      
-      if (!formContent) {
-        throw new Error('Не найден контейнер #form-content для MarketingBudgetStep');
-      }
-      
-      // MarketingBudgetStep доступен через window (не ES6 модуль)
-      if (typeof window.MarketingBudgetStep === 'undefined') {
-        throw new Error('MarketingBudgetStep класс не найден в window');
-      }
-      
-      this.marketingBudgetStep = new window.MarketingBudgetStep(formContent, {
-        onSelect: (budget) => this.handleMarketingBudgetSelect(budget),
-        onNext: (data) => this.handleMarketingBudgetNext(data),
-        onBack: (data) => this.handleMarketingBudgetBack(data),
-        trackAnalytics: true
-      });
-      
-      console.log('✅ MarketingBudgetStep инициализирован');
-      
-    } catch (error) {
-      console.error('Ошибка инициализации MarketingBudgetStep:', error);
-      throw error;
-    }
-  }
 
   /**
    * Инициализация Calculator
@@ -607,51 +477,7 @@ class App {
     }
   }
 
-  /**
-   * Настройка связей между компонентами
-   * @private
-   */
-  setupComponentConnections() {
-    try {
-      // Слушатели событий ProgressBar
-      if (this.progressBar) {
-        const progressContainer = document.getElementById('progress-container');
-        
-        progressContainer.addEventListener('stepClicked', (event) => {
-          this.handleStepNavigation(event.detail.step);
-        });
-      }
-      
-      // Слушатели событий IndustrySelector
-      if (this.industrySelector) {
-        const formContainer = document.getElementById('form-content');
-        
-        formContainer.addEventListener('industryConfirmed', (event) => {
-          this.handleIndustryConfirmed(event.detail);
-        });
-        
-        formContainer.addEventListener('industrySelected', (event) => {
-          this.handleIndustrySelected(event.detail);
-        });
-      }
-      
-      // Слушатели событий Calculator
-      if (this.calculator) {
-        this.calculator.addEventListener('calculationComplete', (event) => {
-          this.handleCalculationComplete(event.detail);
-        });
-        
-        this.calculator.addEventListener('calculationError', (event) => {
-          this.handleCalculationError(event.detail);
-        });
-      }
-      
-      console.log('✅ Связи между компонентами настроены');
-      
-    } catch (error) {
-      console.error('Ошибка настройки связей:', error);
-    }
-  }
+
 
   /**
    * Обработка выбора отрасли
@@ -2096,6 +1922,11 @@ class App {
 
 // Запуск приложения
 const app = new App();
+
+// Глобальные функции для совместимости
+window.calculator = calculator;
+window.calculateSavings = (data) => calculator.calculateSavings(data);
+window.validateData = (data) => calculator.validateData(data);
 
 // Экспорт для тестирования
 export default App; 
