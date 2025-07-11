@@ -4,28 +4,13 @@
  * 
  * @class CookieBanner
  * @author Steamphony Digital Agency
- * @version 2.0.0 - Modular architecture
+ * @version 3.0.0 - Modular architecture
  */
 
 import { getStyles, applyStyles, addHoverEffects } from './CookieBanner/styles.js';
 import { getTexts } from './CookieBanner/texts.js';
-
-/**
- * Конфигурация по умолчанию
- */
-const DEFAULT_CONFIG = {
-  position: 'bottom',
-  theme: 'light',
-  language: 'ru',
-  showOnLoad: true,
-  autoShow: true,
-  respectDNT: true,
-  cookieExpiry: 365,
-  storageKey: 'steamphony_cookie_preferences',
-  privacyPolicyUrl: 'https://steamphony.com/privacy-policy',
-  contactEmail: 'privacy@steamphony.com',
-  companyName: 'Steamphony Digital Agency'
-};
+import { DEFAULT_CONFIG, validateConfig, isBrowserSupported, isDNTEnabled, loadPreferences, savePreferences } from './CookieBanner/CookieBannerConfig.js';
+import { CookieBannerHandlers } from './CookieBanner/CookieBannerHandlers.js';
 
 /**
  * GDPR-Compliant Cookie Banner
@@ -37,7 +22,7 @@ class CookieBanner {
     }
 
     this.analytics = analyticsService;
-    this.config = this.validateConfig({ ...DEFAULT_CONFIG, ...config });
+    this.config = validateConfig({ ...DEFAULT_CONFIG, ...config });
     this.texts = getTexts(this.config.language);
     
     this.isVisible = false;
@@ -46,38 +31,19 @@ class CookieBanner {
     this.modalElement = null;
     this.preferences = null;
     
+    this.handlers = new CookieBannerHandlers(this);
+    
     this.boundHandlers = {
-      handleAcceptAll: this.handleAcceptAll.bind(this),
-      handleDeclineOptional: this.handleDeclineOptional.bind(this),
-      handleCustomizeSettings: this.handleCustomizeSettings.bind(this),
-      handleModalClose: this.handleModalClose.bind(this),
-      handleSaveSettings: this.handleSaveSettings.bind(this),
-      handleKeydown: this.handleKeydown.bind(this),
-      handleResize: this.handleResize.bind(this)
+      handleAcceptAll: this.handlers.handleAcceptAll.bind(this.handlers),
+      handleDeclineOptional: this.handlers.handleDeclineOptional.bind(this.handlers),
+      handleCustomizeSettings: this.handlers.handleCustomizeSettings.bind(this.handlers),
+      handleModalClose: this.handlers.handleModalClose.bind(this.handlers),
+      handleSaveSettings: this.handlers.handleSaveSettings.bind(this.handlers),
+      handleKeydown: this.handlers.handleKeydown.bind(this.handlers),
+      handleResize: this.handlers.handleResize.bind(this.handlers)
     };
     
     this.init();
-  }
-
-  /**
-   * Валидация конфигурации
-   */
-  validateConfig(config) {
-    const validated = { ...config };
-    
-    if (!['top', 'bottom'].includes(validated.position)) {
-      validated.position = 'bottom';
-    }
-    
-    if (!['light', 'dark', 'auto'].includes(validated.theme)) {
-      validated.theme = 'light';
-    }
-    
-    if (typeof validated.cookieExpiry !== 'number' || validated.cookieExpiry < 1) {
-      validated.cookieExpiry = 365;
-    }
-    
-    return validated;
   }
 
   /**
@@ -87,15 +53,15 @@ class CookieBanner {
     try {
       this.log('Инициализация CookieBanner...');
       
-      if (!this.isBrowserSupported()) {
+      if (!isBrowserSupported()) {
         throw new Error('Browser не поддерживает необходимые API');
       }
       
-      await this.loadPreferences();
+      this.preferences = loadPreferences(this.config.storageKey);
       
-      if (this.config.respectDNT && this.isDNTEnabled()) {
+      if (this.config.respectDNT && isDNTEnabled()) {
         this.log('Do Not Track обнаружен, отказываемся от отслеживания');
-        await this.handleDeclineOptional(false);
+        await this.handlers.handleDeclineOptional(false);
         return;
       }
       
@@ -113,55 +79,11 @@ class CookieBanner {
   }
 
   /**
-   * Проверка поддержки браузера
-   */
-  isBrowserSupported() {
-    return typeof window !== 'undefined' && 
-           typeof document !== 'undefined' && 
-           typeof localStorage !== 'undefined';
-  }
-
-  /**
-   * Проверка Do Not Track
-   */
-  isDNTEnabled() {
-    return navigator.doNotTrack === '1' || 
-           window.doNotTrack === '1' || 
-           document.cookie.includes('DNT=1');
-  }
-
-  /**
    * Настройка глобальных обработчиков
    */
   setupGlobalHandlers() {
     window.addEventListener('keydown', this.boundHandlers.handleKeydown);
     window.addEventListener('resize', this.boundHandlers.handleResize);
-  }
-
-  /**
-   * Загрузка сохраненных предпочтений
-   */
-  async loadPreferences() {
-    try {
-      const stored = localStorage.getItem(this.config.storageKey);
-      if (stored) {
-        this.preferences = JSON.parse(stored);
-        this.log('Загружены сохраненные предпочтения:', this.preferences);
-      } else {
-        this.preferences = {
-          essential: true,
-          analytics: false,
-          timestamp: null
-        };
-      }
-    } catch (error) {
-      this.log('Ошибка загрузки предпочтений, используем значения по умолчанию');
-      this.preferences = {
-        essential: true,
-        analytics: false,
-        timestamp: null
-      };
-    }
   }
 
   /**
@@ -209,6 +131,7 @@ class CookieBanner {
       setTimeout(() => {
         if (this.element && this.element.parentNode) {
           this.element.parentNode.removeChild(this.element);
+          this.element = null;
         }
         this.isVisible = false;
       }, 300);
@@ -225,76 +148,44 @@ class CookieBanner {
    * Рендеринг banner
    */
   render() {
-    const styles = getStyles(this.getCurrentTheme());
-    
-    this.element = document.createElement('div');
-    this.element.id = 'steamphony-cookie-banner';
-    this.element.className = 'steamphony-cookie-banner';
-    this.element.setAttribute('role', 'dialog');
-    this.element.setAttribute('aria-label', this.texts.bannerAriaLabel);
-    
-    this.element.innerHTML = `
-      <div class="container">
-        <div class="content">
-          <h3 class="title">${this.texts.title}</h3>
-          <p class="description">${this.texts.description}</p>
-        </div>
-        <div class="buttons">
-          <button type="button" class="btn btn-secondary" data-action="decline">
-            ${this.texts.essential}
-          </button>
-          <button type="button" class="btn btn-accent" data-action="customize">
-            ${this.texts.customize}
-          </button>
-          <button type="button" class="btn btn-primary" data-action="accept">
-            ${this.texts.acceptAll}
-          </button>
+    const styles = getStyles(this.config);
+    const bannerHTML = `
+      <div class="cookie-banner" style="${styles.banner}">
+        <div class="cookie-content" style="${styles.content}">
+          <div class="cookie-text" style="${styles.text}">
+            ${this.texts.message}
+          </div>
+          <div class="cookie-buttons" style="${styles.buttons}">
+            <button class="cookie-btn decline" style="${styles.declineBtn}">
+              ${this.texts.decline}
+            </button>
+            <button class="cookie-btn customize" style="${styles.customizeBtn}">
+              ${this.texts.customize}
+            </button>
+            <button class="cookie-btn accept" style="${styles.acceptBtn}">
+              ${this.texts.accept}
+            </button>
+          </div>
         </div>
       </div>
     `;
     
-    applyStyles(this.element, styles.banner);
-    this.applyChildStyles();
+    document.body.insertAdjacentHTML('beforeend', bannerHTML);
+    this.element = document.querySelector('.cookie-banner');
     
-    document.body.appendChild(this.element);
+    applyStyles(this.element, styles);
+    addHoverEffects(this.element);
   }
 
   /**
    * Применение стилей к дочерним элементам
    */
   applyChildStyles() {
-    const styles = getStyles(this.getCurrentTheme());
+    if (!this.element) return;
     
-    const container = this.element.querySelector('.container');
-    const content = this.element.querySelector('.content');
-    const title = this.element.querySelector('.title');
-    const description = this.element.querySelector('.description');
-    const buttons = this.element.querySelector('.buttons');
-    
-    applyStyles(container, styles.container);
-    applyStyles(content, styles.content);
-    applyStyles(title, styles.title);
-    applyStyles(description, styles.description);
-    applyStyles(buttons, styles.buttons);
-    
-    // Стили для кнопок
-    const btnElements = this.element.querySelectorAll('.btn');
-    btnElements.forEach((btn, index) => {
-      applyStyles(btn, styles.button);
-      
-      if (btn.classList.contains('btn-primary')) {
-        applyStyles(btn, styles.buttonPrimary);
-        btn.classList.add('primary');
-      } else if (btn.classList.contains('btn-secondary')) {
-        applyStyles(btn, styles.buttonSecondary);
-        btn.classList.add('secondary');
-      } else if (btn.classList.contains('btn-accent')) {
-        applyStyles(btn, styles.buttonAccent);
-        btn.classList.add('accent');
-      }
-      
-      addHoverEffects(btn);
-    });
+    const theme = this.getCurrentTheme();
+    const styles = getStyles({ ...this.config, theme });
+    applyStyles(this.element, styles);
   }
 
   /**
@@ -308,76 +199,14 @@ class CookieBanner {
   }
 
   /**
-   * Прикрепление обработчиков событий
+   * Привязка обработчиков событий
    */
   attachEventListeners() {
-    const acceptBtn = this.element.querySelector('[data-action="accept"]');
-    const declineBtn = this.element.querySelector('[data-action="decline"]');
-    const customizeBtn = this.element.querySelector('[data-action="customize"]');
+    if (!this.element) return;
     
-    if (acceptBtn) acceptBtn.addEventListener('click', this.boundHandlers.handleAcceptAll);
-    if (declineBtn) declineBtn.addEventListener('click', this.boundHandlers.handleDeclineOptional);
-    if (customizeBtn) customizeBtn.addEventListener('click', this.boundHandlers.handleCustomizeSettings);
-  }
-
-  /**
-   * Обработка принятия всех cookies
-   */
-  async handleAcceptAll() {
-    try {
-      this.preferences = {
-        essential: true,
-        analytics: true,
-        timestamp: Date.now()
-      };
-      
-      await this.savePreferences(this.preferences);
-      await this.hide();
-      
-      this.analytics.enableTracking();
-      this.log('Все cookies приняты');
-      this.dispatchEvent('cookiesAccepted', { analytics: true });
-      
-    } catch (error) {
-      this.handleError('ACCEPT_ERROR', error);
-    }
-  }
-
-  /**
-   * Обработка отказа от опциональных cookies
-   */
-  async handleDeclineOptional(showBanner = true) {
-    try {
-      this.preferences = {
-        essential: true,
-        analytics: false,
-        timestamp: Date.now()
-      };
-      
-      await this.savePreferences(this.preferences);
-      
-      if (showBanner) {
-        await this.hide();
-      }
-      
-      this.analytics.disableTracking();
-      this.log('От опциональных cookies отказались');
-      this.dispatchEvent('cookiesDeclined', { analytics: false });
-      
-    } catch (error) {
-      this.handleError('DECLINE_ERROR', error);
-    }
-  }
-
-  /**
-   * Обработка настройки cookies
-   */
-  async handleCustomizeSettings() {
-    try {
-      await this.showSettingsModal();
-    } catch (error) {
-      this.handleError('CUSTOMIZE_ERROR', error);
-    }
+    this.element.querySelector('.accept').addEventListener('click', this.boundHandlers.handleAcceptAll);
+    this.element.querySelector('.decline').addEventListener('click', this.boundHandlers.handleDeclineOptional);
+    this.element.querySelector('.customize').addEventListener('click', this.boundHandlers.handleCustomizeSettings);
   }
 
   /**
@@ -388,6 +217,7 @@ class CookieBanner {
     
     try {
       this.createSettingsModal();
+      this.applyModalStyles();
       this.attachModalEventListeners();
       
       requestAnimationFrame(() => {
@@ -406,232 +236,75 @@ class CookieBanner {
    * Создание модального окна настроек
    */
   createSettingsModal() {
-    const styles = getStyles(this.getCurrentTheme());
-    
-    this.modalElement = document.createElement('div');
-    this.modalElement.className = 'steamphony-cookie-modal';
-    this.modalElement.setAttribute('role', 'dialog');
-    this.modalElement.setAttribute('aria-modal', 'true');
-    this.modalElement.setAttribute('aria-label', this.texts.bannerAriaLabel);
-    
-    this.modalElement.innerHTML = `
-      <div class="modal-content">
-        <div class="modal-header">
-          <h2 class="modal-title">${this.texts.title}</h2>
-          <button type="button" class="close-button" aria-label="${this.texts.closeModalLabel}">
-            ×
-          </button>
-        </div>
-        
-        <div class="modal-body">
-          <div class="category">
-            <div class="category-header">
-              <div>
-                <h3 class="category-title">${this.texts.essentialTitle}</h3>
-                <p class="category-description">${this.texts.essentialDesc}</p>
-              </div>
-              <button type="button" class="toggle" disabled>
-                <span class="toggle-thumb"></span>
-              </button>
-            </div>
+    const modalHTML = `
+      <div class="cookie-modal-overlay">
+        <div class="cookie-modal" style="${getStyles(this.config).modal}">
+          <div class="modal-header">
+            <h3>${this.texts.settingsTitle}</h3>
+            <button class="modal-close">&times;</button>
           </div>
-          
-          <div class="category">
-            <div class="category-header">
-              <div>
-                <h3 class="category-title">${this.texts.analyticsTitle}</h3>
-                <p class="category-description">${this.texts.analyticsDesc}</p>
-              </div>
-              <button type="button" class="toggle" data-category="analytics">
-                <span class="toggle-thumb"></span>
-              </button>
+          <form class="modal-form">
+            <div class="setting-group">
+              <label class="setting-label">
+                <input type="checkbox" name="analytics" ${this.preferences.analytics ? 'checked' : ''}>
+                ${this.texts.analyticsLabel}
+              </label>
+              <p class="setting-description">${this.texts.analyticsDescription}</p>
             </div>
-          </div>
-        </div>
-        
-        <div class="modal-footer">
-          <a href="${this.config.privacyPolicyUrl}" class="link" target="_blank">
-            ${this.texts.privacyPolicy}
-          </a>
-          <button type="button" class="btn btn-primary" data-action="save">
-            ${this.texts.saveSettings}
-          </button>
+            <div class="modal-buttons">
+              <button type="button" class="modal-cancel">${this.texts.cancel}</button>
+              <button type="submit" class="modal-save">${this.texts.save}</button>
+            </div>
+          </form>
         </div>
       </div>
     `;
     
-    applyStyles(this.modalElement, styles.modal);
-    this.applyModalStyles();
-    
-    document.body.appendChild(this.modalElement);
+    document.body.insertAdjacentHTML('beforeend', modalHTML);
+    this.modalElement = document.querySelector('.cookie-modal-overlay');
   }
 
   /**
-   * Применение стилей к модальному окну
+   * Применение стилей модального окна
    */
   applyModalStyles() {
-    const styles = getStyles(this.getCurrentTheme());
+    if (!this.modalElement) return;
     
-    const modalContent = this.modalElement.querySelector('.modal-content');
-    const modalHeader = this.modalElement.querySelector('.modal-header');
-    const modalTitle = this.modalElement.querySelector('.modal-title');
-    const closeButton = this.modalElement.querySelector('.close-button');
-    const categories = this.modalElement.querySelectorAll('.category');
-    const toggles = this.modalElement.querySelectorAll('.toggle');
-    const modalFooter = this.modalElement.querySelector('.modal-footer');
-    const saveButton = this.modalElement.querySelector('[data-action="save"]');
-    
-    applyStyles(modalContent, styles.modalContent);
-    applyStyles(modalHeader, styles.modalHeader);
-    applyStyles(modalTitle, styles.modalTitle);
-    applyStyles(closeButton, styles.closeButton);
-    applyStyles(modalFooter, styles.modalFooter);
-    
-    if (saveButton) {
-      applyStyles(saveButton, styles.button);
-      applyStyles(saveButton, styles.buttonPrimary);
-    }
-    
-    categories.forEach(category => {
-      applyStyles(category, styles.category);
-      
-      const categoryHeader = category.querySelector('.category-header');
-      const categoryTitle = category.querySelector('.category-title');
-      const categoryDescription = category.querySelector('.category-description');
-      
-      applyStyles(categoryHeader, styles.categoryHeader);
-      applyStyles(categoryTitle, styles.categoryTitle);
-      applyStyles(categoryDescription, styles.categoryDescription);
-    });
-    
-    toggles.forEach(toggle => {
-      applyStyles(toggle, styles.toggle);
-      
-      const thumb = toggle.querySelector('.toggle-thumb');
-      applyStyles(thumb, styles.toggleThumb);
-      
-      if (toggle.dataset.category === 'analytics') {
-        if (this.preferences.analytics) {
-          toggle.classList.add('active');
-          thumb.classList.add('active');
-        }
-      }
-    });
+    const styles = getStyles(this.config);
+    applyStyles(this.modalElement, styles.modalOverlay);
+    applyStyles(this.modalElement.querySelector('.cookie-modal'), styles.modal);
   }
 
   /**
-   * Прикрепление обработчиков событий к модальному окну
+   * Привязка обработчиков событий модального окна
    */
   attachModalEventListeners() {
-    const closeButton = this.modalElement.querySelector('.close-button');
-    const saveButton = this.modalElement.querySelector('[data-action="save"]');
-    const analyticsToggle = this.modalElement.querySelector('[data-category="analytics"]');
+    if (!this.modalElement) return;
     
-    if (closeButton) closeButton.addEventListener('click', this.boundHandlers.handleModalClose);
-    if (saveButton) saveButton.addEventListener('click', this.boundHandlers.handleSaveSettings);
-    
-    if (analyticsToggle) {
-      analyticsToggle.addEventListener('click', () => {
-        const isActive = analyticsToggle.classList.contains('active');
-        analyticsToggle.classList.toggle('active');
-        analyticsToggle.querySelector('.toggle-thumb').classList.toggle('active');
-      });
-    }
-  }
-
-  /**
-   * Обработка закрытия модального окна
-   */
-  async handleModalClose() {
-    try {
-      this.modalElement.classList.remove('visible');
-      
-      setTimeout(() => {
-        if (this.modalElement && this.modalElement.parentNode) {
-          this.modalElement.parentNode.removeChild(this.modalElement);
-        }
-        this.isModalVisible = false;
-      }, 300);
-      
-      this.log('Модальное окно настроек закрыто');
-      
-    } catch (error) {
-      this.handleError('MODAL_CLOSE_ERROR', error);
-    }
-  }
-
-  /**
-   * Обработка сохранения настроек
-   */
-  async handleSaveSettings() {
-    try {
-      const analyticsToggle = this.modalElement.querySelector('[data-category="analytics"]');
-      const analyticsEnabled = analyticsToggle.classList.contains('active');
-      
-      this.preferences = {
-        essential: true,
-        analytics: analyticsEnabled,
-        timestamp: Date.now()
-      };
-      
-      await this.savePreferences(this.preferences);
-      await this.handleModalClose();
-      await this.hide();
-      
-      if (analyticsEnabled) {
-        this.analytics.enableTracking();
-      } else {
-        this.analytics.disableTracking();
-      }
-      
-      this.log('Настройки cookies сохранены');
-      this.dispatchEvent('cookiesCustomized', { analytics: analyticsEnabled });
-      
-    } catch (error) {
-      this.handleError('SAVE_ERROR', error);
-    }
+    this.modalElement.querySelector('.modal-close').addEventListener('click', this.boundHandlers.handleModalClose);
+    this.modalElement.querySelector('.modal-cancel').addEventListener('click', this.boundHandlers.handleModalClose);
+    this.modalElement.querySelector('.modal-form').addEventListener('submit', (e) => {
+      e.preventDefault();
+      this.boundHandlers.handleSaveSettings();
+    });
   }
 
   /**
    * Сохранение предпочтений
+   * @param {Object} preferences - Предпочтения для сохранения
    */
   async savePreferences(preferences) {
-    try {
-      const data = {
-        ...preferences,
-        version: '1.0',
-        timestamp: Date.now()
-      };
-      
-      localStorage.setItem(this.config.storageKey, JSON.stringify(data));
-      this.log('Предпочтения сохранены:', data);
-      
-    } catch (error) {
-      this.log('Ошибка сохранения предпочтений:', error);
-      throw error;
+    const success = savePreferences(preferences, this.config.storageKey);
+    if (success) {
+      this.preferences = { ...preferences, timestamp: Date.now() };
+      this.log('Предпочтения сохранены:', preferences);
     }
+    return success;
   }
 
   /**
-   * Обработка нажатий клавиш
-   */
-  handleKeydown(event) {
-    if (event.key === 'Escape') {
-      if (this.isModalVisible) {
-        this.handleModalClose();
-      }
-    }
-  }
-
-  /**
-   * Обработка изменения размера окна
-   */
-  handleResize() {
-    // Пересчет позиций при необходимости
-  }
-
-  /**
-   * Получение предпочтений
+   * Получение текущих предпочтений
+   * @returns {Object} Текущие предпочтения
    */
   getPreferences() {
     return { ...this.preferences };
@@ -642,14 +315,14 @@ class CookieBanner {
    */
   async resetConsent() {
     try {
+      localStorage.removeItem(this.config.storageKey);
       this.preferences = {
         essential: true,
         analytics: false,
         timestamp: null
       };
       
-      localStorage.removeItem(this.config.storageKey);
-      this.analytics.disableTracking();
+      await this.analytics.setCookieConsent(false);
       
       this.log('Согласие сброшено');
       this.dispatchEvent('consentReset');
@@ -661,48 +334,47 @@ class CookieBanner {
 
   /**
    * Обновление конфигурации
+   * @param {Object} newConfig - Новая конфигурация
    */
   updateConfig(newConfig) {
-    this.config = this.validateConfig({ ...this.config, ...newConfig });
+    this.config = validateConfig({ ...this.config, ...newConfig });
     this.texts = getTexts(this.config.language);
-    
     this.log('Конфигурация обновлена:', this.config);
   }
 
   /**
    * Обработка ошибок
+   * @param {string} errorCode - Код ошибки
+   * @param {Error} error - Объект ошибки
    */
   handleError(errorCode, error) {
     console.error(`CookieBanner Error [${errorCode}]:`, error);
-    this.dispatchEvent('error', { code: errorCode, error: error.message });
+    this.dispatchEvent('error', { code: errorCode, message: error.message });
   }
 
   /**
-   * Отправка событий
+   * Отправка события
+   * @param {string} eventName - Название события
+   * @param {Object} detail - Детали события
    */
   dispatchEvent(eventName, detail = {}) {
-    try {
-      const event = new CustomEvent(`cookieBanner:${eventName}`, {
-        detail: {
-          timestamp: Date.now(),
-          ...detail
-        },
-        bubbles: true,
-        cancelable: true
-      });
-      
-      document.dispatchEvent(event);
-      
-    } catch (error) {
-      console.error('Ошибка отправки события:', error);
-    }
+    const event = new CustomEvent(`cookieBanner:${eventName}`, {
+      detail: {
+        timestamp: Date.now(),
+        ...detail
+      }
+    });
+    
+    document.dispatchEvent(event);
   }
 
   /**
    * Логирование
+   * @param {string} message - Сообщение
+   * @param {*} data - Данные
    */
   log(message, data = null) {
-    if (this.config.debug) {
+    if (this.config.debugMode) {
       console.log(`[CookieBanner] ${message}`, data || '');
     }
   }
@@ -712,9 +384,11 @@ class CookieBanner {
    */
   destroy() {
     try {
+      // Удаление обработчиков
       window.removeEventListener('keydown', this.boundHandlers.handleKeydown);
       window.removeEventListener('resize', this.boundHandlers.handleResize);
       
+      // Удаление элементов
       if (this.element && this.element.parentNode) {
         this.element.parentNode.removeChild(this.element);
       }
@@ -723,10 +397,15 @@ class CookieBanner {
         this.modalElement.parentNode.removeChild(this.modalElement);
       }
       
+      this.element = null;
+      this.modalElement = null;
+      this.isVisible = false;
+      this.isModalVisible = false;
+      
       this.log('CookieBanner уничтожен');
       
     } catch (error) {
-      console.error('Ошибка уничтожения CookieBanner:', error);
+      console.error('Ошибка при уничтожении CookieBanner:', error);
     }
   }
 }
