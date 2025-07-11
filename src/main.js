@@ -22,6 +22,11 @@ import SecurityHeaders from './security/SecurityHeaders.js';
 import ThreatDetector from './security/ThreatDetector.js';
 import SecurityMonitor from './security/SecurityMonitor.js';
 
+// Импорт Performance Optimization Features
+import { LazyLoader } from './utils/LazyLoader.js';
+import { CacheManager } from './utils/CacheManager.js';
+import { PerformanceMonitor } from './utils/PerformanceMonitor.js';
+
 /**
  * Главный класс приложения
  * Управляет инициализацией и связыванием всех компонентов
@@ -59,6 +64,11 @@ class App {
     this.threatDetector = null;
     this.securityMonitor = null;
     
+    // Performance Optimization Features
+    this.lazyLoader = null;
+    this.cacheManager = null;
+    this.performanceMonitor = null;
+    
     // Инициализация
     this.init();
     
@@ -94,6 +104,9 @@ class App {
       
       // Инициализация Advanced Security Features
       await this.initializeAdvancedSecurity();
+      
+      // Инициализация Performance Optimization Features
+      await this.initializePerformanceOptimization();
       
       // Скрыть экран загрузки
       this.hideLoadingState();
@@ -151,6 +164,11 @@ class App {
             headers: !!this.securityHeaders,
             threatDetector: !!this.threatDetector,
             securityMonitor: !!this.securityMonitor
+          },
+          performance: {
+            lazyLoader: !!this.lazyLoader,
+            cacheManager: !!this.cacheManager,
+            performanceMonitor: !!this.performanceMonitor
           }
         }
       });
@@ -193,6 +211,146 @@ class App {
     } catch (error) {
       console.error('❌ Ошибка инициализации Advanced Security Features:', error);
       // Don't throw error - security features are optional for app functionality
+    }
+  }
+
+  /**
+   * Инициализация Performance Optimization Features
+   * @private
+   */
+  async initializePerformanceOptimization() {
+    try {
+      console.log('⚡ Инициализация Performance Optimization Features...');
+      
+      // Performance optimization configuration
+      const performanceConfig = {
+        lazyLoading: {
+          enabled: true,
+          preloadModules: [
+            './src/components/Calculator.js',
+            './src/services/Analytics.js'
+          ],
+          maxRetries: 3,
+          loadingTimeout: 10000
+        },
+        caching: {
+          enabled: true,
+          serviceWorker: true,
+          strategies: {
+            staticAssets: 'cache-first',
+            apiResponses: 'network-first',
+            analytics: 'background-sync'
+          }
+        },
+        monitoring: {
+          enabled: true,
+          coreWebVitals: true,
+          bundleAnalysis: true,
+          reportingEndpoint: '/api/performance'
+        }
+      };
+      
+      // Initialize LazyLoader
+      this.lazyLoader = new LazyLoader();
+      this.lazyLoader.initialize(performanceConfig.lazyLoading);
+      
+      // Initialize CacheManager
+      this.cacheManager = new CacheManager();
+      await this.cacheManager.initialize(performanceConfig.caching);
+      
+      // Create and register Service Worker
+      const serviceWorkerScript = this.cacheManager.createServiceWorkerScript();
+      const serviceWorkerBlob = new Blob([serviceWorkerScript], { type: 'application/javascript' });
+      const serviceWorkerUrl = URL.createObjectURL(serviceWorkerBlob);
+      await this.cacheManager.registerServiceWorker(serviceWorkerUrl);
+      
+      // Initialize PerformanceMonitor
+      this.performanceMonitor = new PerformanceMonitor();
+      this.performanceMonitor.initialize(performanceConfig.monitoring);
+      
+      // Setup performance monitoring
+      this.setupPerformanceMonitoring();
+      
+      console.log('✅ Performance Optimization Features инициализированы');
+      
+    } catch (error) {
+      console.error('❌ Ошибка инициализации Performance Optimization Features:', error);
+      // Don't throw error - performance features are optional for app functionality
+    }
+  }
+
+  /**
+   * Setup performance monitoring
+   * @private
+   */
+  setupPerformanceMonitoring() {
+    try {
+      // Monitor bundle loading performance
+      window.addEventListener('load', () => {
+        setTimeout(() => {
+          this.reportPerformanceMetrics();
+        }, 1000);
+      });
+      
+      // Monitor user interactions for performance impact
+      document.addEventListener('click', (event) => {
+        this.monitorInteractionPerformance(event);
+      });
+      
+      console.log('📊 Performance monitoring установлен');
+      
+    } catch (error) {
+      console.error('❌ Ошибка установки performance monitoring:', error);
+    }
+  }
+
+  /**
+   * Report performance metrics
+   * @private
+   */
+  reportPerformanceMetrics() {
+    try {
+      if (!this.performanceMonitor) return;
+      
+      const report = this.performanceMonitor.getPerformanceReport();
+      console.log('📊 Performance Report:', report);
+      
+      // Send report to analytics
+      if (this.analytics) {
+        this.analytics.track('performance_metrics', report);
+      }
+      
+    } catch (error) {
+      console.error('❌ Ошибка отправки performance report:', error);
+    }
+  }
+
+  /**
+   * Monitor interaction performance
+   * @param {Event} event - User interaction event
+   * @private
+   */
+  monitorInteractionPerformance(event) {
+    try {
+      if (!this.performanceMonitor) return;
+      
+      const startTime = performance.now();
+      
+      // Measure interaction response time
+      requestAnimationFrame(() => {
+        const endTime = performance.now();
+        const responseTime = endTime - startTime;
+        
+        if (responseTime > 16) { // Longer than one frame (16ms)
+          console.warn('🐌 Slow interaction detected:', {
+            element: event.target,
+            responseTime: responseTime.toFixed(2) + 'ms'
+          });
+        }
+      });
+      
+    } catch (error) {
+      console.error('❌ Ошибка мониторинга interaction performance:', error);
     }
   }
 
