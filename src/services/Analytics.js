@@ -137,8 +137,8 @@ class Analytics {
     
     // Валидация measurementId
     if (!validated.measurementId || typeof validated.measurementId !== 'string') {
-      console.warn('Analytics: Некорректный measurementId, используется placeholder');
-      validated.measurementId = 'G-PLACEHOLDER';
+      console.warn('Analytics: Некорректный measurementId, используется fallback');
+      validated.measurementId = 'G-XXXXXXXXXX';
     }
     
     // Валидация числовых значений
