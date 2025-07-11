@@ -12,7 +12,7 @@
  * @private
  */
 const DEFAULT_CONFIG = {
-  measurementId: 'G-PLACEHOLDER', // Заменить на реальный ID
+  measurementId: 'G-XXXXXXXXXX', // Steamphony GA4 Measurement ID
   cookieDomain: typeof window !== 'undefined' ? window.location.hostname : 'localhost',
   consentStorageKey: 'steamphony_analytics_consent',
   eventQueueLimit: 50,
