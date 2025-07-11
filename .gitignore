@@ -4,9 +4,11 @@ npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
 
-# Production builds
+# Build outputs
 dist/
 build/
+*.min.js
+*.min.css
 
 # Environment variables
 .env
@@ -15,7 +17,7 @@ build/
 .env.test.local
 .env.production.local
 
-# IDE/Editor files
+# IDE files
 .vscode/
 .idea/
 *.swp
@@ -32,29 +34,24 @@ ehthumbs.db
 Thumbs.db
 
 # Logs
+logs
 *.log
-logs/
-
-# Temporary files
-tmp/
-temp/
-
-# CSS build files
-public/styles.css
-public/styles.css.map
-
-# Backup files
-*.backup
-*.bak
-
-# Coverage directory used by tools like istanbul
-coverage/
 
 # Runtime data
 pids
 *.pid
 *.seed
 *.pid.lock
+
+# Coverage directory used by tools like istanbul
+coverage/
+*.lcov
+
+# nyc test coverage
+.nyc_output
+
+# Dependency directories
+jspm_packages/
 
 # Optional npm cache directory
 .npm
@@ -75,4 +72,36 @@ pids
 *.tgz
 
 # Yarn Integrity file
-.yarn-integrity 
+.yarn-integrity
+
+# parcel-bundler cache (https://parceljs.org/)
+.cache
+.parcel-cache
+
+# next.js build output
+.next
+
+# nuxt.js build output
+.nuxt
+
+# vuepress build output
+.vuepress/dist
+
+# Serverless directories
+.serverless/
+
+# FuseBox cache
+.fusebox/
+
+# DynamoDB Local files
+.dynamodb/
+
+# TernJS port file
+.tern-port
+
+# Stores VSCode versions used for testing VSCode extensions
+.vscode-test
+
+# Temporary folders
+tmp/
+temp/ 
