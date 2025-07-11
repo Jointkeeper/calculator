@@ -62,7 +62,7 @@ const DEFAULT_CONFIG = {
   respectDNT: true, // Respect Do Not Track header
   cookieExpiry: 365, // days
   storageKey: 'steamphony_cookie_preferences',
-  privacyPolicyUrl: '/privacy',
+      privacyPolicyUrl: 'https://steamphony.com/privacy-policy',
   contactEmail: 'privacy@steamphony.com',
   companyName: 'Steamphony Digital Agency'
 };
