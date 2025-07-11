@@ -13,6 +13,15 @@ import { UniversalSavingsCalculator } from './components/Calculator.js';
 import Analytics from './services/Analytics.js';
 import CookieBanner from './components/CookieBanner.js';
 
+// Импорт Security Layer
+import { SecurityLayer } from './security/index.js';
+
+// Импорт Advanced Security Features
+import CSPConfig from './security/CSPConfig.js';
+import SecurityHeaders from './security/SecurityHeaders.js';
+import ThreatDetector from './security/ThreatDetector.js';
+import SecurityMonitor from './security/SecurityMonitor.js';
+
 /**
  * Главный класс приложения
  * Управляет инициализацией и связыванием всех компонентов
@@ -26,20 +35,29 @@ class App {
     this.marketingBudgetStep = null;
     this.calculator = null;
     
-          // Данные формы
-      this.formData = {
-        industry: null,
-        businessSize: null,
-        marketingBudget: null,
-        marketingTools: null,
-        hasMarketer: null,
-        tools: []
-      };
+    // Данные формы
+    this.formData = {
+      industry: null,
+      businessSize: null,
+      marketingBudget: null,
+      marketingTools: null,
+      hasMarketer: null,
+      tools: []
+    };
     
     // Состояние приложения
     this.currentStep = 1;
     this.totalSteps = 6;
     this.isInitialized = false;
+    
+    // Security layer
+    this.securityLayer = SecurityLayer;
+    
+    // Advanced Security Features
+    this.cspConfig = null;
+    this.securityHeaders = null;
+    this.threatDetector = null;
+    this.securityMonitor = null;
     
     // Инициализация
     this.init();
@@ -73,6 +91,9 @@ class App {
   async initializeComponents() {
     try {
       console.log('🚀 Инициализация приложения...');
+      
+      // Инициализация Advanced Security Features
+      await this.initializeAdvancedSecurity();
       
       // Скрыть экран загрузки
       this.hideLoadingState();
@@ -124,13 +145,218 @@ class App {
           industrySelector: !!this.industrySelector,
           calculator: !!this.calculator,
           analytics: !!this.analytics,
-          cookieBanner: !!this.cookieBanner
+          cookieBanner: !!this.cookieBanner,
+          security: {
+            csp: !!this.cspConfig,
+            headers: !!this.securityHeaders,
+            threatDetector: !!this.threatDetector,
+            securityMonitor: !!this.securityMonitor
+          }
         }
       });
       
     } catch (error) {
       console.error('App: Ошибка инициализации компонентов:', error);
       this.handleInitializationError(error);
+    }
+  }
+
+  /**
+   * Инициализация Advanced Security Features
+   * @private
+   */
+  async initializeAdvancedSecurity() {
+    try {
+      console.log('🔒 Инициализация Advanced Security Features...');
+      
+      // Initialize CSP Configuration
+      this.cspConfig = new CSPConfig();
+      this.cspConfig.applyCSPToDocument(document);
+      
+      // Initialize Security Headers
+      this.securityHeaders = new SecurityHeaders();
+      this.securityHeaders.setCSPConfig(this.cspConfig);
+      this.securityHeaders.applyToDocument(document);
+      
+      // Initialize Threat Detector
+      this.threatDetector = new ThreatDetector();
+      
+      // Initialize Security Monitor
+      this.securityMonitor = new SecurityMonitor();
+      this.securityMonitor.initialize(document);
+      
+      // Set up global security monitoring
+      this.setupGlobalSecurityMonitoring();
+      
+      console.log('✅ Advanced Security Features инициализированы');
+      
+    } catch (error) {
+      console.error('❌ Ошибка инициализации Advanced Security Features:', error);
+      // Don't throw error - security features are optional for app functionality
+    }
+  }
+
+  /**
+   * Setup global security monitoring
+   * @private
+   */
+  setupGlobalSecurityMonitoring() {
+    try {
+      // Monitor form submissions
+      document.addEventListener('submit', (event) => {
+        this.monitorFormSubmission(event);
+      });
+      
+      // Monitor input changes for suspicious activity
+      document.addEventListener('input', (event) => {
+        this.monitorInputActivity(event);
+      });
+      
+      // Monitor navigation for potential threats
+      window.addEventListener('beforeunload', (event) => {
+        this.monitorNavigation(event);
+      });
+      
+      console.log('🔍 Global security monitoring установлен');
+      
+    } catch (error) {
+      console.error('❌ Ошибка установки global security monitoring:', error);
+    }
+  }
+
+  /**
+   * Monitor form submission for threats
+   * @param {Event} event - Form submission event
+   * @private
+   */
+  monitorFormSubmission(event) {
+    try {
+      if (!this.threatDetector) return;
+      
+      const form = event.target;
+      const formData = new FormData(form);
+      
+      // Check rate limiting
+      if (!this.threatDetector.implementRateLimit('form_submission', this.threatDetector.rateLimits.formSubmissions)) {
+        event.preventDefault();
+        console.warn('🚫 Form submission rate limit exceeded');
+        return;
+      }
+      
+      // Check for suspicious activity
+      const activity = {
+        type: 'form_submission',
+        form: form.id || form.className,
+        inputs: Object.fromEntries(formData.entries()),
+        url: window.location.href,
+        timestamp: new Date().toISOString()
+      };
+      
+      const threatResult = this.threatDetector.detectSuspiciousActivity(activity);
+      
+      if (threatResult.suspicious) {
+        console.warn('🚨 Suspicious form submission detected:', threatResult);
+        this.threatDetector.triggerSecurityResponse(threatResult);
+        
+        // For critical threats, prevent submission
+        if (threatResult.threatLevel >= 4) {
+          event.preventDefault();
+          return;
+        }
+      }
+      
+    } catch (error) {
+      console.error('❌ Form submission monitoring failed:', error);
+    }
+  }
+
+  /**
+   * Monitor input activity for threats
+   * @param {Event} event - Input event
+   * @private
+   */
+  monitorInputActivity(event) {
+    try {
+      if (!this.threatDetector) return;
+      
+      const input = event.target;
+      const value = input.value;
+      
+      // Only check for obvious threats in real-time
+      if (value && value.length > 10) {
+        const activity = {
+          type: 'input_activity',
+          input: input.name || input.id,
+          content: value,
+          url: window.location.href,
+          timestamp: new Date().toISOString()
+        };
+        
+        const threatResult = this.threatDetector.detectSuspiciousActivity(activity);
+        
+        if (threatResult.suspicious && threatResult.threatLevel >= 4) {
+          console.warn('🚨 Critical threat detected in input:', threatResult);
+          this.threatDetector.triggerSecurityResponse(threatResult);
+        }
+      }
+      
+    } catch (error) {
+      console.error('❌ Input activity monitoring failed:', error);
+    }
+  }
+
+  /**
+   * Monitor navigation for threats
+   * @param {Event} event - Navigation event
+   * @private
+   */
+  monitorNavigation(event) {
+    try {
+      if (!this.threatDetector) return;
+      
+      const activity = {
+        type: 'navigation',
+        url: window.location.href,
+        referrer: document.referrer,
+        timestamp: new Date().toISOString()
+      };
+      
+      const threatResult = this.threatDetector.detectSuspiciousActivity(activity);
+      
+      if (threatResult.suspicious) {
+        console.warn('🚨 Suspicious navigation detected:', threatResult);
+        this.threatDetector.triggerSecurityResponse(threatResult);
+      }
+      
+    } catch (error) {
+      console.error('❌ Navigation monitoring failed:', error);
+    }
+  }
+
+  /**
+   * Get security statistics
+   * @returns {Object} Security statistics
+   */
+  getSecurityStatistics() {
+    try {
+      return {
+        csp: this.cspConfig?.getStatistics() || null,
+        headers: this.securityHeaders?.getSecurityStatistics() || null,
+        threatDetector: this.threatDetector?.getStatistics() || null,
+        securityMonitor: this.securityMonitor?.getStatistics() || null
+      };
+    } catch (error) {
+      console.error('❌ Security statistics retrieval failed:', error);
+      return { error: 'Statistics unavailable' };
+    }
+  }
+
+  /**
+   * Toggle security dashboard
+   */
+  toggleSecurityDashboard() {
+    if (this.securityMonitor) {
+      this.securityMonitor.toggleDashboard();
     }
   }
 

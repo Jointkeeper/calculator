@@ -10,6 +10,7 @@
 
 import { INDUSTRY_CONFIG, CALCULATION_CONSTANTS } from '../data/industries.js';
 import { IndustryUtils } from '../utils/IndustryUtils.js';
+import { SecurityLayer, InputValidator } from '../security/index.js';
 
 export class UniversalSavingsCalculator {
   /**
@@ -33,6 +34,10 @@ export class UniversalSavingsCalculator {
       enableAnalytics: true,
       ...options
     };
+    
+    // Security layer
+    this.securityLayer = SecurityLayer;
+    this.inputValidator = InputValidator;
 
     // Маркетинговые инструменты с базовыми ценами (USD/месяц)
     this.marketingTools = {
@@ -263,26 +268,29 @@ export class UniversalSavingsCalculator {
     try {
       this.calculationCount++;
       
-      // Dispatch начала расчета
+      // SECURITY: Sanitize all input data before processing
+      const sanitizedFormData = this.sanitizeFormData(formData);
+      
+      // Dispatch начала расчета (с sanitized данными)
       this.dispatchEvent('calculationStarted', {
-        formData,
+        formData: sanitizedFormData,
         calculationId: this.calculationCount
       });
 
-      // 1. Валидация входных данных
-      const validationResult = this.validateFormData(formData);
+      // 1. Валидация входных данных (с sanitized данными)
+      const validationResult = this.validateFormData(sanitizedFormData);
       if (!validationResult.isValid) {
         throw new Error(`Validation failed: ${validationResult.errors.join(', ')}`);
       }
 
-      // 2. Получение конфигурации отрасли
-      const industryConfig = this.utils.getIndustry(formData.industry);
+      // 2. Получение конфигурации отрасли (с sanitized данными)
+      const industryConfig = this.utils.getIndustry(sanitizedFormData.industry);
       if (!industryConfig) {
-        throw new Error(`Industry '${formData.industry}' not found`);
+        throw new Error(`Industry '${this.securityLayer.sanitizeInput(sanitizedFormData.industry)}' not found`);
       }
 
-      // 3. Нормализация данных
-      const normalizedData = this.normalizeFormData(formData, industryConfig);
+      // 3. Нормализация данных (с sanitized данными)
+      const normalizedData = this.normalizeFormData(sanitizedFormData, industryConfig);
 
       // 4. Расчет текущих расходов клиента
       const currentCosts = this.calculateCurrentCosts(normalizedData, industryConfig);
@@ -312,13 +320,13 @@ export class UniversalSavingsCalculator {
         roiAnalysis
       });
 
-      // 10. Формирование финального результата
+      // 10. Формирование финального результата (с sanitized данными)
       const calculationResults = {
         meta: {
           calculationId: this.calculationCount,
           timestamp: new Date().toISOString(),
-          industry: industryConfig.displayName,
-          businessSize: normalizedData.businessSize,
+          industry: this.securityLayer.sanitizeInput(industryConfig.displayName),
+          businessSize: this.securityLayer.sanitizeInput(normalizedData.businessSize),
           currency: this.options.currency
         },
         input: normalizedData,
@@ -342,8 +350,8 @@ export class UniversalSavingsCalculator {
         }
       };
 
-      // Кэширование результата
-      const cacheKey = this.generateCacheKey(formData);
+      // SECURITY: Кэширование результата (с sanitized данными)
+      const cacheKey = this.generateCacheKey(sanitizedFormData);
       this.calculationCache.set(cacheKey, calculationResults);
 
       // Аналитика
@@ -665,7 +673,12 @@ export class UniversalSavingsCalculator {
    * @returns {Object} Персонализированные инсайты
    */
   generateInsights(formData, industryConfig, calculations) {
-    const messages = industryConfig.personalizedMessages;
+    // SECURITY: Sanitize all message content
+    const messages = {
+      savingsMessage: this.securityLayer.sanitizeInput(industryConfig.personalizedMessages.savingsMessage),
+      opportunityMessage: this.securityLayer.sanitizeInput(industryConfig.personalizedMessages.opportunityMessage),
+      industryInsight: this.securityLayer.sanitizeInput(industryConfig.personalizedMessages.industryInsight)
+    };
     const benchmarks = industryConfig.benchmarks;
     const { currentCosts, savings, roiAnalysis } = calculations;
 
@@ -695,7 +708,11 @@ export class UniversalSavingsCalculator {
    * @returns {Object} Рекомендации и план действий
    */
   generateRecommendations(formData, industryConfig, calculations) {
-    const messages = industryConfig.personalizedMessages;
+    // SECURITY: Sanitize all message content
+    const messages = {
+      toolsRecommendation: this.securityLayer.sanitizeInput(industryConfig.personalizedMessages.toolsRecommendation),
+      commonMistakes: this.securityLayer.sanitizeInput(industryConfig.personalizedMessages.commonMistakes)
+    };
     const { currentCosts, savings, roiAnalysis } = calculations;
     
     const recommendations = [];
@@ -822,67 +839,70 @@ export class UniversalSavingsCalculator {
   // ========== ВСПОМОГАТЕЛЬНЫЕ МЕТОДЫ ==========
 
   /**
-   * Валидация входных данных формы
+   * Валидация входных данных формы с security layer
    * @param {Object} formData - Данные формы
    * @returns {Object} Результат валидации
    */
   validateFormData(formData) {
-    const errors = [];
+    // Сначала sanitize все входные данные
+    const sanitizedData = this.sanitizeFormData(formData);
+    
+    // Затем валидируем с помощью InputValidator
+    const businessValidation = this.inputValidator.validateBusinessData(sanitizedData);
+    
+    const errors = businessValidation.errors ? Object.values(businessValidation.errors) : [];
     const warnings = [];
 
-    // Обязательные поля
-    const requiredFields = {
-      industry: 'Отрасль бизнеса',
-      businessSize: 'Размер бизнеса',
-      marketingBudget: 'Маркетинговый бюджет'
-    };
-
-    for (const [field, name] of Object.entries(requiredFields)) {
-      if (!formData[field]) {
-        errors.push(`${name} обязателен для заполнения`);
-      }
-    }
-
-    // Проверка существования отрасли
-    if (formData.industry && !this.utils.industryExists(formData.industry)) {
-      errors.push(`Отрасль '${formData.industry}' не поддерживается`);
-    }
-
-    // Проверка размера бизнеса
-    if (formData.industry && formData.businessSize) {
-      const sizes = this.utils.getBusinessSizes(formData.industry);
-      const sizeExists = sizes.some(size => size.value === formData.businessSize);
-      if (!sizeExists) {
-        errors.push(`Размер бизнеса '${formData.businessSize}' не доступен для отрасли '${formData.industry}'`);
-      }
-    }
-
-    // Проверка бюджета
-    if (formData.marketingBudget !== undefined) {
-      if (typeof formData.marketingBudget === 'number') {
-        if (formData.marketingBudget < 0) {
+    // Дополнительные проверки бизнес-логики
+    if (sanitizedData.marketingBudget !== undefined) {
+      if (typeof sanitizedData.marketingBudget === 'number') {
+        if (sanitizedData.marketingBudget < 0) {
           errors.push('Маркетинговый бюджет не может быть отрицательным');
         }
-        if (formData.marketingBudget < 500) {
+        if (sanitizedData.marketingBudget < 500) {
           warnings.push('Слишком низкий маркетинговый бюджет для эффективных расчетов');
         }
-        if (formData.marketingBudget > 100000) {
+        if (sanitizedData.marketingBudget > 100000) {
           warnings.push('Очень высокий бюджет, рекомендуем индивидуальную консультацию');
         }
       }
     }
 
     // Проверка типа маркетолога
-    if (formData.marketerType && !this.marketerTypes[formData.marketerType]) {
-      errors.push(`Тип маркетолога '${formData.marketerType}' не поддерживается`);
+    if (sanitizedData.marketerType && !this.marketerTypes[sanitizedData.marketerType]) {
+      errors.push(`Тип маркетолога '${sanitizedData.marketerType}' не поддерживается`);
     }
 
     return {
       isValid: errors.length === 0,
       errors,
       warnings,
-      fieldCount: Object.keys(formData).length
+      fieldCount: Object.keys(sanitizedData).length,
+      sanitizedData: businessValidation.sanitizedData
     };
+  }
+
+  /**
+   * Sanitize данные формы для безопасности
+   * @param {Object} formData - Исходные данные формы
+   * @returns {Object} Очищенные данные
+   */
+  sanitizeFormData(formData) {
+    const sanitized = {};
+    
+    // Sanitize все строковые поля
+    for (const [key, value] of Object.entries(formData)) {
+      if (typeof value === 'string') {
+        sanitized[key] = this.securityLayer.sanitizeInput(value, { ALLOWED_TAGS: [] });
+      } else if (typeof value === 'object' && value !== null) {
+        // Рекурсивно sanitize объекты
+        sanitized[key] = this.sanitizeFormData(value);
+      } else {
+        sanitized[key] = value;
+      }
+    }
+    
+    return sanitized;
   }
 
   /**

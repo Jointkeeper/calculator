@@ -2,6 +2,9 @@
 // Steamphony Calculator - Step 6: Contact + Results + Lead Generation
 // MVP FINAL COMPONENT (1000+ lines)
 
+import { SecurityLayer } from '../security/SecurityLayer.js';
+import { InputValidator } from '../security/InputValidator.js';
+
 class ContactFormStep {
   constructor(options = {}) {
     // Core state
@@ -18,6 +21,11 @@ class ContactFormStep {
     this.successSection = null;
     this.onSubmit = options.onSubmit || (() => {});
     this.onComplete = options.onComplete || (() => {});
+    
+    // Security layer
+    this.securityLayer = SecurityLayer;
+    this.inputValidator = InputValidator;
+    
     this.init();
   }
 
@@ -457,20 +465,24 @@ class ContactFormStep {
   }
 
   validateField(name, value) {
-    // Validate single field
+    // Validate single field using security layer
     let error = '';
     switch (name) {
       case 'firstName':
-        if (!value || value.trim().length < 2) error = 'Введите имя (минимум 2 буквы)';
+        const nameValidation = this.inputValidator.validateName(value);
+        if (!nameValidation.isValid) error = nameValidation.error;
         break;
       case 'phone':
-        if (!/^\+?\d[\d\s\-()]{9,}$/.test(value.trim())) error = 'Введите корректный телефон';
+        const phoneValidation = this.inputValidator.validatePhone(value);
+        if (!phoneValidation.isValid) error = phoneValidation.error;
         break;
       case 'email':
-        if (!/^\S+@\S+\.\S+$/.test(value.trim())) error = 'Введите корректный email';
+        const emailValidation = this.inputValidator.validateEmail(value);
+        if (!emailValidation.isValid) error = emailValidation.error;
         break;
       case 'company':
-        if (!value || value.trim().length < 2) error = 'Введите название компании';
+        const companyValidation = this.inputValidator.validateCompany(value);
+        if (!companyValidation.isValid) error = companyValidation.error;
         break;
       case 'gdprConsent':
         if (!this.form.querySelector('#gdprConsent').checked) error = 'Необходимо согласие на обработку данных';

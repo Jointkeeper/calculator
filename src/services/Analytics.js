@@ -7,6 +7,8 @@
  * @version 1.0.0
  */
 
+import { SecurityLayer } from '../security/index.js';
+
 /**
  * Конфигурация по умолчанию
  * @private
@@ -77,6 +79,9 @@ class Analytics {
     
     // Обработчики событий
     this.eventHandlers = new Map();
+    
+    // Security layer
+    this.securityLayer = SecurityLayer;
     
     // Инициализация
     this.init();
@@ -479,7 +484,7 @@ class Analytics {
   }
 
   /**
-   * Санитизация параметров события (удаление PII)
+   * Санитизация параметров события (удаление PII) с security layer
    * @private
    * @param {Object} params - Исходные параметры
    * @returns {Object} Санитизированные параметры
@@ -501,10 +506,16 @@ class Analytics {
       }
     });
     
-    // Ограничение длины строк
+    // Sanitize все строковые поля с помощью SecurityLayer
     Object.keys(sanitized).forEach(key => {
-      if (typeof sanitized[key] === 'string' && sanitized[key].length > 100) {
-        sanitized[key] = sanitized[key].substring(0, 100);
+      if (typeof sanitized[key] === 'string') {
+        // Удаляем потенциально опасные HTML/JS
+        sanitized[key] = this.securityLayer.sanitizeInput(sanitized[key], { ALLOWED_TAGS: [] });
+        
+        // Ограничение длины строк
+        if (sanitized[key].length > 100) {
+          sanitized[key] = sanitized[key].substring(0, 100);
+        }
       }
     });
     
@@ -678,10 +689,11 @@ class Analytics {
    * @param {Object} leadData - Данные лида (без PII)
    */
   trackLeadGenerated(leadData = {}) {
+    // SECURITY: Sanitize all lead data
     const sanitizedData = {
-      industry: leadData.industry || 'unknown',
-      business_size: leadData.businessSize || 'unknown',
-      marketing_budget: leadData.marketingBudget || 'unknown',
+      industry: this.securityLayer.sanitizeInput(leadData.industry || 'unknown'),
+      business_size: this.securityLayer.sanitizeInput(leadData.businessSize || 'unknown'),
+      marketing_budget: this.securityLayer.sanitizeInput(leadData.marketingBudget || 'unknown'),
       lead_source: 'calculator',
       has_email: !!leadData.email,
       has_phone: !!leadData.phone
@@ -700,9 +712,13 @@ class Analytics {
    * @param {string} errorMessage - Сообщение об ошибке
    */
   trackError(errorType, errorMessage) {
+    // SECURITY: Sanitize error data
+    const sanitizedErrorType = this.securityLayer.sanitizeInput(errorType);
+    const sanitizedErrorMessage = this.securityLayer.sanitizeInput(errorMessage.substring(0, 100));
+    
     this.trackEvent('error_occurred', {
-      error_type: errorType,
-      error_message: errorMessage.substring(0, 100), // Ограничение длины
+      error_type: sanitizedErrorType,
+      error_message: sanitizedErrorMessage,
       page_url: window.location.pathname,
       user_agent: navigator.userAgent.substring(0, 100)
     }, {
@@ -811,8 +827,11 @@ class Analytics {
         
         // Слушаем использование поиска
         container.addEventListener('searchUsed', (event) => {
+          // SECURITY: Sanitize search query
+          const sanitizedQuery = this.securityLayer.sanitizeInput(event.detail.query?.substring(0, 50) || '');
+          
           this.trackEvent('industry_search', {
-            search_query: event.detail.query?.substring(0, 50) || '',
+            search_query: sanitizedQuery,
             results_count: event.detail.resultsCount || 0
           });
         });
