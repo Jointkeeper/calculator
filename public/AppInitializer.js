@@ -3,20 +3,21 @@
  * Отвечает за инициализацию всех компонентов и сервисов
  */
 
-import { AppState } from './AppState.js';
-import { NavigationManager } from '../managers/NavigationManager.js';
-import { calculator } from '../core/Calculator.js';
-import { getEventHandlers } from '../handlers/EventHandlers.js';
-import { uiManager } from '../components/UIManager.js';
-import { SecurityLayer } from '../security/index.js';
-import Analytics from '../services/Analytics.js';
-import CookieBanner from '../components/CookieBanner.js';
-import { CSPConfig } from '../security/CSPConfig.js?v=1.0.3';
-import { LazyLoader } from '../utils/LazyLoader.js?v=1.0.4';
-import { SecurityHeaders } from '../security/SecurityHeaders.js?v=1.0.4';
-import { CacheManager } from '../utils/CacheManager.js?v=1.0.4';
-import { ThreatDetector } from '../security/ThreatDetector.js?v=1.0.4';
-import { SecurityMonitor } from '../security/SecurityMonitor.js?v=1.0.4';
+import { AppState } from './core/AppState.js';
+import { NavigationManager } from './managers/NavigationManager.js';
+import { calculator } from './core/Calculator.js';
+import { getEventHandlers } from './handlers/EventHandlers.js';
+import { uiManager } from './components/UIManager.js';
+import { SecurityLayer } from './security/index.js';
+import Analytics from './services/Analytics.js';
+import CookieBanner from './components/CookieBanner.js';
+import { CSPConfig } from './security/CSPConfig.js?v=1.0.3';
+import { LazyLoader } from './utils/LazyLoader.js?v=1.0.4';
+import { SecurityHeaders } from './security/SecurityHeaders.js?v=1.0.4';
+import { CacheManager } from './utils/CacheManager.js?v=1.0.4';
+import { ThreatDetector } from './security/ThreatDetector.js?v=1.0.4';
+import { SecurityMonitor } from './security/SecurityMonitor.js?v=1.0.4';
+import PerformanceMonitor from './utils/PerformanceMonitor.js';
 
 class AppInitializer {
   constructor() {
