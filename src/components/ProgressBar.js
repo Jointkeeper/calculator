@@ -508,7 +508,7 @@ class ProgressBar {
         <div class="error-message">
           <h3>Ошибка загрузки прогресс-бара</h3>
           <p>${message}</p>
-          <button onclick="location.reload()" class="btn btn-primary btn-sm">
+          <button onclick="location.reload()" class="nav-button primary">
             Обновить страницу
           </button>
         </div>

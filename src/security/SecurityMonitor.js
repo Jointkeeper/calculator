@@ -7,7 +7,7 @@
 import { SecurityDashboard } from './monitoring/SecurityDashboard.js';
 import { SecurityMetrics } from './monitoring/SecurityMetrics.js';
 
-class SecurityMonitor {
+export class SecurityMonitor {
     constructor() {
         this.metrics = new SecurityMetrics();
         this.dashboard = new SecurityDashboard();
@@ -310,6 +310,4 @@ class SecurityMonitor {
         this.dashboard.destroy();
         console.log('🛑 Security monitoring stopped');
     }
-}
-
-export default SecurityMonitor; 
+} 

@@ -4,7 +4,7 @@
  * Implements pattern recognition, rate limiting, and automated security responses
  */
 
-class ThreatDetector {
+export class ThreatDetector {
     constructor() {
         this.threatPatterns = {
             // XSS attack patterns
@@ -535,8 +535,4 @@ class ThreatDetector {
         };
         return names[level] || 'UNKNOWN';
     }
-}
-
-// Export for use in other modules
-// Export for ES modules
-export default ThreatDetector; 
+} 

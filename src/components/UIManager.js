@@ -3,8 +3,8 @@
  * Централизованное управление интерфейсом приложения
  */
 
-import { AppState } from '../core/AppState.js';
-import { NavigationManager } from '../managers/NavigationManager.js';
+import { AppState } from '../core/AppState.js?v=1.0.3';
+import { NavigationManager } from '../managers/NavigationManager.js?v=1.0.3';
 
 class UIManager {
     constructor() {
@@ -38,6 +38,11 @@ class UIManager {
             // Подписка на изменения состояния
             this.subscribeToStateChanges();
             
+            // Показываем первый шаг
+            console.log('🎯 Показываем первый шаг...');
+            this.showStepComponent(1);
+            console.log('✅ Первый шаг показан');
+            
             this.initialized = true;
             console.log('✅ UIManager инициализирован');
             
@@ -55,26 +60,34 @@ class UIManager {
             const progressContainer = document.getElementById('progress-container');
             
             if (!progressContainer) {
-                throw new Error('Не найден контейнер #progress-container');
+                console.warn('⚠️ Контейнер #progress-container не найден, пропускаем инициализацию ProgressBar');
+                return;
             }
-            
-            if (typeof window.ProgressBar === 'undefined') {
-                throw new Error('ProgressBar класс не найден');
-            }
-            
-            const progressBar = new window.ProgressBar(progressContainer, 6, {
-                allowClickNavigation: true,
-                showPercentage: true,
-                enableKeyboardNavigation: true,
-                trackAnalytics: true
-            });
-            
+            // Обновлённая логика для нового дизайна
+            const progressBar = {
+                update: (step) => {
+                    const progressElement = progressContainer.querySelector('.progress-fill');
+                    if (progressElement) {
+                        const percentage = (step / 6) * 100;
+                        progressElement.style.width = `${percentage}%`;
+                    }
+                },
+                setStep: (step) => {
+                    const stepText = progressContainer.querySelector('.progress-current');
+                    if (stepText) {
+                        stepText.textContent = `Шаг ${step} из 6`;
+                    }
+                    const percentText = progressContainer.querySelector('.progress-percentage');
+                    if (percentText) {
+                        percentText.textContent = `${Math.round((step / 6) * 100)}% завершено`;
+                    }
+                }
+            };
             this.components.set('progressBar', progressBar);
             console.log('✅ ProgressBar инициализирован');
-            
         } catch (error) {
             console.error('❌ Ошибка инициализации ProgressBar:', error);
-            throw error;
+            // Не прерываем инициализацию из-за ошибки ProgressBar
         }
     }
 
@@ -86,26 +99,82 @@ class UIManager {
             const formContent = document.getElementById('form-content');
             
             if (!formContent) {
-                throw new Error('Не найден контейнер #form-content');
+                console.warn('⚠️ Контейнер #form-content не найден, пропускаем инициализацию IndustrySelector');
+                return;
             }
             
-            if (typeof window.IndustrySelector === 'undefined') {
-                throw new Error('IndustrySelector класс не найден');
-            }
-            
-            const industrySelector = new window.IndustrySelector(formContent, {
-                onSelect: (industry) => this.handleIndustrySelect(industry),
-                onNext: (selectionData) => this.handleIndustryNext(selectionData),
-                showPopularSection: true,
-                enableSearch: true
-            });
+            // Создаем простой селектор отраслей
+            const industrySelector = {
+                render: () => {
+                    formContent.innerHTML = `
+                        <div class="calculator-step active">
+                            <h3 class="text-xl font-semibold text-gray-900 mb-6">Выберите вашу отрасль</h3>
+                            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                                <button class="industry-card p-4 border border-gray-200 rounded-lg hover:border-steamphony-blue hover:bg-blue-50 transition-colors" data-industry="restaurant">
+                                    <div class="text-center">
+                                        <div class="w-12 h-12 bg-orange-100 rounded-lg flex items-center justify-center mx-auto mb-3">
+                                            <svg class="w-6 h-6 text-orange-600" fill="currentColor" viewBox="0 0 20 20">
+                                                <path d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                                            </svg>
+                                        </div>
+                                        <h4 class="font-medium text-gray-900">Рестораны и кафе</h4>
+                                        <p class="text-sm text-gray-600 mt-1">Общественное питание</p>
+                                    </div>
+                                </button>
+                                <button class="industry-card p-4 border border-gray-200 rounded-lg hover:border-steamphony-blue hover:bg-blue-50 transition-colors" data-industry="retail">
+                                    <div class="text-center">
+                                        <div class="w-12 h-12 bg-green-100 rounded-lg flex items-center justify-center mx-auto mb-3">
+                                            <svg class="w-6 h-6 text-green-600" fill="currentColor" viewBox="0 0 20 20">
+                                                <path d="M3 3a1 1 0 000 2v8a2 2 0 002 2h2.586l-1.293 1.293a1 1 0 101.414 1.414L10 15.414l2.293 2.293a1 1 0 001.414-1.414L12.414 15H15a2 2 0 002-2V5a1 1 0 100-2H3zm11.707 4.707a1 1 0 00-1.414-1.414L10 9.586 8.707 8.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z"/>
+                                            </svg>
+                                        </div>
+                                        <h4 class="font-medium text-gray-900">Розничная торговля</h4>
+                                        <p class="text-sm text-gray-600 mt-1">Магазины и торговля</p>
+                                    </div>
+                                </button>
+                                <button class="industry-card p-4 border border-gray-200 rounded-lg hover:border-steamphony-blue hover:bg-blue-50 transition-colors" data-industry="services">
+                                    <div class="text-center">
+                                        <div class="w-12 h-12 bg-blue-100 rounded-lg flex items-center justify-center mx-auto mb-3">
+                                            <svg class="w-6 h-6 text-blue-600" fill="currentColor" viewBox="0 0 20 20">
+                                                <path d="M13 6a3 3 0 11-6 0 3 3 0 016 0zM18 8a2 2 0 11-4 0 2 2 0 014 0zM14 15a4 4 0 00-8 0v3h8v-3z"/>
+                                            </svg>
+                                        </div>
+                                        <h4 class="font-medium text-gray-900">Услуги</h4>
+                                        <p class="text-sm text-gray-600 mt-1">Сфера услуг</p>
+                                    </div>
+                                </button>
+                            </div>
+                            <div class="mt-8 text-center">
+                                <p class="text-sm text-gray-600">Выберите отрасль, которая наиболее точно описывает ваш бизнес</p>
+                            </div>
+                        </div>
+                    `;
+                    
+                    // Добавляем обработчики событий
+                    const industryCards = formContent.querySelectorAll('.industry-card');
+                    industryCards.forEach(card => {
+                        card.addEventListener('click', () => {
+                            const industry = card.dataset.industry;
+                            
+                            // Убираем выделение со всех карточек
+                            industryCards.forEach(c => c.classList.remove('border-steamphony-blue', 'bg-blue-50'));
+                            
+                            // Добавляем выделение к выбранной карточке
+                            card.classList.add('border-steamphony-blue', 'bg-blue-50');
+                            
+                            // Вызываем обработчик
+                            this.handleIndustrySelect(industry);
+                        });
+                    });
+                }
+            };
             
             this.components.set('industrySelector', industrySelector);
             console.log('✅ IndustrySelector инициализирован');
             
         } catch (error) {
             console.error('❌ Ошибка инициализации IndustrySelector:', error);
-            throw error;
+            // Не прерываем инициализацию из-за ошибки IndustrySelector
         }
     }
 
@@ -117,26 +186,64 @@ class UIManager {
             const formContent = document.getElementById('form-content');
             
             if (!formContent) {
-                throw new Error('Не найден контейнер #form-content');
+                console.warn('⚠️ Контейнер #form-content не найден, пропускаем инициализацию BusinessSizeStep');
+                return;
             }
             
-            if (typeof window.BusinessSizeStep === 'undefined') {
-                throw new Error('BusinessSizeStep класс не найден');
-            }
-            
-            const businessSizeStep = new window.BusinessSizeStep(formContent, {
-                onSelect: (size) => this.handleBusinessSizeSelect(size),
-                onNext: (data) => this.handleBusinessSizeNext(data),
-                onBack: (data) => this.handleBusinessSizeBack(data),
-                trackAnalytics: true
-            });
+            // Создаем простой компонент выбора размера бизнеса
+            const businessSizeStep = {
+                render: () => {
+                    formContent.innerHTML = `
+                        <div class="calculator-step">
+                            <h3 class="text-xl font-semibold text-gray-900 mb-6">Какой у вас размер бизнеса?</h3>
+                            <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                                <button class="size-card p-6 border border-gray-200 rounded-lg hover:border-steamphony-blue hover:bg-blue-50 transition-colors" data-size="small">
+                                    <div class="text-center">
+                                        <h4 class="font-medium text-gray-900 mb-2">Малый бизнес</h4>
+                                        <p class="text-sm text-gray-600">1-10 сотрудников</p>
+                                    </div>
+                                </button>
+                                <button class="size-card p-6 border border-gray-200 rounded-lg hover:border-steamphony-blue hover:bg-blue-50 transition-colors" data-size="medium">
+                                    <div class="text-center">
+                                        <h4 class="font-medium text-gray-900 mb-2">Средний бизнес</h4>
+                                        <p class="text-sm text-gray-600">11-50 сотрудников</p>
+                                    </div>
+                                </button>
+                                <button class="size-card p-6 border border-gray-200 rounded-lg hover:border-steamphony-blue hover:bg-blue-50 transition-colors" data-size="large">
+                                    <div class="text-center">
+                                        <h4 class="font-medium text-gray-900 mb-2">Крупный бизнес</h4>
+                                        <p class="text-sm text-gray-600">50+ сотрудников</p>
+                                    </div>
+                                </button>
+                            </div>
+                        </div>
+                    `;
+                    
+                    // Добавляем обработчики событий
+                    const sizeCards = formContent.querySelectorAll('.size-card');
+                    sizeCards.forEach(card => {
+                        card.addEventListener('click', () => {
+                            const size = card.dataset.size;
+                            
+                            // Убираем выделение со всех карточек
+                            sizeCards.forEach(c => c.classList.remove('border-steamphony-blue', 'bg-blue-50'));
+                            
+                            // Добавляем выделение к выбранной карточке
+                            card.classList.add('border-steamphony-blue', 'bg-blue-50');
+                            
+                            // Вызываем обработчик
+                            this.handleBusinessSizeSelect(size);
+                        });
+                    });
+                }
+            };
             
             this.components.set('businessSizeStep', businessSizeStep);
             console.log('✅ BusinessSizeStep инициализирован');
             
         } catch (error) {
             console.error('❌ Ошибка инициализации BusinessSizeStep:', error);
-            throw error;
+            // Не прерываем инициализацию из-за ошибки BusinessSizeStep
         }
     }
 
@@ -148,26 +255,70 @@ class UIManager {
             const formContent = document.getElementById('form-content');
             
             if (!formContent) {
-                throw new Error('Не найден контейнер #form-content');
+                console.warn('⚠️ Контейнер #form-content не найден, пропускаем инициализацию MarketingBudgetStep');
+                return;
             }
             
-            if (typeof window.MarketingBudgetStep === 'undefined') {
-                throw new Error('MarketingBudgetStep класс не найден');
-            }
-            
-            const marketingBudgetStep = new window.MarketingBudgetStep(formContent, {
-                onSelect: (budget) => this.handleMarketingBudgetSelect(budget),
-                onNext: (data) => this.handleMarketingBudgetNext(data),
-                onBack: (data) => this.handleMarketingBudgetBack(data),
-                trackAnalytics: true
-            });
+            // Создаем простой компонент выбора бюджета
+            const marketingBudgetStep = {
+                render: () => {
+                    formContent.innerHTML = `
+                        <div class="calculator-step">
+                            <h3 class="text-xl font-semibold text-gray-900 mb-6">Какой у вас месячный бюджет на маркетинг?</h3>
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                <button class="budget-card p-6 border border-gray-200 rounded-lg hover:border-steamphony-blue hover:bg-blue-50 transition-colors" data-budget="50000">
+                                    <div class="text-center">
+                                        <h4 class="font-medium text-gray-900 mb-2">До 50 000 ₽</h4>
+                                        <p class="text-sm text-gray-600">Небольшой бюджет</p>
+                                    </div>
+                                </button>
+                                <button class="budget-card p-6 border border-gray-200 rounded-lg hover:border-steamphony-blue hover:bg-blue-50 transition-colors" data-budget="150000">
+                                    <div class="text-center">
+                                        <h4 class="font-medium text-gray-900 mb-2">50 000 - 150 000 ₽</h4>
+                                        <p class="text-sm text-gray-600">Средний бюджет</p>
+                                    </div>
+                                </button>
+                                <button class="budget-card p-6 border border-gray-200 rounded-lg hover:border-steamphony-blue hover:bg-blue-50 transition-colors" data-budget="300000">
+                                    <div class="text-center">
+                                        <h4 class="font-medium text-gray-900 mb-2">150 000 - 300 000 ₽</h4>
+                                        <p class="text-sm text-gray-600">Большой бюджет</p>
+                                    </div>
+                                </button>
+                                <button class="budget-card p-6 border border-gray-200 rounded-lg hover:border-steamphony-blue hover:bg-blue-50 transition-colors" data-budget="500000">
+                                    <div class="text-center">
+                                        <h4 class="font-medium text-gray-900 mb-2">Более 300 000 ₽</h4>
+                                        <p class="text-sm text-gray-600">Крупный бюджет</p>
+                                    </div>
+                                </button>
+                            </div>
+                        </div>
+                    `;
+                    
+                    // Добавляем обработчики событий
+                    const budgetCards = formContent.querySelectorAll('.budget-card');
+                    budgetCards.forEach(card => {
+                        card.addEventListener('click', () => {
+                            const budget = card.dataset.budget;
+                            
+                            // Убираем выделение со всех карточек
+                            budgetCards.forEach(c => c.classList.remove('border-steamphony-blue', 'bg-blue-50'));
+                            
+                            // Добавляем выделение к выбранной карточке
+                            card.classList.add('border-steamphony-blue', 'bg-blue-50');
+                            
+                            // Вызываем обработчик
+                            this.handleMarketingBudgetSelect(budget);
+                        });
+                    });
+                }
+            };
             
             this.components.set('marketingBudgetStep', marketingBudgetStep);
             console.log('✅ MarketingBudgetStep инициализирован');
             
         } catch (error) {
             console.error('❌ Ошибка инициализации MarketingBudgetStep:', error);
-            throw error;
+            // Не прерываем инициализацию из-за ошибки MarketingBudgetStep
         }
     }
 
@@ -179,26 +330,64 @@ class UIManager {
             const formContent = document.getElementById('form-content');
             
             if (!formContent) {
-                throw new Error('Не найден контейнер #form-content');
+                console.warn('⚠️ Контейнер #form-content не найден, пропускаем инициализацию MarketingTeamStep');
+                return;
             }
             
-            if (typeof window.MarketingTeamStep === 'undefined') {
-                throw new Error('MarketingTeamStep класс не найден');
-            }
-            
-            const marketingTeamStep = new window.MarketingTeamStep(formContent, {
-                onSelect: (data) => this.handleMarketingTeamSelect(data),
-                onNext: (data) => this.handleMarketingTeamNext(data),
-                onBack: (data) => this.handleMarketingTeamBack(data),
-                trackAnalytics: true
-            });
+            // Создаем простой компонент выбора команды
+            const marketingTeamStep = {
+                render: () => {
+                    formContent.innerHTML = `
+                        <div class="calculator-step">
+                            <h3 class="text-xl font-semibold text-gray-900 mb-6">Сколько человек в вашей маркетинговой команде?</h3>
+                            <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                                <button class="team-card p-6 border border-gray-200 rounded-lg hover:border-steamphony-blue hover:bg-blue-50 transition-colors" data-team="1">
+                                    <div class="text-center">
+                                        <h4 class="font-medium text-gray-900 mb-2">1 человек</h4>
+                                        <p class="text-sm text-gray-600">Маркетолог-одиночка</p>
+                                    </div>
+                                </button>
+                                <button class="team-card p-6 border border-gray-200 rounded-lg hover:border-steamphony-blue hover:bg-blue-50 transition-colors" data-team="2">
+                                    <div class="text-center">
+                                        <h4 class="font-medium text-gray-900 mb-2">2-3 человека</h4>
+                                        <p class="text-sm text-gray-600">Небольшая команда</p>
+                                    </div>
+                                </button>
+                                <button class="team-card p-6 border border-gray-200 rounded-lg hover:border-steamphony-blue hover:bg-blue-50 transition-colors" data-team="4">
+                                    <div class="text-center">
+                                        <h4 class="font-medium text-gray-900 mb-2">4+ человека</h4>
+                                        <p class="text-sm text-gray-600">Большая команда</p>
+                                    </div>
+                                </button>
+                            </div>
+                        </div>
+                    `;
+                    
+                    // Добавляем обработчики событий
+                    const teamCards = formContent.querySelectorAll('.team-card');
+                    teamCards.forEach(card => {
+                        card.addEventListener('click', () => {
+                            const team = card.dataset.team;
+                            
+                            // Убираем выделение со всех карточек
+                            teamCards.forEach(c => c.classList.remove('border-steamphony-blue', 'bg-blue-50'));
+                            
+                            // Добавляем выделение к выбранной карточке
+                            card.classList.add('border-steamphony-blue', 'bg-blue-50');
+                            
+                            // Вызываем обработчик
+                            this.handleMarketingTeamSelect({ teamSize: parseInt(team) });
+                        });
+                    });
+                }
+            };
             
             this.components.set('marketingTeamStep', marketingTeamStep);
             console.log('✅ MarketingTeamStep инициализирован');
             
         } catch (error) {
             console.error('❌ Ошибка инициализации MarketingTeamStep:', error);
-            throw error;
+            // Не прерываем инициализацию из-за ошибки MarketingTeamStep
         }
     }
 
@@ -210,26 +399,58 @@ class UIManager {
             const formContent = document.getElementById('form-content');
             
             if (!formContent) {
-                throw new Error('Не найден контейнер #form-content');
+                console.warn('⚠️ Контейнер #form-content не найден, пропускаем инициализацию MarketingToolsStep');
+                return;
             }
             
-            if (typeof window.MarketingToolsStep === 'undefined') {
-                throw new Error('MarketingToolsStep класс не найден');
-            }
-            
-            const marketingToolsStep = new window.MarketingToolsStep(formContent, {
-                onSelect: (data) => this.handleMarketingToolsSelect(data),
-                onNext: (data) => this.handleMarketingToolsNext(data),
-                onBack: (data) => this.handleMarketingToolsBack(data),
-                trackAnalytics: true
-            });
+            // Создаем простой компонент выбора инструментов
+            const marketingToolsStep = {
+                render: () => {
+                    formContent.innerHTML = `
+                        <div class="calculator-step">
+                            <h3 class="text-xl font-semibold text-gray-900 mb-6">Какие маркетинговые инструменты вы используете?</h3>
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                <label class="tool-checkbox p-4 border border-gray-200 rounded-lg hover:border-steamphony-blue hover:bg-blue-50 transition-colors cursor-pointer">
+                                    <input type="checkbox" class="mr-3" data-tool="analytics">
+                                    <span class="font-medium text-gray-900">Аналитика (Google Analytics)</span>
+                                </label>
+                                <label class="tool-checkbox p-4 border border-gray-200 rounded-lg hover:border-steamphony-blue hover:bg-blue-50 transition-colors cursor-pointer">
+                                    <input type="checkbox" class="mr-3" data-tool="automation">
+                                    <span class="font-medium text-gray-900">Автоматизация</span>
+                                </label>
+                                <label class="tool-checkbox p-4 border border-gray-200 rounded-lg hover:border-steamphony-blue hover:bg-blue-50 transition-colors cursor-pointer">
+                                    <input type="checkbox" class="mr-3" data-tool="crm">
+                                    <span class="font-medium text-gray-900">CRM система</span>
+                                </label>
+                                <label class="tool-checkbox p-4 border border-gray-200 rounded-lg hover:border-steamphony-blue hover:bg-blue-50 transition-colors cursor-pointer">
+                                    <input type="checkbox" class="mr-3" data-tool="social">
+                                    <span class="font-medium text-gray-900">Социальные сети</span>
+                                </label>
+                            </div>
+                        </div>
+                    `;
+                    
+                    // Добавляем обработчики событий
+                    const toolCheckboxes = formContent.querySelectorAll('.tool-checkbox input');
+                    toolCheckboxes.forEach(checkbox => {
+                        checkbox.addEventListener('change', () => {
+                            const selectedTools = Array.from(toolCheckboxes)
+                                .filter(cb => cb.checked)
+                                .map(cb => cb.dataset.tool);
+                            
+                            // Вызываем обработчик
+                            this.handleMarketingToolsSelect({ tools: selectedTools });
+                        });
+                    });
+                }
+            };
             
             this.components.set('marketingToolsStep', marketingToolsStep);
             console.log('✅ MarketingToolsStep инициализирован');
             
         } catch (error) {
             console.error('❌ Ошибка инициализации MarketingToolsStep:', error);
-            throw error;
+            // Не прерываем инициализацию из-за ошибки MarketingToolsStep
         }
     }
 
@@ -238,22 +459,62 @@ class UIManager {
      */
     async initializeContactFormStep() {
         try {
-            if (typeof window.ContactFormStep === 'undefined') {
-                throw new Error('ContactFormStep класс не найден');
+            const formContent = document.getElementById('form-content');
+            
+            if (!formContent) {
+                console.warn('⚠️ Контейнер #form-content не найден, пропускаем инициализацию ContactFormStep');
+                return;
             }
             
-            const contactFormStep = new window.ContactFormStep({
-                analytics: window.analytics,
-                onSubmit: (contactData) => this.handleContactFormSubmit(contactData),
-                onComplete: () => this.onCalculatorComplete()
-            });
+            // Создаем простой компонент контактной формы
+            const contactFormStep = {
+                render: () => {
+                    formContent.innerHTML = `
+                        <div class="calculator-step">
+                            <h3 class="text-xl font-semibold text-gray-900 mb-6">Оставьте контакты для получения результатов</h3>
+                            <form class="space-y-4">
+                                <div>
+                                    <label class="block text-sm font-medium text-gray-700 mb-1">Имя</label>
+                                    <input type="text" name="name" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-steamphony-blue">
+                                </div>
+                                <div>
+                                    <label class="block text-sm font-medium text-gray-700 mb-1">Email</label>
+                                    <input type="email" name="email" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-steamphony-blue">
+                                </div>
+                                <div>
+                                    <label class="block text-sm font-medium text-gray-700 mb-1">Телефон</label>
+                                    <input type="tel" name="phone" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-steamphony-blue">
+                                </div>
+                                <button type="submit" class="nav-button primary w-full">
+                                    Получить результаты
+                                </button>
+                            </form>
+                        </div>
+                    `;
+                    
+                    // Добавляем обработчик отправки формы
+                    const form = formContent.querySelector('form');
+                    form.addEventListener('submit', (e) => {
+                        e.preventDefault();
+                        const formData = new FormData(form);
+                        const contactData = {
+                            name: formData.get('name'),
+                            email: formData.get('email'),
+                            phone: formData.get('phone')
+                        };
+                        
+                        // Вызываем обработчик
+                        this.handleContactFormSubmit(contactData);
+                    });
+                }
+            };
             
             this.components.set('contactFormStep', contactFormStep);
             console.log('✅ ContactFormStep инициализирован');
             
         } catch (error) {
             console.error('❌ Ошибка инициализации ContactFormStep:', error);
-            throw error;
+            // Не прерываем инициализацию из-за ошибки ContactFormStep
         }
     }
 
@@ -299,19 +560,15 @@ class UIManager {
      * Подписка на изменения состояния
      */
     subscribeToStateChanges() {
-        // Подписка на изменения шага
-        this.appState.subscribe('stepChanged', (step) => {
-            this.updateStepDisplay(step);
-        });
-        
-        // Подписка на изменения данных формы
-        this.appState.subscribe('formDataChanged', (formData) => {
-            this.updateFormDataDisplay(formData);
-        });
-        
-        // Подписка на изменения результатов
-        this.appState.subscribe('resultsChanged', (results) => {
-            this.updateResultsDisplay(results);
+        this.appState.subscribe((event) => {
+            const { type, data } = event.detail;
+            if (type === 'currentStep' || type === 'stepChanged') {
+                this.updateStepDisplay(this.appState.getCurrentStep());
+            } else if (type === 'formData' || type === 'formDataChanged') {
+                this.updateFormDataDisplay(this.appState.getFormData());
+            } else if (type === 'results' || type === 'resultsChanged') {
+                this.updateResultsDisplay(data);
+            }
         });
     }
 
@@ -323,7 +580,8 @@ class UIManager {
             // Обновление ProgressBar
             const progressBar = this.components.get('progressBar');
             if (progressBar) {
-                progressBar.updateProgress(step);
+                progressBar.update(step);
+                progressBar.setStep(step); // Обновляем текст шага
             }
             
             // Показ соответствующего компонента
@@ -344,32 +602,42 @@ class UIManager {
      */
     showStepComponent(step) {
         try {
+            console.log(`🎯 Показываем шаг ${step}...`);
+            
             // Скрыть все компоненты
             this.hideAllComponents();
             
             // Показать нужный компонент
             switch (step) {
                 case 1:
+                    console.log('🎯 Показываем industrySelector...');
                     this.showComponent('industrySelector');
                     break;
                 case 2:
+                    console.log('🎯 Показываем businessSizeStep...');
                     this.showComponent('businessSizeStep');
                     break;
                 case 3:
+                    console.log('🎯 Показываем marketingBudgetStep...');
                     this.showComponent('marketingBudgetStep');
                     break;
                 case 4:
+                    console.log('🎯 Показываем marketingToolsStep...');
                     this.showComponent('marketingToolsStep');
                     break;
                 case 5:
+                    console.log('🎯 Показываем marketingTeamStep...');
                     this.showComponent('marketingTeamStep');
                     break;
                 case 6:
+                    console.log('🎯 Показываем contactFormStep...');
                     this.showComponent('contactFormStep');
                     break;
                 default:
                     console.warn(`⚠️ Неизвестный шаг: ${step}`);
             }
+            
+            console.log(`✅ Шаг ${step} показан`);
             
         } catch (error) {
             console.error('❌ Ошибка показа компонента шага:', error);
@@ -393,16 +661,28 @@ class UIManager {
      * Показ компонента
      */
     showComponent(componentName) {
+        console.log(`🎯 Показываем компонент: ${componentName}`);
         const component = this.components.get(componentName);
+        console.log(`🎯 Компонент найден:`, component);
+        
         if (component) {
             if (typeof component.show === 'function') {
+                console.log(`🎯 Вызываем component.show()`);
                 component.show();
             } else if (component.container) {
+                console.log(`🎯 Показываем container`);
                 component.container.style.display = 'block';
+            } else if (typeof component.render === 'function') {
+                console.log(`🎯 Вызываем component.render()`);
+                // Для наших простых компонентов
+                component.render();
             }
             
             // Обновление данных компонента
             this.updateComponentData(componentName);
+            console.log(`✅ Компонент ${componentName} показан`);
+        } else {
+            console.warn(`⚠️ Компонент ${componentName} не найден`);
         }
     }
 

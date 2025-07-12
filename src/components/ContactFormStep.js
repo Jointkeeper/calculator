@@ -373,7 +373,7 @@ class ContactFormStep {
           <p>Проверьте папку "Спам", если не получили письмо</p>
         </div>
         <div class="success-actions">
-          <button type="button" class="btn btn-secondary" onclick="window.location.reload()">
+          <button type="button" class="nav-button secondary" onclick="window.location.reload()">
             Пройти калькулятор еще раз
           </button>
         </div>

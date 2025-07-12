@@ -3,14 +3,23 @@
  * Централизованная обработка всех пользовательских взаимодействий
  */
 
-import { AppState } from '../core/AppState.js';
-import { NavigationManager } from '../managers/NavigationManager.js';
+import { AppState } from '../core/AppState.js?v=1.0.2';
+import { NavigationManager } from '../managers/NavigationManager.js?v=1.0.2';
 
 class EventHandlers {
     constructor() {
+        this.appState = null;
+        this.navigationManager = null;
+        this.isInitialized = false;
+    }
+
+    initialize() {
+        if (this.isInitialized) return;
+        
         this.appState = AppState.getInstance();
         this.navigationManager = NavigationManager.getInstance();
         this.bindEvents();
+        this.isInitialized = true;
     }
 
     bindEvents() {
@@ -389,5 +398,15 @@ class EventHandlers {
     }
 }
 
-// Экспорт синглтона
-export const eventHandlers = new EventHandlers(); 
+// Экспорт класса и синглтона
+export { EventHandlers };
+
+// Создаем синглтон, но не инициализируем его сразу
+let eventHandlersInstance = null;
+
+export const getEventHandlers = () => {
+    if (!eventHandlersInstance) {
+        eventHandlersInstance = new EventHandlers();
+    }
+    return eventHandlersInstance;
+}; 

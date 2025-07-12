@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Тест модуля EventHandlers</title>
+</head>
+<body>
+    <h1>Тест загрузки EventHandlers</h1>
+    <div id="output"></div>
+
+    <script type="module">
+        const output = document.getElementById('output');
+        
+        try {
+            console.log('🔄 Начинаем тест загрузки EventHandlers...');
+            
+            // Тест 1: Импорт модуля
+            const { getEventHandlers } = await import('../src/handlers/EventHandlers.js?v=1.0.3');
+            console.log('✅ EventHandlers импортирован успешно');
+            output.innerHTML += '<p style="color: green;">✅ EventHandlers импортирован успешно</p>';
+            
+            // Тест 2: Получение экземпляра
+            const eventHandlers = getEventHandlers();
+            console.log('✅ Экземпляр EventHandlers получен:', eventHandlers);
+            output.innerHTML += '<p style="color: green;">✅ Экземпляр EventHandlers получен</p>';
+            
+            // Тест 3: Инициализация
+            eventHandlers.initialize();
+            console.log('✅ EventHandlers инициализирован');
+            output.innerHTML += '<p style="color: green;">✅ EventHandlers инициализирован</p>';
+            
+            output.innerHTML += '<p style="color: green; font-weight: bold;">🎉 Все тесты прошли успешно!</p>';
+            
+        } catch (error) {
+            console.error('❌ Ошибка:', error);
+            output.innerHTML += `<p style="color: red;">❌ Ошибка: ${error.message}</p>`;
+            output.innerHTML += `<pre style="color: red; background: #f0f0f0; padding: 10px;">${error.stack}</pre>`;
+        }
+    </script>
+</body>
+</html> 

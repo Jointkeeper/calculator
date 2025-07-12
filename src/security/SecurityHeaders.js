@@ -4,7 +4,7 @@
  * Implements comprehensive security headers to prevent various attacks
  */
 
-class SecurityHeaders {
+export class SecurityHeaders {
     constructor() {
         this.headers = {
             // Prevent clickjacking attacks
@@ -385,8 +385,4 @@ class SecurityHeaders {
 
         return recommendations;
     }
-}
-
-// Export for use in other modules
-// Export for ES modules
-export default SecurityHeaders; 
+} 

@@ -3,11 +3,28 @@
  * Управление навигацией между шагами калькулятора
  */
 
+import { AppState } from '../core/AppState.js';
+
 export class NavigationManager {
+  static instance = null;
+  
+  static getInstance() {
+    if (!NavigationManager.instance) {
+      // Получаем глобальный экземпляр AppState
+      const appState = window.appState || AppState.getInstance();
+      NavigationManager.instance = new NavigationManager(appState);
+    }
+    return NavigationManager.instance;
+  }
+  
   constructor(appState) {
     this.appState = appState;
     this.stepHandlers = new Map();
     this.setupStepHandlers();
+  }
+
+  initialize() {
+    // no-op for compatibility
   }
 
   /**

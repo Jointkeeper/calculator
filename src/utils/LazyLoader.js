@@ -4,7 +4,7 @@
  * Implements intelligent loading strategies and error handling
  */
 
-class LazyLoader {
+export class LazyLoader {
     constructor() {
         this.loadedModules = new Map();
         this.loadingModules = new Map();
@@ -347,7 +347,4 @@ class LazyLoader {
 
         console.log('🚀 LazyLoader initialized with configuration:', config);
     }
-}
-
-// Export for ES modules
-export default LazyLoader; 
+} 

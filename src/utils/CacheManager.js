@@ -4,7 +4,7 @@
  * Implements cache-first, network-first, and background sync for optimal performance
  */
 
-class CacheManager {
+export class CacheManager {
     constructor() {
         this.cacheName = 'steamphony-calculator-v1';
         this.cacheStrategies = {
@@ -564,7 +564,4 @@ class CacheManager {
             throw error;
         }
     }
-}
-
-// Export for ES modules
-export default CacheManager; 
+} 

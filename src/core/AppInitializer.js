@@ -6,18 +6,24 @@
 import { AppState } from './AppState.js';
 import { NavigationManager } from '../managers/NavigationManager.js';
 import { calculator } from './Calculator.js';
-import { eventHandlers } from '../handlers/EventHandlers.js';
+import { getEventHandlers } from '../handlers/EventHandlers.js';
 import { uiManager } from '../components/UIManager.js';
 import { SecurityLayer } from '../security/index.js';
 import Analytics from '../services/Analytics.js';
 import CookieBanner from '../components/CookieBanner.js';
+import { CSPConfig } from '../security/CSPConfig.js?v=1.0.3';
+import { LazyLoader } from '../utils/LazyLoader.js?v=1.0.4';
+import { SecurityHeaders } from '../security/SecurityHeaders.js?v=1.0.4';
+import { CacheManager } from '../utils/CacheManager.js?v=1.0.4';
+import { ThreatDetector } from '../security/ThreatDetector.js?v=1.0.4';
+import { SecurityMonitor } from '../security/SecurityMonitor.js?v=1.0.4';
 
 class AppInitializer {
   constructor() {
     this.appState = AppState.getInstance();
     this.navigationManager = NavigationManager.getInstance();
     this.calculator = calculator;
-    this.eventHandlers = eventHandlers;
+            this.eventHandlers = getEventHandlers();
     this.uiManager = uiManager;
     this.securityLayer = SecurityLayer;
   }
@@ -29,15 +35,42 @@ class AppInitializer {
     try {
       console.log('🚀 Инициализация приложения...');
       
-      // Инициализация компонентов
+      // Инициализация базовых компонентов
       await this.initializeAdvancedSecurity();
       await this.initializePerformanceOptimization();
       
       // Скрыть экран загрузки
       this.hideLoadingState();
       
-      // Показать контент калькулятора
-      this.showCalculatorContent();
+      // Показать кнопку запуска калькулятора
+      this.showStartButton();
+      
+      // Инициализация Event Handlers
+      this.eventHandlers.initialize();
+      
+      // Настройка обработчика кнопки запуска
+      this.setupStartButtonHandler();
+      
+      console.log('✅ Приложение готово к запуску калькулятора');
+      
+      // Dispatch события готовности
+      this.dispatchEvent('appReady', this.appState.getAppState());
+      
+    } catch (error) {
+      console.error('App: Ошибка инициализации компонентов:', error);
+      this.handleInitializationError(error);
+    }
+  }
+
+  /**
+   * Запуск калькулятора после нажатия кнопки
+   */
+  async startCalculator() {
+    try {
+      console.log('🎯 Запуск калькулятора...');
+      
+      // Показать состояние загрузки
+      this.showLoadingState();
       
       // Инициализация UI менеджера
       await this.uiManager.initialize();
@@ -51,13 +84,13 @@ class AppInitializer {
       // Переподключение Analytics к компонентам после их инициализации
       this.connectAnalyticsEvents();
       
-      console.log('✅ Приложение успешно инициализировано');
+      // Показать контент калькулятора
+      this.showCalculatorContent();
       
-      // Dispatch события готовности
-      this.dispatchEvent('appReady', this.appState.getAppState());
+      console.log('✅ Калькулятор успешно запущен');
       
     } catch (error) {
-      console.error('App: Ошибка инициализации компонентов:', error);
+      console.error('❌ Ошибка запуска калькулятора:', error);
       this.handleInitializationError(error);
     }
   }
@@ -108,8 +141,8 @@ class AppInitializer {
         lazyLoading: {
           enabled: true,
           preloadModules: [
-            './src/components/Calculator.js',
-            './src/services/Analytics.js'
+            '/src/core/Calculator.js',
+            '/src/services/Analytics.js'
           ],
           maxRetries: 3,
           loadingTimeout: 10000
@@ -137,13 +170,13 @@ class AppInitializer {
       
       // Initialize CacheManager
       this.cacheManager = new CacheManager();
-      await this.cacheManager.initialize(performanceConfig.caching);
+      await this.cacheManager.initialize({
+        ...performanceConfig.caching,
+        registerServiceWorker: false // Prevent automatic registration
+      });
       
-      // Create and register Service Worker
-      const serviceWorkerScript = this.cacheManager.createServiceWorkerScript();
-      const serviceWorkerBlob = new Blob([serviceWorkerScript], { type: 'application/javascript' });
-      const serviceWorkerUrl = URL.createObjectURL(serviceWorkerBlob);
-      await this.cacheManager.registerServiceWorker(serviceWorkerUrl);
+      // Register existing Service Worker
+      await this.cacheManager.registerServiceWorker('/public/sw.js');
       
       // Initialize Performance Monitor
       this.performanceMonitor = new PerformanceMonitor();
@@ -296,9 +329,60 @@ class AppInitializer {
    * Скрытие состояния загрузки
    */
   hideLoadingState() {
-    const loadingElement = document.getElementById('loading');
+    const loadingElement = document.getElementById('loading-state');
     if (loadingElement) {
       loadingElement.style.display = 'none';
+    }
+  }
+
+  /**
+   * Показ состояния загрузки
+   */
+  showLoadingState() {
+    const startButton = document.getElementById('start-calculator');
+    const loadingElement = document.getElementById('loading-state');
+    
+    if (startButton) {
+      startButton.style.display = 'none';
+    }
+    
+    if (loadingElement) {
+      loadingElement.classList.remove('hidden');
+    }
+  }
+
+  /**
+   * Показ кнопки запуска калькулятора
+   */
+  showStartButton() {
+    const startButton = document.getElementById('start-calculator');
+    if (startButton) {
+      startButton.style.display = 'block';
+    }
+  }
+
+  /**
+   * Настройка обработчика кнопки запуска
+   */
+  setupStartButtonHandler() {
+    const startButton = document.getElementById('start-calculator-btn');
+    if (startButton) {
+      startButton.addEventListener('click', async (event) => {
+        event.preventDefault();
+        
+        // Добавляем анимацию нажатия
+        startButton.classList.add('scale-95');
+        
+        // Запускаем калькулятор
+        await this.startCalculator();
+        
+        // Убираем анимацию
+        setTimeout(() => {
+          startButton.classList.remove('scale-95');
+        }, 150);
+      });
+      
+      console.log('✅ Обработчик кнопки запуска настроен');
     }
   }
 
@@ -306,9 +390,14 @@ class AppInitializer {
    * Показ контента калькулятора
    */
   showCalculatorContent() {
-    const calculatorElement = document.getElementById('calculator');
+    const calculatorElement = document.getElementById('calculator-content');
     if (calculatorElement) {
-      calculatorElement.style.display = 'block';
+      calculatorElement.classList.remove('hidden');
+    }
+    // Показываем прогресс-бар
+    const progressContainer = document.getElementById('progress-container');
+    if (progressContainer) {
+      progressContainer.classList.remove('hidden');
     }
   }
 
@@ -331,16 +420,9 @@ class AppInitializer {
    * Показ ошибки пользователю
    */
   showError(message) {
-    const errorContainer = document.getElementById('error-container');
+    const errorContainer = document.getElementById('error-state');
     if (errorContainer) {
-      errorContainer.innerHTML = `
-        <div class="error-message">
-          <h3>Ошибка</h3>
-          <p>${message}</p>
-          <button onclick="location.reload()">Обновить страницу</button>
-        </div>
-      `;
-      errorContainer.style.display = 'block';
+      errorContainer.classList.remove('hidden');
     }
   }
 

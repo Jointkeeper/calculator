@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Тест загрузки модулей</title>
+</head>
+<body>
+    <h1>Тест загрузки модулей</h1>
+    <div id="status">Загрузка...</div>
+    
+    <script type="module">
+        try {
+            console.log('Начинаем тест загрузки модулей...');
+            
+            // Тест 1: AppState
+            const { AppState } = await import('./src/core/AppState.js');
+            console.log('✅ AppState загружен');
+            
+            // Тест 2: AppInitializer
+            const AppInitializer = await import('./src/core/AppInitializer.js');
+            console.log('✅ AppInitializer загружен');
+            
+            // Тест 3: main.js
+            const app = await import('./src/main.js');
+            console.log('✅ main.js загружен');
+            
+            document.getElementById('status').innerHTML = '✅ Все модули загружены успешно!';
+            document.getElementById('status').style.color = 'green';
+            
+        } catch (error) {
+            console.error('❌ Ошибка загрузки модулей:', error);
+            document.getElementById('status').innerHTML = '❌ Ошибка: ' + error.message;
+            document.getElementById('status').style.color = 'red';
+        }
+    </script>
+</body>
+</html> 

@@ -3,11 +3,11 @@
  * Централизованная логика всех вычислений калькулятора
  */
 
-import { industries } from '../data/industries.js';
+import { INDUSTRY_CONFIG } from '../data/industries.js';
 
 class Calculator {
     constructor() {
-        this.industries = industries;
+        this.industries = Object.values(INDUSTRY_CONFIG);
         this.defaultRates = {
             cpc: 50, // средний CPC в рублях
             conversion: 0.02, // 2% конверсия

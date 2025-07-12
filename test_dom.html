@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Тест DOM элементов</title>
+</head>
+<body>
+    <h1>Тест DOM элементов</h1>
+    <div id="status">Проверка...</div>
+    
+    <script>
+        function testDOMElements() {
+            const status = document.getElementById('status');
+            const results = [];
+            
+            // Тест 1: Проверяем, что мы можем найти элементы
+            const loadingState = document.getElementById('loading-state');
+            const calculatorContent = document.getElementById('calculator-content');
+            const formContent = document.getElementById('form-content');
+            
+            results.push(`loading-state: ${loadingState ? '✅ найден' : '❌ не найден'}`);
+            results.push(`calculator-content: ${calculatorContent ? '✅ найден' : '❌ не найден'}`);
+            results.push(`form-content: ${formContent ? '✅ найден' : '❌ не найден'}`);
+            
+            // Тест 2: Проверяем классы
+            if (calculatorContent) {
+                results.push(`calculator-content имеет класс 'hidden': ${calculatorContent.classList.contains('hidden') ? '✅ да' : '❌ нет'}`);
+            }
+            
+            if (loadingState) {
+                results.push(`loading-state display: ${loadingState.style.display}`);
+            }
+            
+            // Выводим результаты
+            status.innerHTML = results.map(r => `<div>${r}</div>`).join('');
+        }
+        
+        // Запускаем тест после загрузки страницы
+        if (document.readyState === 'loading') {
+            document.addEventListener('DOMContentLoaded', testDOMElements);
+        } else {
+            testDOMElements();
+        }
+    </script>
+</body>
+</html> 

@@ -4,6 +4,15 @@
  */
 
 export class AppState {
+  static instance = null;
+  
+  static getInstance() {
+    if (!AppState.instance) {
+      AppState.instance = new AppState();
+    }
+    return AppState.instance;
+  }
+  
   constructor() {
     // Данные формы
     this.formData = {
@@ -302,6 +311,13 @@ export class AppState {
     });
     
     this.dispatchStateChange('reset', this.getAppState());
+  }
+
+  /**
+   * Восстановить состояние приложения (reset)
+   */
+  restore() {
+    this.reset();
   }
 
   /**

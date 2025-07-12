@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Пошаговый тест модулей</title>
+</head>
+<body>
+    <h1>Пошаговый тест модулей</h1>
+    <div id="output"></div>
+
+    <script type="module">
+        const output = document.getElementById('output');
+        
+        async function testStep(stepName, testFunction) {
+            try {
+                output.innerHTML += `<h3>🔄 Тест: ${stepName}</h3>`;
+                await testFunction();
+                output.innerHTML += `<p style="color: green;">✅ ${stepName} - УСПЕХ</p>`;
+                return true;
+            } catch (error) {
+                output.innerHTML += `<p style="color: red;">❌ ${stepName} - ОШИБКА: ${error.message}</p>`;
+                console.error(`Ошибка в ${stepName}:`, error);
+                return false;
+            }
+        }
+        
+        try {
+            // Тест 1: AppState
+            await testStep('AppState', async () => {
+                const { AppState } = await import('../src/core/AppState.js?v=1.0.3');
+                const appState = AppState.getInstance();
+                console.log('AppState:', appState);
+            });
+            
+            // Тест 2: NavigationManager
+            await testStep('NavigationManager', async () => {
+                const { NavigationManager } = await import('../src/managers/NavigationManager.js?v=1.0.3');
+                console.log('NavigationManager class:', NavigationManager);
+                console.log('getInstance method:', NavigationManager.getInstance);
+                const navManager = NavigationManager.getInstance();
+                console.log('NavigationManager instance:', navManager);
+            });
+            
+            // Тест 3: EventHandlers
+            await testStep('EventHandlers', async () => {
+                const { getEventHandlers } = await import('../src/handlers/EventHandlers.js?v=1.0.3');
+                console.log('getEventHandlers function:', getEventHandlers);
+                const eventHandlers = getEventHandlers();
+                console.log('EventHandlers instance:', eventHandlers);
+            });
+            
+            // Тест 4: Инициализация EventHandlers
+            await testStep('EventHandlers.initialize()', async () => {
+                const { getEventHandlers } = await import('../src/handlers/EventHandlers.js?v=1.0.3');
+                const eventHandlers = getEventHandlers();
+                eventHandlers.initialize();
+                console.log('EventHandlers initialized:', eventHandlers.isInitialized);
+            });
+            
+            output.innerHTML += '<h2 style="color: green;">🎉 Все тесты завершены!</h2>';
+            
+        } catch (error) {
+            output.innerHTML += `<p style="color: red;">❌ Критическая ошибка: ${error.message}</p>`;
+            console.error('Критическая ошибка:', error);
+        }
+    </script>
+</body>
+</html> 

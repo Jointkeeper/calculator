@@ -4,7 +4,7 @@
  * Implements strict CSP directives to prevent XSS, injection attacks
  */
 
-class CSPConfig {
+export class CSPConfig {
     constructor() {
         this.cspDirectives = {
             'default-src': ["'self'"],
@@ -241,7 +241,4 @@ class CSPConfig {
             return { error: 'Statistics unavailable' };
         }
     }
-}
-
-// Export for ES modules
-export default CSPConfig; 
+} 

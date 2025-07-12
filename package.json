@@ -18,7 +18,12 @@
     "tailwindcss": "^3.3.0"
   },
   "devDependencies": {
-    "live-server": "^1.2.0"
+    "@eslint/js": "^9.31.0",
+    "eslint-plugin-import": "^2.32.0",
+    "live-server": "^1.2.0",
+    "webpack": "^5.100.1",
+    "webpack-cli": "^6.0.1",
+    "webpack-dev-server": "^5.2.2"
   },
   "keywords": [
     "calculator",
