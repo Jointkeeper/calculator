@@ -8,7 +8,6 @@
     <meta name="author" content="Steamphony Digital Agency">
     
     <!-- Security Headers -->
-    <meta http-equiv="X-Frame-Options" content="DENY">
     <meta http-equiv="X-Content-Type-Options" content="nosniff">
     <meta http-equiv="Referrer-Policy" content="strict-origin-when-cross-origin">
     <meta http-equiv="X-XSS-Protection" content="1; mode=block">
@@ -35,14 +34,14 @@
     <link rel="preload" href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" as="style">
     
     <!-- Favicon -->
-    <link rel="icon" href="/favicon.ico" type="image/x-icon">
-    <link rel="apple-touch-icon" sizes="180x180" href="/assets/apple-touch-icon.png">
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🧮</text></svg>">
     
     <!-- Fonts -->
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     
     <!-- Styles -->
     <link href="styles.css" rel="stylesheet">
+    <link href="src/styles/steamphony-theme.css" rel="stylesheet">
     
     <!-- Structured data -->
     <script type="application/ld+json">
@@ -97,17 +96,14 @@
             </div>
             
             <!-- Progress bar container -->
-            <div id="progress-container" class="bg-gray-100 border-t border-gray-200">
-                <div class="max-w-4xl mx-auto px-4 py-3">
-                    <div id="progress-bar" role="progressbar" aria-valuemin="0" aria-valuemax="100" aria-valuenow="16" aria-label="Прогресс заполнения калькулятора">
-                        <!-- Progress bar will be populated by JavaScript -->
-                        <div class="flex items-center justify-between text-sm text-gray-600 mb-2">
-                            <span>Шаг 1 из 6</span>
-                            <span>16% завершено</span>
-                        </div>
-                        <div class="w-full bg-gray-200 rounded-full h-2">
-                            <div class="bg-steamphony-blue h-2 rounded-full transition-all duration-500" style="width: 16%"></div>
-                        </div>
+            <div id="progress-container" class="progress-container">
+                <div id="progress-bar" role="progressbar" aria-valuemin="0" aria-valuemax="100" aria-valuenow="16" aria-label="Прогресс заполнения калькулятора">
+                    <div class="progress-info">
+                        <span class="progress-current">Шаг 1 из 6</span>
+                        <span class="progress-percentage">16% завершено</span>
+                    </div>
+                    <div class="progress-track">
+                        <div class="progress-fill" style="width: 16%"></div>
                     </div>
                 </div>
             </div>
@@ -151,9 +147,58 @@
             <section class="py-8 md:py-12">
                 <div class="max-w-4xl mx-auto px-4">
                     <!-- Calculator form container - populated by JavaScript -->
-                    <div id="calculator-container" class="bg-white rounded-xl shadow-lg border border-gray-200 p-6 md:p-8">
+                    <div id="calculator-container" class="calculator-widget">
+                        <!-- Start Calculator Button -->
+                        <div id="start-calculator" class="text-center py-16">
+                            <div class="mb-8">
+                                <div class="widget-logo-icon flex items-center justify-center mx-auto mb-6">
+                                    <svg class="w-8 h-8 text-white" fill="currentColor" viewBox="0 0 20 20" aria-hidden="true">
+                                        <path fill-rule="evenodd" d="M3 4a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zm0 4a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zm0 4a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zm0 4a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1z" clip-rule="evenodd"/>
+                                    </svg>
+                                </div>
+                                <h3 class="text-2xl font-bold text-steamphony-primary mb-4">Готовы рассчитать экономию?</h3>
+                                <p class="text-lg text-gray-600 mb-8">Заполните простую форму и узнайте, сколько вы можете сэкономить на маркетинге</p>
+                            </div>
+                            
+                            <!-- Animated Start Button -->
+                            <button id="start-calculator-btn" class="start-button">
+                                <svg class="w-6 h-6" fill="currentColor" viewBox="0 0 20 20" aria-hidden="true">
+                                    <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM9.555 7.168A1 1 0 008 8v4a1 1 0 001.555.832l3-2a1 1 0 000-1.664l-3-2z" clip-rule="evenodd"/>
+                                </svg>
+                                <span>Начать расчет</span>
+                            </button>
+                            
+                            <!-- Features list -->
+                            <div class="trust-grid mt-12">
+                                <div class="trust-item">
+                                    <div class="trust-icon">
+                                        <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
+                                            <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/>
+                                        </svg>
+                                    </div>
+                                    <div class="trust-text">Бесплатно</div>
+                                </div>
+                                <div class="trust-item">
+                                    <div class="trust-icon">
+                                        <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
+                                            <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm1-12a1 1 0 10-2 0v4a1 1 0 00.293.707l2.828 2.829a1 1 0 101.415-1.415L11 9.586V6z" clip-rule="evenodd"/>
+                                        </svg>
+                                    </div>
+                                    <div class="trust-text">5 минут</div>
+                                </div>
+                                <div class="trust-item">
+                                    <div class="trust-icon">
+                                        <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
+                                            <path d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                                        </svg>
+                                    </div>
+                                    <div class="trust-text">Персональный результат</div>
+                                </div>
+                            </div>
+                        </div>
+                        
                         <!-- Loading state -->
-                        <div id="loading-state" class="text-center py-12">
+                        <div id="loading-state" class="hidden text-center py-12">
                             <div class="loading-spinner mx-auto mb-4"></div>
                             <p class="text-gray-600">Загружаем калькулятор...</p>
                         </div>
@@ -167,7 +212,7 @@
                             </div>
                             <h3 class="text-lg font-semibold text-gray-900 mb-2">Ошибка загрузки</h3>
                             <p class="text-gray-600 mb-4">Попробуйте обновить страницу</p>
-                            <button onclick="location.reload()" class="btn btn-primary">
+                            <button onclick="location.reload()" class="nav-button primary">
                                 Обновить страницу
                             </button>
                         </div>
@@ -186,38 +231,56 @@
             <!-- Trust signals -->
             <section class="bg-gray-100 py-12" aria-labelledby="trust-heading">
                 <div class="max-w-4xl mx-auto px-4">
-                    <h2 id="trust-heading" class="text-2xl font-bold text-center text-gray-900 mb-8">
+                    <h2 id="trust-heading" class="text-2xl font-bold text-center text-steamphony-primary mb-8">
                         Нам доверяют
                     </h2>
-                    <div class="grid grid-cols-2 md:grid-cols-4 gap-8 items-center">
+                    <div class="trust-grid">
                         <!-- Client logos placeholders -->
-                        <div class="bg-white p-4 rounded-lg shadow-sm flex items-center justify-center h-16">
-                            <span class="text-gray-400">Client 1</span>
+                        <div class="trust-item">
+                            <div class="trust-icon">
+                                <span class="text-lg font-bold">C1</span>
+                            </div>
+                            <div class="trust-text">Client 1</div>
                         </div>
-                        <div class="bg-white p-4 rounded-lg shadow-sm flex items-center justify-center h-16">
-                            <span class="text-gray-400">Client 2</span>
+                        <div class="trust-item">
+                            <div class="trust-icon">
+                                <span class="text-lg font-bold">C2</span>
+                            </div>
+                            <div class="trust-text">Client 2</div>
                         </div>
-                        <div class="bg-white p-4 rounded-lg shadow-sm flex items-center justify-center h-16">
-                            <span class="text-gray-400">Client 3</span>
+                        <div class="trust-item">
+                            <div class="trust-icon">
+                                <span class="text-lg font-bold">C3</span>
+                            </div>
+                            <div class="trust-text">Client 3</div>
                         </div>
-                        <div class="bg-white p-4 rounded-lg shadow-sm flex items-center justify-center h-16">
-                            <span class="text-gray-400">Client 4</span>
+                        <div class="trust-item">
+                            <div class="trust-icon">
+                                <span class="text-lg font-bold">C4</span>
+                            </div>
+                            <div class="trust-text">Client 4</div>
                         </div>
                     </div>
                     
                     <!-- Statistics -->
-                    <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mt-12">
-                        <div class="text-center">
-                            <div class="text-3xl font-bold text-steamphony-blue mb-2">150+</div>
-                            <div class="text-gray-600">Успешных проектов</div>
+                    <div class="trust-grid mt-12">
+                        <div class="trust-item">
+                            <div class="trust-icon">
+                                <span class="text-2xl font-bold">150+</span>
+                            </div>
+                            <div class="trust-text">Успешных проектов</div>
                         </div>
-                        <div class="text-center">
-                            <div class="text-3xl font-bold text-steamphony-blue mb-2">35%</div>
-                            <div class="text-gray-600">Средняя экономия бюджета</div>
+                        <div class="trust-item">
+                            <div class="trust-icon">
+                                <span class="text-2xl font-bold">35%</span>
+                            </div>
+                            <div class="trust-text">Средняя экономия бюджета</div>
                         </div>
-                        <div class="text-center">
-                            <div class="text-3xl font-bold text-steamphony-blue mb-2">4.8</div>
-                            <div class="text-gray-600">Средний ROI наших клиентов</div>
+                        <div class="trust-item">
+                            <div class="trust-icon">
+                                <span class="text-2xl font-bold">4.8</span>
+                            </div>
+                            <div class="trust-text">Средний ROI наших клиентов</div>
                         </div>
                     </div>
                 </div>
@@ -329,38 +392,8 @@
         };
     </script>
 
-    <!-- Component Scripts (Non-Module) -->
-    <script src="src/components/ProgressBar.js"></script>
-    <script src="src/components/IndustrySelector.js"></script>
-    <script src="src/components/BusinessSizeStep.js"></script>
-    <script src="src/components/MarketingBudgetStep.js"></script>
-    <script src="src/components/MarketingToolsStep.js"></script>
-    <script src="src/components/MarketingTeamStep.js"></script>
-    <script src="src/components/ContactFormStep.js"></script>
-    <script src="src/components/Calculator.js"></script>
-    
-    <!-- Module imports for global access -->
-    <script type="module">
-        try {
-            const { default: Analytics } = await import('./src/services/Analytics.js');
-            const { default: CookieBanner } = await import('./src/components/CookieBanner.js');
-            
-            // Global access for debugging and testing
-            window.SteamphonyAnalytics = Analytics;
-            window.SteamphonyCookieBanner = CookieBanner;
-            
-            console.log('✅ Analytics and CookieBanner classes loaded globally');
-        } catch (error) {
-            console.warn('⚠️ Failed to load Analytics/CookieBanner globally:', error);
-        }
-    </script>
-    
     <!-- Application entry point -->
-    <script type="module" src="src/main.js"></script>
-    <!-- Marketing Tools Step -->
-    <div id="marketing-tools-step" class="step-container" style="display: none;">
-      <!-- MarketingToolsStep.js will render content here -->
-    </div>
+    <script type="module" src="../src/main.js?v=1.0.3"></script>
 
   </body>
 </html> 
