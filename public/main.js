@@ -63,9 +63,15 @@ class App {
       // Инициализация через AppInitializer
       await this.initializer.initialize();
       
+      // Инициализация UI Manager (создает componentManager и stepManager)
+      await this.uiManager.initialize();
+      
       // Глобальный доступ для тестирования
       if (typeof window !== 'undefined') {
         window.app = this;
+        // Добавляем менеджеры в глобальный объект
+        window.app.componentManager = this.uiManager.componentManager;
+        window.app.stepManager = this.uiManager.stepManager;
       }
       
     } catch (error) {

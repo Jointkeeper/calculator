@@ -110,11 +110,13 @@ class EventHandlers {
         const field = input.name || input.dataset.field;
         
         // Обновление состояния
-        this.appState.updateField(field, value);
-        
+        if (this.appState && typeof this.appState.setFormField === 'function') {
+            this.appState.setFormField(field, value);
+        } else {
+            console.warn('AppState.setFormField не найден');
+        }
         // Валидация в реальном времени
         this.validateField(input);
-        
         // Автосохранение
         this.appState.autoSave();
     }
@@ -125,13 +127,15 @@ class EventHandlers {
         const field = select.name || select.dataset.field;
         
         // Обновление состояния
-        this.appState.updateField(field, value);
-        
+        if (this.appState && typeof this.appState.setFormField === 'function') {
+            this.appState.setFormField(field, value);
+        } else {
+            console.warn('AppState.setFormField не найден');
+        }
         // Специальная обработка для индустрии
         if (field === 'industry') {
             this.handleIndustryChange(value);
         }
-        
         // Автосохранение
         this.appState.autoSave();
     }

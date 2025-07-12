@@ -1,0 +1,220 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Steamphony Calculator - No Cache Test</title>
+    <link rel="stylesheet" href="styles.css?v=1.0.5">
+    <link rel="stylesheet" href="base.css?v=1.0.5">
+    <link rel="stylesheet" href="styles/main.css?v=1.0.5">
+    <link rel="stylesheet" href="styles/components.css?v=1.0.5">
+</head>
+<body>
+    <!-- Loading State -->
+    <div id="loading-state" class="loading-state">
+        <div class="loading-spinner"></div>
+        <p>Загрузка калькулятора...</p>
+    </div>
+
+    <!-- Main Content -->
+    <div id="main-content" class="main-content hidden">
+        <!-- Hero Section -->
+        <section class="hero">
+            <div class="hero-content">
+                <h1>Калькулятор маркетингового бюджета</h1>
+                <p>Рассчитайте оптимальный бюджет для вашего бизнеса</p>
+                <button id="start-calculator" class="start-button">
+                    Начать расчет
+                </button>
+            </div>
+        </section>
+
+        <!-- Calculator Section -->
+        <section id="calculator-section" class="calculator-section hidden">
+            <div class="calculator-container">
+                <!-- Progress Bar -->
+                <div id="progress-container" class="progress-container">
+                    <div id="progress-bar" class="progress-bar">
+                        <div class="progress-fill"></div>
+                    </div>
+                    <div class="progress-steps">
+                        <span class="step active" data-step="1">Отрасль</span>
+                        <span class="step" data-step="2">Размер бизнеса</span>
+                        <span class="step" data-step="3">Команда</span>
+                        <span class="step" data-step="4">Бюджет</span>
+                        <span class="step" data-step="5">Инструменты</span>
+                        <span class="step" data-step="6">Контакты</span>
+                    </div>
+                </div>
+
+                <!-- Calculator Steps -->
+                <div id="calculator-steps" class="calculator-steps">
+                    <!-- Step 1: Industry Selection -->
+                    <div id="step-1" class="step-content active">
+                        <h2>Выберите вашу отрасль</h2>
+                        <div id="industry-grid" class="industry-grid">
+                            <!-- Industries will be loaded here -->
+                        </div>
+                    </div>
+
+                    <!-- Step 2: Business Size -->
+                    <div id="step-2" class="step-content">
+                        <h2>Размер вашего бизнеса</h2>
+                        <div class="business-size-options">
+                            <div class="option-card" data-size="startup">
+                                <h3>Стартап</h3>
+                                <p>До 10 сотрудников</p>
+                            </div>
+                            <div class="option-card" data-size="small">
+                                <h3>Малый бизнес</h3>
+                                <p>10-50 сотрудников</p>
+                            </div>
+                            <div class="option-card" data-size="medium">
+                                <h3>Средний бизнес</h3>
+                                <p>50-250 сотрудников</p>
+                            </div>
+                            <div class="option-card" data-size="large">
+                                <h3>Крупный бизнес</h3>
+                                <p>Более 250 сотрудников</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Step 3: Marketing Team -->
+                    <div id="step-3" class="step-content">
+                        <h2>Ваша маркетинговая команда</h2>
+                        <div class="team-options">
+                            <div class="option-card" data-team="none">
+                                <h3>Нет команды</h3>
+                                <p>Нужно создать с нуля</p>
+                            </div>
+                            <div class="option-card" data-team="small">
+                                <h3>1-2 специалиста</h3>
+                                <p>Минимальная команда</p>
+                            </div>
+                            <div class="option-card" data-team="medium">
+                                <h3>3-5 специалистов</h3>
+                                <p>Средняя команда</p>
+                            </div>
+                            <div class="option-card" data-team="large">
+                                <h3>6+ специалистов</h3>
+                                <p>Большая команда</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Step 4: Marketing Budget -->
+                    <div id="step-4" class="step-content">
+                        <h2>Текущий маркетинговый бюджет</h2>
+                        <div class="budget-input">
+                            <label for="current-budget">Месячный бюджет (₽)</label>
+                            <input type="number" id="current-budget" placeholder="Введите сумму">
+                        </div>
+                    </div>
+
+                    <!-- Step 5: Marketing Tools -->
+                    <div id="step-5" class="step-content">
+                        <h2>Используемые инструменты</h2>
+                        <div class="tools-grid">
+                            <div class="tool-card" data-tool="google-ads">
+                                <input type="checkbox" id="google-ads">
+                                <label for="google-ads">Google Ads</label>
+                            </div>
+                            <div class="tool-card" data-tool="facebook-ads">
+                                <input type="checkbox" id="facebook-ads">
+                                <label for="facebook-ads">Facebook Ads</label>
+                            </div>
+                            <div class="tool-card" data-tool="yandex-direct">
+                                <input type="checkbox" id="yandex-direct">
+                                <label for="yandex-direct">Яндекс.Директ</label>
+                            </div>
+                            <div class="tool-card" data-tool="vk-ads">
+                                <input type="checkbox" id="vk-ads">
+                                <label for="vk-ads">VK Ads</label>
+                            </div>
+                            <div class="tool-card" data-tool="instagram-ads">
+                                <input type="checkbox" id="instagram-ads">
+                                <label for="instagram-ads">Instagram Ads</label>
+                            </div>
+                            <div class="tool-card" data-tool="youtube-ads">
+                                <input type="checkbox" id="youtube-ads">
+                                <label for="youtube-ads">YouTube Ads</label>
+                            </div>
+                            <div class="tool-card" data-tool="telegram-ads">
+                                <input type="checkbox" id="telegram-ads">
+                                <label for="telegram-ads">Telegram Ads</label>
+                            </div>
+                            <div class="tool-card" data-tool="linkedin-ads">
+                                <input type="checkbox" id="linkedin-ads">
+                                <label for="linkedin-ads">LinkedIn Ads</label>
+                            </div>
+                            <div class="tool-card" data-tool="tiktok-ads">
+                                <input type="checkbox" id="tiktok-ads">
+                                <label for="tiktok-ads">TikTok Ads</label>
+                            </div>
+                            <div class="tool-card" data-tool="my-target">
+                                <input type="checkbox" id="my-target">
+                                <label for="my-target">MyTarget</label>
+                            </div>
+                            <div class="tool-card" data-tool="crm">
+                                <input type="checkbox" id="crm">
+                                <label for="crm">CRM системы</label>
+                            </div>
+                            <div class="tool-card" data-tool="analytics">
+                                <input type="checkbox" id="analytics">
+                                <label for="analytics">Аналитика</label>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Step 6: Contact Form -->
+                    <div id="step-6" class="step-content">
+                        <h2>Получить результаты</h2>
+                        <div class="contact-form">
+                            <div class="form-group">
+                                <label for="name">Имя</label>
+                                <input type="text" id="name" required>
+                            </div>
+                            <div class="form-group">
+                                <label for="email">Email</label>
+                                <input type="email" id="email" required>
+                            </div>
+                            <div class="form-group">
+                                <label for="phone">Телефон</label>
+                                <input type="tel" id="phone">
+                            </div>
+                            <button type="submit" class="submit-button">Получить расчет</button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Navigation -->
+                <div class="step-navigation">
+                    <button id="prev-step" class="nav-button prev" disabled>Назад</button>
+                    <button id="next-step" class="nav-button next">Далее</button>
+                </div>
+            </div>
+        </section>
+    </div>
+
+    <!-- Scripts with cache busting -->
+    <script type="module" src="main.js?v=1.0.5"></script>
+    <script type="module" src="AppInitializer.js?v=1.0.5"></script>
+    <script type="module" src="core/AppState.js?v=1.0.5"></script>
+    <script type="module" src="core/Calculator.js?v=1.0.5"></script>
+    <script type="module" src="components/ProgressBar.js?v=1.0.5"></script>
+    <script type="module" src="components/IndustrySelector.js?v=1.0.5"></script>
+    <script type="module" src="components/BusinessSizeStep.js?v=1.0.5"></script>
+    <script type="module" src="components/MarketingTeamStep.js?v=1.0.5"></script>
+    <script type="module" src="components/MarketingBudgetStep.js?v=1.0.5"></script>
+    <script type="module" src="components/MarketingToolsStep.js?v=1.0.5"></script>
+    <script type="module" src="components/ContactFormStep.js?v=1.0.5"></script>
+    <script type="module" src="managers/NavigationManager.js?v=1.0.5"></script>
+    <script type="module" src="managers/ComponentManager.js?v=1.0.5"></script>
+    <script type="module" src="managers/StepManager.js?v=1.0.5"></script>
+    <script type="module" src="handlers/EventHandlers.js?v=1.0.5"></script>
+    <script type="module" src="data/industries.js?v=1.0.5"></script>
+    <script type="module" src="data/marketingTeams.js?v=1.0.5"></script>
+    <script type="module" src="data/marketingTools.js?v=1.0.5"></script>
+</body>
+</html> 

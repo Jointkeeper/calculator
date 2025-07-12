@@ -407,6 +407,7 @@ class ContactFormStep {
    * Расчет результатов
    */
   calculateResults() {
+    console.log('[ContactFormStep] calculateResults input:', this.formData);
     if (!this.formData) return null;
 
     const currentCosts = this.calculateCurrentCosts();
@@ -429,18 +430,34 @@ class ContactFormStep {
    * Расчет текущих затрат
    */
   calculateCurrentCosts() {
+    console.log('[ContactFormStep] calculateCurrentCosts - formData:', this.formData);
+    
+    // Получаем бюджет из marketingBudget.budget (как сохраняет MarketingBudgetStep)
     const budget = this.formData?.marketingBudget?.budget || 0;
+    console.log('[ContactFormStep] budget:', budget);
+    
+    // Получаем стоимость команды из marketingTeam.monthlyCost (как сохраняет MarketingTeamStep)
     const team = this.formData?.marketingTeam?.monthlyCost || 0;
-    const tools = this.formData?.marketingTools?.totalCost || 0;
-    return budget + team + tools;
+    console.log('[ContactFormStep] team cost:', team);
+    
+    // Получаем стоимость инструментов из marketingTools.estimatedMonthlyCost (как сохраняет MarketingToolsStep)
+    const tools = this.formData?.marketingTools?.estimatedMonthlyCost || 0;
+    console.log('[ContactFormStep] tools cost:', tools);
+    
+    const total = budget + team + tools;
+    console.log('[ContactFormStep] total current costs:', total);
+    return total;
   }
 
   /**
    * Расчет затрат Steamphony
    */
   calculateSteamphonyCosts() {
-    const tools = this.formData?.marketingTools?.totalCost || 0;
-    return Math.round(tools * 0.7); // 30% оптимизация
+    // Получаем стоимость инструментов
+    const tools = this.formData?.marketingTools?.estimatedMonthlyCost || 0;
+    const steamphonyCost = Math.round(tools * 0.7); // 30% оптимизация
+    console.log('[ContactFormStep] Steamphony costs:', steamphonyCost, 'from tools:', tools);
+    return steamphonyCost;
   }
 
   /**
@@ -617,4 +634,5 @@ class ContactFormStep {
   }
 }
 
-export default ContactFormStep; 
+export default ContactFormStep;
+window.ContactFormStep = ContactFormStep; 

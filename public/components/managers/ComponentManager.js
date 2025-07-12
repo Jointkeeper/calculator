@@ -4,6 +4,7 @@
  */
 
 import { AppState } from '../../core/AppState.js?v=1.0.4';
+import ContactFormStep from '../ContactFormStep.js';
 
 class ComponentManager {
     constructor() {
@@ -760,29 +761,15 @@ class ComponentManager {
     }
 
     async initializeContactFormStep() {
-        const contactFormStep = {
-            render: () => {
-                const formContent = document.getElementById('form-content');
-                if (!formContent) return;
-
-                formContent.innerHTML = `
-                    <div class="calculator-step active">
-                        <h3 class="step-title">Контактная информация</h3>
-                        <p class="step-description">Оставьте свои данные для получения результатов</p>
-                        <div class="space-y-4">
-                            <input type="text" placeholder="Ваше имя" class="w-full p-3 border border-gray-300 rounded-lg">
-                            <input type="email" placeholder="Email" class="w-full p-3 border border-gray-300 rounded-lg">
-                            <input type="tel" placeholder="Телефон" class="w-full p-3 border border-gray-300 rounded-lg">
-                        </div>
-                    </div>
-                `;
-                
-                this.setupContactEventHandlers();
-            }
-        };
-        
+        const formContent = document.getElementById('form-content');
+        if (!formContent) {
+            console.warn('⚠️ Контейнер #form-content не найден, пропускаем инициализацию ContactFormStep');
+            return;
+        }
+        // Создаем экземпляр настоящего класса ContactFormStep
+        const contactFormStep = new ContactFormStep(formContent);
         this.components.set('contactFormStep', contactFormStep);
-        console.log('✅ ContactFormStep инициализирован');
+        console.log('✅ ContactFormStep инициализирован (реальный класс)');
     }
 
     setupContactEventHandlers() {

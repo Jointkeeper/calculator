@@ -316,7 +316,18 @@ export class AppState {
    * Восстановить состояние приложения (reset)
    */
   restore() {
-    this.reset();
+    try {
+      const savedState = localStorage.getItem('calculator_state');
+      if (savedState) {
+        const state = JSON.parse(savedState);
+        this.formData = { ...this.formData, ...state.formData };
+        this.currentStep = state.currentStep || 1;
+        this.dispatchStateChange('restored', state);
+      }
+    } catch (error) {
+      console.warn('Ошибка восстановления состояния:', error);
+      this.reset();
+    }
   }
 
   /**
@@ -338,5 +349,21 @@ export class AppState {
     return () => {
       document.removeEventListener('appStateChange', callback);
     };
+  }
+
+  /**
+   * Автосохранение состояния
+   */
+  autoSave() {
+    try {
+      const stateToSave = {
+        formData: this.formData,
+        currentStep: this.currentStep,
+        timestamp: Date.now()
+      };
+      localStorage.setItem('calculator_state', JSON.stringify(stateToSave));
+    } catch (error) {
+      console.warn('Ошибка автосохранения:', error);
+    }
   }
 } 

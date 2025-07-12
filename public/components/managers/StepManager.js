@@ -525,46 +525,54 @@ class StepManager {
      * Показать результаты
      */
     showResults() {
+        // Получаем контейнер и экземпляр ContactFormStep
         const formContent = document.getElementById('form-content');
         if (!formContent) return;
 
-        const formData = this.appState.getFormData();
-        const results = this.calculateResults(formData);
+        // Получаем/создаём экземпляр ContactFormStep
+        let contactFormStep = window.app?.componentManager?.getComponent('contactFormStep');
+        console.log('[StepManager] contactFormStep из componentManager:', contactFormStep);
+        if (!contactFormStep) {
+            // Если не найден, создаём вручную (fallback)
+            const ContactFormStep = window.ContactFormStep || (window.app?.componentManager?.ContactFormStep);
+            console.log('[StepManager] ContactFormStep класс:', ContactFormStep);
+            if (ContactFormStep) {
+                contactFormStep = new ContactFormStep(formContent);
+                window.app.componentManager.setComponent('contactFormStep', contactFormStep);
+                console.log('[StepManager] ContactFormStep создан вручную:', contactFormStep);
+            } else {
+                // Fallback: просто показываем старый результат
+                console.log('[StepManager] Fallback: ContactFormStep не найден, рендерим простую форму');
+                formContent.innerHTML = '<div class="calculator-step active"><h3>Результаты не удалось отобразить</h3></div>';
+                return;
+            }
+        }
 
-        formContent.innerHTML = `
-            <div class="calculator-step active">
-                <div class="results-container">
-                    <div class="savings-amount">${this.formatCurrency(results.totalSavings)}</div>
-                    <div class="savings-label">Ваша потенциальная экономия в месяц</div>
-                    
-                    <div class="savings-breakdown">
-                        <div class="breakdown-item">
-                            <span class="breakdown-label">Экономия на инструментах</span>
-                            <span class="breakdown-value">${this.formatCurrency(results.toolsSavings)}</span>
-                        </div>
-                        <div class="breakdown-item">
-                            <span class="breakdown-label">Экономия на времени</span>
-                            <span class="breakdown-value">${this.formatCurrency(results.timeSavings)}</span>
-                        </div>
-                        <div class="breakdown-item">
-                            <span class="breakdown-label">Экономия на ошибках</span>
-                            <span class="breakdown-value">${this.formatCurrency(results.errorSavings)}</span>
-                        </div>
-                        <div class="breakdown-item">
-                            <span class="breakdown-label">Общая экономия</span>
-                            <span class="breakdown-value">${this.formatCurrency(results.totalSavings)}</span>
-                        </div>
-                    </div>
-                    
-                    <div class="mt-8">
-                        <p class="text-gray-600 mb-4">Получите детальный отчет с рекомендациями</p>
-                        <button class="nav-button primary" onclick="window.app.eventHandler.handleGetReport()">
-                            Получить отчет
-                        </button>
-                    </div>
-                </div>
-            </div>
-        `;
+        // Получаем данные формы и рассчитываем результаты
+        const formData = this.appState.getFormData();
+        console.log('[StepManager] formData при показе результатов:', formData);
+        
+        // Явно вызываем updateWithFormData для обновления данных и расчета
+        if (typeof contactFormStep.updateWithFormData === 'function') {
+            console.log('[StepManager] Вызываю updateWithFormData с данными:', formData);
+            contactFormStep.updateWithFormData(formData);
+        } else {
+            console.log('[StepManager] updateWithFormData не найден, устанавливаю данные вручную');
+            contactFormStep.formData = formData;
+            contactFormStep.calculationResults = contactFormStep.calculateResults();
+        }
+        
+        // Явно вызываем render для обновления UI
+        if (typeof contactFormStep.render === 'function') {
+            console.log('[StepManager] Вызываю render для обновления UI');
+            contactFormStep.render();
+        }
+        
+        // Явно вызываем updateResultsUI для обновления результатов
+        if (typeof contactFormStep.updateResultsUI === 'function') {
+            console.log('[StepManager] Вызываю updateResultsUI');
+            contactFormStep.updateResultsUI();
+        }
     }
 
     /**

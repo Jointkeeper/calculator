@@ -160,16 +160,13 @@ class AppInitializer {
       const performanceConfig = {
         lazyLoading: {
           enabled: true,
-          preloadModules: [
-            './core/Calculator.js',
-            './services/Analytics.js'
-          ],
+          preloadModules: [], // Отключаем предзагрузку проблемных модулей
           maxRetries: 3,
           loadingTimeout: 10000
         },
         caching: {
           enabled: true,
-          serviceWorker: true,
+          serviceWorker: false, // Отключаем Service Worker
           strategies: {
             staticAssets: 'cache-first',
             apiResponses: 'network-first',
@@ -195,8 +192,8 @@ class AppInitializer {
         registerServiceWorker: false // Prevent automatic registration
       });
       
-      // Register existing Service Worker
-      await this.cacheManager.registerServiceWorker('./sw.js');
+      // Register existing Service Worker - отключено для избежания ошибок
+      // await this.cacheManager.registerServiceWorker('./sw.js');
       
       // Initialize Performance Monitor
       this.performanceMonitor = new PerformanceMonitor();
