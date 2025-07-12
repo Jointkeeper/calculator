@@ -136,7 +136,7 @@ class StepManager {
                     componentManager.showComponent(componentName);
                     console.log(`✅ Показан компонент: ${componentName} для шага ${step}`);
                 } else {
-                    console.warn('❌ ComponentManager не найден или showComponent не функция');
+                    console.warn('❌ ComponentManager не найден или showComponent не функция - используем fallback');
                     // Fallback: прямая инициализация компонента
                     this.initializeComponentFallback(componentName, step);
                 }

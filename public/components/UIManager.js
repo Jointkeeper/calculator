@@ -27,12 +27,12 @@ class UIManager {
         try {
             console.log('🎨 Инициализация UIManager v2.0...');
             
-            // Инициализация подменеджеров
+            // СНАЧАЛА настраиваем глобальные связи
+            this.setupComponentConnections();
+            
+            // ПОТОМ инициализируем подменеджеры
             await this.componentManager.initialize();
             await this.stepManager.initialize();
-            
-            // Настройка связей между компонентами
-            this.setupComponentConnections();
             
             // Подписка на изменения состояния
             this.subscribeToStateChanges();
