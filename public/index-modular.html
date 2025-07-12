@@ -1,0 +1,198 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Steamphony - Калькулятор экономии маркетингового бюджета</title>
+    
+    <!-- CSS Modules -->
+    <link rel="stylesheet" href="base.css">
+    <link rel="stylesheet" href="styles/components/layout.css">
+    <link rel="stylesheet" href="styles/components/calculator.css">
+    
+    <!-- Favicon -->
+    <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🧮</text></svg>">
+    
+    <!-- Meta tags -->
+    <meta name="description" content="Рассчитайте экономию маркетингового бюджета с помощью AI-калькулятора Steamphony">
+    <meta name="keywords" content="маркетинг, калькулятор, экономия, AI, Steamphony">
+    <meta name="author" content="Steamphony Digital Agency">
+    
+    <!-- Open Graph -->
+    <meta property="og:title" content="Steamphony - Калькулятор экономии маркетингового бюджета">
+    <meta property="og:description" content="Рассчитайте экономию маркетингового бюджета с помощью AI-калькулятора">
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="https://steamphony.com/calculator">
+    
+    <!-- Security Headers -->
+    <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline';">
+    <meta http-equiv="X-Content-Type-Options" content="nosniff">
+    <meta http-equiv="X-Frame-Options" content="DENY">
+    <meta http-equiv="X-XSS-Protection" content="1; mode=block">
+</head>
+<body>
+    <!-- Page Container -->
+    <div class="page-container">
+        <!-- Header -->
+        <header class="main-header">
+            <div class="header-content">
+                <div class="main-logo">
+                    <div class="main-logo-icon"></div>
+                    <div class="main-logo-text">Steamphony</div>
+                </div>
+                <div class="header-contact">
+                    <a href="tel:+74951234567">+7 (495) 123-45-67</a>
+                    <a href="mailto:info@steamphony.com">info@steamphony.com</a>
+                </div>
+            </div>
+        </header>
+
+        <!-- Hero Section -->
+        <section class="hero-section">
+            <div class="hero-content">
+                <h1 class="hero-title">Рассчитайте экономию маркетингового бюджета</h1>
+                <p class="hero-subtitle">Узнайте, сколько вы можете сэкономить с помощью AI-оптимизации</p>
+                <div class="hero-features">
+                    <div class="hero-feature">
+                        <div class="hero-feature-icon">✓</div>
+                        <span>Быстрый расчет</span>
+                    </div>
+                    <div class="hero-feature">
+                        <div class="hero-feature-icon">✓</div>
+                        <span>AI-анализ</span>
+                    </div>
+                    <div class="hero-feature">
+                        <div class="hero-feature-icon">✓</div>
+                        <span>Персональный отчет</span>
+                    </div>
+                </div>
+                
+                <!-- Start Calculator Button -->
+                <div id="start-calculator" class="text-center py-8">
+                    <div class="mb-4">
+                        <p class="text-lg text-gray-600">Готовы узнать вашу экономию?</p>
+                    </div>
+                    <button id="start-calculator-btn" class="start-button">
+                        Запустить калькулятор
+                    </button>
+                </div>
+            </div>
+        </section>
+
+        <!-- Main Content -->
+        <main class="main-content">
+            <div class="content-container">
+                <!-- Calculator Widget -->
+                <div class="calculator-widget">
+                    <!-- Widget Header -->
+                    <div class="widget-header">
+                        <h2 class="widget-title">Калькулятор экономии</h2>
+                        <p class="widget-subtitle">Заполните форму и получите персональный расчет</p>
+                    </div>
+
+                    <!-- Widget Body -->
+                    <div class="widget-body">
+                        <!-- Progress Bar -->
+                        <div class="progress-container" id="progress-container">
+                            <div class="progress-bar">
+                                <div class="progress-fill" style="width: 16.67%"></div>
+                            </div>
+                            <div class="progress-info">
+                                <span class="progress-current">Шаг 1 из 6</span>
+                                <span class="progress-percentage">16% завершено</span>
+                            </div>
+                        </div>
+
+                        <!-- Form Content -->
+                        <div id="form-content">
+                            <!-- Content will be dynamically loaded by JavaScript -->
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </main>
+
+        <!-- Trust Section -->
+        <section class="trust-section">
+            <div class="trust-container">
+                <h2 class="trust-title">Нам доверяют</h2>
+                <p class="trust-subtitle">Более 500 компаний уже сэкономили на маркетинге с нами</p>
+                
+                <div class="trust-stats">
+                    <div class="trust-stat">
+                        <div class="stat-number">500+</div>
+                        <div class="stat-label">Довольных клиентов</div>
+                    </div>
+                    <div class="trust-stat">
+                        <div class="stat-number">₽15M</div>
+                        <div class="stat-label">Сэкономлено в среднем</div>
+                    </div>
+                    <div class="trust-stat">
+                        <div class="stat-number">98%</div>
+                        <div class="stat-label">Успешных проектов</div>
+                    </div>
+                </div>
+
+                <div class="clients-grid">
+                    <div class="client-card">
+                        <div class="client-logo">R</div>
+                        <div class="client-name">Restaurant Pro</div>
+                        <div class="client-industry">Рестораны</div>
+                        <div class="client-savings">₽450,000/мес</div>
+                    </div>
+                    <div class="client-card">
+                        <div class="client-logo">S</div>
+                        <div class="client-name">ShopSmart</div>
+                        <div class="client-industry">Розничная торговля</div>
+                        <div class="client-savings">₽680,000/мес</div>
+                    </div>
+                    <div class="client-card">
+                        <div class="client-logo">C</div>
+                        <div class="client-name">Consulting Plus</div>
+                        <div class="client-industry">Консалтинг</div>
+                        <div class="client-savings">₽320,000/мес</div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Footer -->
+        <footer class="main-footer">
+            <div class="footer-content">
+                <div class="footer-logo">Steamphony</div>
+                <div class="footer-contact">
+                    <p>Москва, ул. Тверская, 1</p>
+                    <p>+7 (495) 123-45-67 | info@steamphony.com</p>
+                </div>
+                <div class="footer-links">
+                    <a href="#">О нас</a>
+                    <a href="#">Услуги</a>
+                    <a href="#">Портфолио</a>
+                    <a href="#">Контакты</a>
+                </div>
+                <div class="footer-copyright">
+                    © 2024 Steamphony Digital Agency. Все права защищены.
+                </div>
+            </div>
+        </footer>
+    </div>
+
+    <!-- JavaScript Modules -->
+    <script type="module" src="main.js"></script>
+    
+    <!-- Service Worker Registration -->
+    <script>
+        if ('serviceWorker' in navigator) {
+            window.addEventListener('load', () => {
+                navigator.serviceWorker.register('/sw.js')
+                    .then(registration => {
+                        console.log('SW registered: ', registration);
+                    })
+                    .catch(registrationError => {
+                        console.log('SW registration failed: ', registrationError);
+                    });
+            });
+        }
+    </script>
+</body>
+</html> 

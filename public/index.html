@@ -41,7 +41,7 @@
     
     <!-- Styles -->
     <link href="styles.css" rel="stylesheet">
-    <link href="src/styles/steamphony-theme.css" rel="stylesheet">
+    <link rel="stylesheet" href="styles/steamphony-theme.css">
     
     <!-- Structured data -->
     <script type="application/ld+json">
@@ -61,9 +61,6 @@
 
 <body class="antialiased bg-gray-50 text-gray-900">
     <!-- Skip navigation link for accessibility -->
-    <a href="#main-content" class="sr-only focus:not-sr-only focus:absolute focus:top-4 focus:left-4 nav-button primary z-50">
-        Перейти к основному содержанию
-    </a>
 
     <div id="app" class="min-h-screen flex flex-col">
         <!-- Header -->
@@ -112,54 +109,34 @@
         <!-- Main content -->
         <main id="main-content" role="main" class="flex-1">
             <!-- Hero section -->
-            <section class="bg-gradient-to-br from-steamphony-blue to-indigo-700 text-white py-12 md:py-16">
-                <div class="max-w-4xl mx-auto px-4 text-center">
-                    <h2 class="text-3xl md:text-4xl lg:text-5xl font-bold mb-4">
+            <section class="hero-section">
+                <div class="max-w-6xl mx-auto px-4 text-center relative z-10">
+                    <h2 class="hero-title">
                         Калькулятор экономии маркетингового бюджета
                     </h2>
-                    <p class="text-xl md:text-2xl text-blue-100 mb-6">
+                    <p class="hero-subtitle">
                         Узнайте, сколько вы сможете сэкономить с нашей помощью
                     </p>
-                    <div class="flex flex-wrap justify-center gap-4 text-sm">
-                        <div class="flex items-center space-x-2">
-                            <svg class="w-5 h-5 text-green-400" fill="currentColor" viewBox="0 0 20 20" aria-hidden="true">
-                                <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/>
-                            </svg>
-                            <span>Бесплатный расчет</span>
-                        </div>
-                        <div class="flex items-center space-x-2">
-                            <svg class="w-5 h-5 text-green-400" fill="currentColor" viewBox="0 0 20 20" aria-hidden="true">
-                                <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/>
-                            </svg>
-                            <span>За 5 минут</span>
-                        </div>
-                        <div class="flex items-center space-x-2">
-                            <svg class="w-5 h-5 text-green-400" fill="currentColor" viewBox="0 0 20 20" aria-hidden="true">
-                                <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/>
-                            </svg>
-                            <span>Персональные рекомендации</span>
-                        </div>
-                    </div>
+                </div>
+            </section>
+
+            <!-- Transition section -->
+            <section class="hero-transition">
+                <div class="max-w-3xl mx-auto text-center">
+                    <p class="transition-text">Пройдите короткий опрос и получите персональный расчет экономии для вашего бизнеса</p>
                 </div>
             </section>
 
             <!-- Calculator container -->
-            <section class="py-8 md:py-12">
+            <section class="calculator-section">
                 <div class="max-w-4xl mx-auto px-4">
                     <!-- Calculator form container - populated by JavaScript -->
                     <div id="calculator-container" class="calculator-widget">
                         <!-- Start Calculator Button -->
-                        <div id="start-calculator" class="text-center py-16">
+                        <div id="start-calculator" class="text-center py-8">
                             <div class="mb-8">
-                                <div class="widget-logo-icon flex items-center justify-center mx-auto mb-6">
-                                    <svg class="w-8 h-8 text-white" fill="currentColor" viewBox="0 0 20 20" aria-hidden="true">
-                                        <path fill-rule="evenodd" d="M3 4a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zm0 4a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zm0 4a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zm0 4a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1z" clip-rule="evenodd"/>
-                                    </svg>
-                                </div>
-                                <h3 class="text-2xl font-bold text-steamphony-primary mb-4">Готовы рассчитать экономию?</h3>
-                                <p class="text-lg text-gray-600 mb-8">Заполните простую форму и узнайте, сколько вы можете сэкономить на маркетинге</p>
+                                <!-- ...удалённый текст... -->
                             </div>
-                            
                             <!-- Animated Start Button -->
                             <button id="start-calculator-btn" class="start-button">
                                 <svg class="w-6 h-6" fill="currentColor" viewBox="0 0 20 20" aria-hidden="true">
@@ -167,42 +144,12 @@
                                 </svg>
                                 <span>Начать расчет</span>
                             </button>
-                            
-                            <!-- Features list -->
-                            <div class="trust-grid mt-12">
-                                <div class="trust-item">
-                                    <div class="trust-icon">
-                                        <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
-                                            <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/>
-                                        </svg>
-                                    </div>
-                                    <div class="trust-text">Бесплатно</div>
-                                </div>
-                                <div class="trust-item">
-                                    <div class="trust-icon">
-                                        <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
-                                            <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm1-12a1 1 0 10-2 0v4a1 1 0 00.293.707l2.828 2.829a1 1 0 101.415-1.415L11 9.586V6z" clip-rule="evenodd"/>
-                                        </svg>
-                                    </div>
-                                    <div class="trust-text">5 минут</div>
-                                </div>
-                                <div class="trust-item">
-                                    <div class="trust-icon">
-                                        <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
-                                            <path d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
-                                        </svg>
-                                    </div>
-                                    <div class="trust-text">Персональный результат</div>
-                                </div>
-                            </div>
                         </div>
-                        
                         <!-- Loading state -->
                         <div id="loading-state" class="hidden text-center py-12">
                             <div class="loading-spinner mx-auto mb-4"></div>
                             <p class="text-gray-600">Загружаем калькулятор...</p>
                         </div>
-                        
                         <!-- Error state -->
                         <div id="error-state" class="hidden text-center py-12">
                             <div class="text-red-500 mb-4">
@@ -216,7 +163,6 @@
                                 Обновить страницу
                             </button>
                         </div>
-                        
                         <!-- Calculator content will be inserted here by JavaScript -->
                         <div id="calculator-content" class="hidden">
                             <!-- Form content container -->
@@ -229,58 +175,89 @@
             </section>
 
             <!-- Trust signals -->
-            <section class="bg-gray-100 py-12" aria-labelledby="trust-heading">
-                <div class="max-w-4xl mx-auto px-4">
-                    <h2 id="trust-heading" class="text-2xl font-bold text-center text-steamphony-primary mb-8">
+            <section class="trust-section" aria-labelledby="trust-heading">
+                <div class="max-w-6xl mx-auto px-4">
+                    <h2 id="trust-heading" class="trust-title">
                         Нам доверяют
                     </h2>
-                    <div class="trust-grid">
-                        <!-- Client logos placeholders -->
-                        <div class="trust-item">
-                            <div class="trust-icon">
-                                <span class="text-lg font-bold">C1</span>
+                    
+                    <!-- Premium Client Cards -->
+                    <div class="client-grid">
+                        <div class="client-card">
+                            <div class="client-logo">
+                                <svg class="w-12 h-12" fill="currentColor" viewBox="0 0 24 24">
+                                    <path d="M12 2L2 7v10c0 5.55 3.84 9.74 9 9.74s9-4.19 9-9.74V7L12 2z"/>
+                                </svg>
                             </div>
-                            <div class="trust-text">Client 1</div>
-                        </div>
-                        <div class="trust-item">
-                            <div class="trust-icon">
-                                <span class="text-lg font-bold">C2</span>
+                            <h3 class="client-name">TechCorp Solutions</h3>
+                            <p class="client-industry">IT & Software</p>
+                            <div class="client-result">
+                                <span class="result-number">+127%</span>
+                                <span class="result-text">ROI за 6 месяцев</span>
                             </div>
-                            <div class="trust-text">Client 2</div>
                         </div>
-                        <div class="trust-item">
-                            <div class="trust-icon">
-                                <span class="text-lg font-bold">C3</span>
+                        
+                        <div class="client-card">
+                            <div class="client-logo">
+                                <svg class="w-12 h-12" fill="currentColor" viewBox="0 0 24 24">
+                                    <path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2z"/>
+                                </svg>
                             </div>
-                            <div class="trust-text">Client 3</div>
-                        </div>
-                        <div class="trust-item">
-                            <div class="trust-icon">
-                                <span class="text-lg font-bold">C4</span>
+                            <h3 class="client-name">GreenMarket Retail</h3>
+                            <p class="client-industry">E-commerce</p>
+                            <div class="client-result">
+                                <span class="result-number">+89%</span>
+                                <span class="result-text">конверсий</span>
                             </div>
-                            <div class="trust-text">Client 4</div>
                         </div>
+                        
+                        <div class="client-card">
+                            <div class="client-logo">
+                                <svg class="w-12 h-12" fill="currentColor" viewBox="0 0 24 24">
+                                    <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/>
+                                </svg>
+                            </div>
+                            <h3 class="client-name">FinanceFlow Bank</h3>
+                            <p class="client-industry">Financial Services</p>
+                            <div class="client-result">
+                                <span class="result-number">+156%</span>
+                                <span class="result-text">лидов</span>
+                            </div>
+                        </div>
+                        
+
                     </div>
                     
-                    <!-- Statistics -->
-                    <div class="trust-grid mt-12">
-                        <div class="trust-item">
-                            <div class="trust-icon">
-                                <span class="text-2xl font-bold">150+</span>
+                    <!-- Premium Statistics -->
+                    <div class="stats-section">
+                        <div class="stat-container">
+                            <div class="stat-number">150+</div>
+                            <div class="stat-label">Успешных проектов</div>
+                            <div class="stat-icon">
+                                <svg class="w-8 h-8" fill="currentColor" viewBox="0 0 20 20">
+                                    <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"/>
+                                </svg>
                             </div>
-                            <div class="trust-text">Успешных проектов</div>
                         </div>
-                        <div class="trust-item">
-                            <div class="trust-icon">
-                                <span class="text-2xl font-bold">35%</span>
+                        
+                        <div class="stat-container">
+                            <div class="stat-number">35%</div>
+                            <div class="stat-label">Средняя экономия бюджета</div>
+                            <div class="stat-icon">
+                                <svg class="w-8 h-8" fill="currentColor" viewBox="0 0 20 20">
+                                    <path fill-rule="evenodd" d="M4 4a2 2 0 00-2 2v4a2 2 0 002 2V6h10a2 2 0 00-2-2H4zm2 6a2 2 0 012-2h8a2 2 0 012 2v4a2 2 0 01-2 2H8a2 2 0 01-2-2v-4zm6 4a2 2 0 100-4 2 2 0 000 4z" clip-rule="evenodd"/>
+                                </svg>
                             </div>
-                            <div class="trust-text">Средняя экономия бюджета</div>
                         </div>
-                        <div class="trust-item">
-                            <div class="trust-icon">
-                                <span class="text-2xl font-bold">4.8</span>
+                        
+                        <div class="stat-container">
+                            <div class="stat-number">4.8</div>
+                            <div class="stat-label">Средний ROI наших клиентов</div>
+                            <div class="stat-icon">
+                                <svg class="w-8 h-8" fill="currentColor" viewBox="0 0 20 20">
+                                    <path fill-rule="evenodd" d="M3 4a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zm0 4a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zm0 4a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zm0 4a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1z" clip-rule="evenodd"/>
+                                </svg>
                             </div>
-                            <div class="trust-text">Средний ROI наших клиентов</div>
                         </div>
                     </div>
                 </div>
@@ -393,7 +370,7 @@
     </script>
 
     <!-- Application entry point -->
-    <script type="module" src="../src/main.js?v=1.0.3"></script>
+    <script type="module" src="main.js?v=1.0.3"></script>
 
   </body>
 </html> 

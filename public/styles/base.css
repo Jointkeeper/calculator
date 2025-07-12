@@ -65,54 +65,6 @@ a:hover {
     text-align: right;
 }
 
-/* Button Styles */
-.start-button, .nav-button.primary {
-    background: var(--action-gradient);
-    color: white;
-    border: none;
-    padding: 16px 32px;
-    border-radius: 12px;
-    font-size: 16px;
-    font-weight: 600;
-    cursor: pointer;
-    transition: all 0.3s ease;
-    box-shadow: var(--soft-shadow);
-    position: relative;
-    overflow: hidden;
-}
-
-.start-button:hover, .nav-button.primary:hover {
-    transform: translateY(-2px);
-    box-shadow: var(--strong-shadow);
-    background: linear-gradient(135deg, #A0522D 0%, #8B4513 100%);
-}
-
-.start-button:focus, .nav-button.primary:focus {
-    outline: none;
-    box-shadow: 0 0 0 3px rgba(139, 69, 19, 0.3);
-}
-
-.start-button:active, .nav-button.primary:active {
-    transform: translateY(0);
-}
-
-.nav-button.secondary {
-    background: transparent;
-    color: var(--steamphony-primary);
-    border: 2px solid var(--steamphony-primary);
-    padding: 12px 24px;
-    border-radius: 8px;
-    font-size: 14px;
-    font-weight: 500;
-    cursor: pointer;
-    transition: all 0.3s ease;
-}
-
-.nav-button.secondary:hover {
-    background: var(--steamphony-primary);
-    color: white;
-}
-
 .font-bold {
     font-weight: 700;
 }
@@ -199,7 +151,7 @@ a:hover {
 
 .items-center {
     align-items: center;
-  }
+}
 
 .justify-center {
     justify-content: center;
@@ -220,7 +172,7 @@ a:hover {
 /* Grid */
 .grid {
     display: grid;
-  }
+}
 
 .grid-cols-1 {
     grid-template-columns: repeat(1, minmax(0, 1fr));
@@ -228,7 +180,7 @@ a:hover {
 
 .grid-cols-2 {
     grid-template-columns: repeat(2, minmax(0, 1fr));
-  }
+}
 
 .grid-cols-3 {
     grid-template-columns: repeat(3, minmax(0, 1fr));
@@ -239,8 +191,8 @@ a:hover {
     .grid-cols-2,
     .grid-cols-3 {
         grid-template-columns: repeat(1, minmax(0, 1fr));
-  }
-
+    }
+    
     .flex {
         flex-direction: column;
     }
@@ -248,7 +200,7 @@ a:hover {
     .text-center-mobile {
         text-align: center;
     }
-  }
+}
 
 /* Animations */
 @keyframes fadeIn {
@@ -259,7 +211,7 @@ a:hover {
     to {
         opacity: 1;
         transform: translateY(0);
-  }
+    }
 }
 
 @keyframes slideIn {
@@ -281,7 +233,7 @@ a:hover {
     to {
         opacity: 1;
         transform: scale(1);
-  }
+    }
 }
 
 .fade-in {
@@ -297,7 +249,7 @@ a:hover {
 }
 
 /* Accessibility */
-  .sr-only {
+.sr-only {
     position: absolute;
     width: 1px;
     height: 1px;
@@ -307,7 +259,7 @@ a:hover {
     clip: rect(0, 0, 0, 0);
     white-space: nowrap;
     border: 0;
-  }
+}
 
 /* Focus styles */
 button:focus,
@@ -322,10 +274,10 @@ textarea:focus {
 @media print {
     .no-print {
         display: none !important;
-  }
+    }
     
     body {
         background: white !important;
         color: black !important;
-  }
+    }
 } 

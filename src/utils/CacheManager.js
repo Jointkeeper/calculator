@@ -74,7 +74,7 @@ export class CacheManager {
                 '/index.html',
                 '/styles.css',
                 '/src/main.js',
-                '/src/components/Calculator.js',
+                './src/core/Calculator.js',
                 '/src/security/CSPConfig.js',
                 '/src/security/SecurityHeaders.js',
                 '/src/security/ThreatDetector.js',

@@ -73,12 +73,12 @@ export class CacheManager {
                 '/',
                 '/index.html',
                 '/styles.css',
-                './main.js',
-                './core/Calculator.js',
-                './security/CSPConfig.js',
-                './security/SecurityHeaders.js',
-                './security/ThreatDetector.js',
-                './security/SecurityMonitor.js'
+                '/src/main.js',
+                './src/core/Calculator.js',
+                '/src/security/CSPConfig.js',
+                '/src/security/SecurityHeaders.js',
+                '/src/security/ThreatDetector.js',
+                '/src/security/SecurityMonitor.js'
             ];
 
             // Install event - cache static assets

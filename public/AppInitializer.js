@@ -87,12 +87,24 @@ class AppInitializer {
       // Показать контент калькулятора
       this.showCalculatorContent();
       console.log('[DEBUG] Контент калькулятора показан');
+      
+      // Скрыть кнопку запуска
+      const startButton = document.getElementById('start-calculator');
+      if (startButton) {
+        startButton.style.display = 'none';
+      }
+      
       // Явно показать первый шаг через StepManager
       if (window.app && window.app.stepManager) {
         console.log('[DEBUG] Вызов window.app.stepManager.showStep(1)');
         window.app.stepManager.showStep(1);
       } else {
         console.warn('[DEBUG] window.app.stepManager не найден');
+        // Прямая инициализация первого шага
+        const componentManager = window.app?.componentManager;
+        if (componentManager) {
+          componentManager.showComponent('industrySelector');
+        }
       }
       console.log('✅ Калькулятор успешно запущен');
       
@@ -148,8 +160,8 @@ class AppInitializer {
         lazyLoading: {
           enabled: true,
           preloadModules: [
-            './src/core/Calculator.js',
-            '/src/services/Analytics.js'
+            './core/Calculator.js',
+            './services/Analytics.js'
           ],
           maxRetries: 3,
           loadingTimeout: 10000
@@ -183,7 +195,7 @@ class AppInitializer {
       });
       
       // Register existing Service Worker
-      await this.cacheManager.registerServiceWorker('/public/sw.js');
+      await this.cacheManager.registerServiceWorker('./sw.js');
       
       // Initialize Performance Monitor
       this.performanceMonitor = new PerformanceMonitor();

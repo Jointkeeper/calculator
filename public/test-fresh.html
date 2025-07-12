@@ -1,0 +1,593 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Свежий тест калькулятора</title>
+    <link rel="stylesheet" href="styles.css?v=2.0">
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 20px;
+            background: #f5f5f5;
+        }
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        .start-button {
+            background: linear-gradient(135deg, #8B4513 0%, #A0522D 100%);
+            color: white;
+            border: none;
+            padding: 16px 32px;
+            border-radius: 12px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            margin: 20px 0;
+        }
+        .start-button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 20px rgba(0,0,0,0.2);
+        }
+        .calculator-widget {
+            display: none;
+            margin-top: 20px;
+            padding: 20px;
+            border: 1px solid #ddd;
+            border-radius: 10px;
+        }
+        .progress-bar {
+            width: 100%;
+            height: 10px;
+            background: #eee;
+            border-radius: 5px;
+            overflow: hidden;
+            margin: 20px 0;
+        }
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(135deg, #8B4513 0%, #A0522D 100%);
+            width: 16.67%;
+            transition: width 0.3s ease;
+        }
+        .step {
+            display: none;
+            padding: 20px;
+            border: 1px solid #eee;
+            border-radius: 8px;
+            margin: 10px 0;
+        }
+        .step.active {
+            display: block;
+        }
+        .industry-card {
+            padding: 15px;
+            border: 2px solid #ddd;
+            border-radius: 8px;
+            margin: 10px 0;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        .industry-card:hover {
+            border-color: #8B4513;
+            background: #f9f9f9;
+        }
+        .industry-card.selected {
+            border-color: #8B4513;
+            background: #f0f0f0;
+        }
+        .nav-buttons {
+            display: flex;
+            gap: 10px;
+            margin-top: 20px;
+        }
+        .nav-button {
+            padding: 10px 20px;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: 500;
+        }
+        .nav-button.primary {
+            background: #8B4513;
+            color: white;
+        }
+        .nav-button.secondary {
+            background: transparent;
+            color: #8B4513;
+            border: 2px solid #8B4513;
+        }
+        
+        /* Стили для инструментов маркетинга */
+        .tools-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 15px;
+            margin: 20px 0;
+        }
+        
+        .tool-card {
+            display: flex;
+            align-items: flex-start;
+            padding: 15px;
+            border: 2px solid #ddd;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            background: white;
+        }
+        
+        .tool-card:hover {
+            border-color: #8B4513;
+            background: #f9f9f9;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+        }
+        
+        .tool-card input[type="checkbox"] {
+            margin-right: 12px;
+            margin-top: 4px;
+            transform: scale(1.2);
+        }
+        
+        .tool-card label {
+            cursor: pointer;
+            flex: 1;
+        }
+        
+        .tool-card h4 {
+            margin: 0 0 5px 0;
+            color: #333;
+            font-size: 16px;
+        }
+        
+        .tool-card p {
+            margin: 0;
+            color: #666;
+            font-size: 14px;
+        }
+        
+        .tool-card input[type="checkbox"]:checked + label {
+            color: #8B4513;
+        }
+        
+        .tool-card:has(input[type="checkbox"]:checked) {
+            border-color: #8B4513;
+            background: #f0f0f0;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🆕 Свежий тест калькулятора</h1>
+        <p>Версия с принудительным обновлением кэша</p>
+        
+        <div id="start-section">
+            <p>Нажмите кнопку, чтобы запустить калькулятор:</p>
+            <button id="start-btn" class="start-button">Запустить калькулятор</button>
+        </div>
+        
+        <div id="calculator-widget" class="calculator-widget">
+            <h2>Калькулятор экономии</h2>
+            
+            <div class="progress-bar">
+                <div class="progress-fill" id="progress-fill"></div>
+            </div>
+            <div id="progress-text">Шаг 1 из 6</div>
+            
+            <div id="form-content">
+                <!-- Шаги будут загружаться динамически -->
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let currentStep = 1;
+        const totalSteps = 6;
+        
+        // Данные шагов
+        const steps = [
+            {
+                title: 'Выберите вашу отрасль',
+                content: `
+                    <div class="industry-card" data-industry="restaurant">
+                        <h3>Рестораны и кафе</h3>
+                        <p>Общественное питание</p>
+                    </div>
+                    <div class="industry-card" data-industry="retail">
+                        <h3>Розничная торговля</h3>
+                        <p>Магазины и торговля</p>
+                    </div>
+                    <div class="industry-card" data-industry="services">
+                        <h3>Услуги</h3>
+                        <p>Сфера услуг</p>
+                    </div>
+                    <div class="industry-card" data-industry="ecommerce">
+                        <h3>E-commerce</h3>
+                        <p>Интернет-магазины</p>
+                    </div>
+                    <div class="industry-card" data-industry="consulting">
+                        <h3>Консалтинг</h3>
+                        <p>Бизнес-консультации</p>
+                    </div>
+                    <div class="industry-card" data-industry="education">
+                        <h3>Образование</h3>
+                        <p>Онлайн и офлайн обучение</p>
+                    </div>
+                    <div class="industry-card" data-industry="healthcare">
+                        <h3>Здравоохранение</h3>
+                        <p>Медицинские услуги</p>
+                    </div>
+                    <div class="industry-card" data-industry="realestate">
+                        <h3>Недвижимость</h3>
+                        <p>Агентства недвижимости</p>
+                    </div>
+                    <div class="industry-card" data-industry="finance">
+                        <h3>Финансы</h3>
+                        <p>Банки, страховые компании</p>
+                    </div>
+                    <div class="industry-card" data-industry="manufacturing">
+                        <h3>Производство</h3>
+                        <p>Промышленное производство</p>
+                    </div>
+                    <div class="industry-card" data-industry="technology">
+                        <h3>Технологии</h3>
+                        <p>IT и программное обеспечение</p>
+                    </div>
+                    <div class="industry-card" data-industry="automotive">
+                        <h3>Автомобильная отрасль</h3>
+                        <p>Автосервисы, дилеры</p>
+                    </div>
+                    <div class="industry-card" data-industry="beauty">
+                        <h3>Красота и здоровье</h3>
+                        <p>Салоны красоты, фитнес</p>
+                    </div>
+                    <div class="industry-card" data-industry="entertainment">
+                        <h3>Развлечения</h3>
+                        <p>Кинотеатры, развлекательные центры</p>
+                    </div>
+                    <div class="industry-card" data-industry="travel">
+                        <h3>Туризм</h3>
+                        <p>Туристические агентства</p>
+                    </div>
+                    <div class="industry-card" data-industry="custom">
+                        <h3>Другая отрасль</h3>
+                        <p>Укажите свою отрасль</p>
+                        <input type="text" id="custom-industry" placeholder="Введите название отрасли" style="width: 100%; padding: 8px; margin-top: 10px; border: 1px solid #ddd; border-radius: 4px; display: none;">
+                    </div>
+                `
+            },
+            {
+                title: 'Размер вашего бизнеса',
+                content: `
+                    <div class="industry-card" data-size="small">
+                        <h3>Малый бизнес</h3>
+                        <p>1-10 сотрудников</p>
+                    </div>
+                    <div class="industry-card" data-size="medium">
+                        <h3>Средний бизнес</h3>
+                        <p>11-50 сотрудников</p>
+                    </div>
+                    <div class="industry-card" data-size="large">
+                        <h3>Крупный бизнес</h3>
+                        <p>50+ сотрудников</p>
+                    </div>
+                `
+            },
+            {
+                title: 'Маркетинговый бюджет',
+                content: `
+                    <p>Укажите ваш текущий месячный бюджет на маркетинг:</p>
+                    <input type="range" id="budget-slider" min="50000" max="1000000" step="50000" value="200000" style="width: 100%; margin: 20px 0;">
+                    <div style="text-align: center;">
+                        <span id="budget-value" style="font-size: 24px; font-weight: bold;">200,000 ₽</span>
+                        <p>в месяц</p>
+                    </div>
+                `
+            },
+            {
+                title: 'Маркетинговая команда',
+                content: `
+                    <div class="industry-card" data-team="1">
+                        <h3>1 человек</h3>
+                        <p>Самозанятый</p>
+                    </div>
+                    <div class="industry-card" data-team="2-5">
+                        <h3>2-5 человек</h3>
+                        <p>Небольшая команда</p>
+                    </div>
+                    <div class="industry-card" data-team="5+">
+                        <h3>5+ человек</h3>
+                        <p>Большая команда</p>
+                    </div>
+                `
+            },
+            {
+                title: 'Маркетинговые инструменты',
+                content: `
+                    <p>Какие инструменты вы используете для маркетинга?</p>
+                    <div class="tools-grid">
+                        <div class="tool-card">
+                            <input type="checkbox" id="social" value="social">
+                            <label for="social">
+                                <h4>Социальные сети</h4>
+                                <p>Instagram, Facebook, VK</p>
+                            </label>
+                        </div>
+                        <div class="tool-card">
+                            <input type="checkbox" id="ads" value="ads">
+                            <label for="ads">
+                                <h4>Контекстная реклама</h4>
+                                <p>Яндекс.Директ, Google Ads</p>
+                            </label>
+                        </div>
+                        <div class="tool-card">
+                            <input type="checkbox" id="seo" value="seo">
+                            <label for="seo">
+                                <h4>SEO</h4>
+                                <p>Поисковая оптимизация</p>
+                            </label>
+                        </div>
+                        <div class="tool-card">
+                            <input type="checkbox" id="email" value="email">
+                            <label for="email">
+                                <h4>Email-маркетинг</h4>
+                                <p>Рассылки по email</p>
+                            </label>
+                        </div>
+                        <div class="tool-card">
+                            <input type="checkbox" id="content" value="content">
+                            <label for="content">
+                                <h4>Контент-маркетинг</h4>
+                                <p>Блоги, статьи, видео</p>
+                            </label>
+                        </div>
+                        <div class="tool-card">
+                            <input type="checkbox" id="influencer" value="influencer">
+                            <label for="influencer">
+                                <h4>Инфлюенсер-маркетинг</h4>
+                                <p>Работа с блогерами</p>
+                            </label>
+                        </div>
+                        <div class="tool-card">
+                            <input type="checkbox" id="affiliate" value="affiliate">
+                            <label for="affiliate">
+                                <h4>Партнерский маркетинг</h4>
+                                <p>Партнерские программы</p>
+                            </label>
+                        </div>
+                        <div class="tool-card">
+                            <input type="checkbox" id="events" value="events">
+                            <label for="events">
+                                <h4>Ивент-маркетинг</h4>
+                                <p>Мероприятия и выставки</p>
+                            </label>
+                        </div>
+                        <div class="tool-card">
+                            <input type="checkbox" id="pr" value="pr">
+                            <label for="pr">
+                                <h4>PR и медиа</h4>
+                                <p>Связи с общественностью</p>
+                            </label>
+                        </div>
+                        <div class="tool-card">
+                            <input type="checkbox" id="retargeting" value="retargeting">
+                            <label for="retargeting">
+                                <h4>Ретаргетинг</h4>
+                                <p>Повторное таргетирование</p>
+                            </label>
+                        </div>
+                        <div class="tool-card">
+                            <input type="checkbox" id="crm" value="crm">
+                            <label for="crm">
+                                <h4>CRM системы</h4>
+                                <p>Управление клиентами</p>
+                            </label>
+                        </div>
+                        <div class="tool-card">
+                            <input type="checkbox" id="analytics" value="analytics">
+                            <label for="analytics">
+                                <h4>Аналитика</h4>
+                                <p>Яндекс.Метрика, GA</p>
+                            </label>
+                        </div>
+                    </div>
+                `
+            },
+            {
+                title: 'Контактная информация',
+                content: `
+                    <p>Оставьте свои данные для получения результатов:</p>
+                    <input type="text" placeholder="Ваше имя" style="width: 100%; padding: 10px; margin: 10px 0; border: 1px solid #ddd; border-radius: 4px;"><br>
+                    <input type="email" placeholder="Email" style="width: 100%; padding: 10px; margin: 10px 0; border: 1px solid #ddd; border-radius: 4px;"><br>
+                    <input type="tel" placeholder="Телефон" style="width: 100%; padding: 10px; margin: 10px 0; border: 1px solid #ddd; border-radius: 4px;">
+                `
+            }
+        ];
+        
+        // Обработчик кнопки запуска
+        document.getElementById('start-btn').addEventListener('click', function() {
+            document.getElementById('start-section').style.display = 'none';
+            document.getElementById('calculator-widget').style.display = 'block';
+            showStep(1);
+        });
+        
+        // Показать шаг
+        function showStep(step) {
+            currentStep = step;
+            
+            // Обновить прогресс
+            const progress = (step / totalSteps) * 100;
+            document.getElementById('progress-fill').style.width = progress + '%';
+            document.getElementById('progress-text').textContent = `Шаг ${step} из ${totalSteps}`;
+            
+            // Показать контент шага
+            const stepData = steps[step - 1];
+            const formContent = document.getElementById('form-content');
+            
+            formContent.innerHTML = `
+                <div class="step active">
+                    <h3>${stepData.title}</h3>
+                    ${stepData.content}
+                    <div class="nav-buttons">
+                        ${step > 1 ? '<button class="nav-button secondary" onclick="showStep(' + (step - 1) + ')">Назад</button>' : ''}
+                        ${step < totalSteps ? '<button class="nav-button primary" onclick="showStep(' + (step + 1) + ')">Далее</button>' : ''}
+                        ${step === totalSteps ? '<button class="nav-button primary" onclick="showResults()">Получить результаты</button>' : ''}
+                    </div>
+                </div>
+            `;
+            
+            // Настроить обработчики для текущего шага
+            setupStepHandlers(step);
+        }
+        
+        // Настройка обработчиков для шага
+        function setupStepHandlers(step) {
+            const formContent = document.getElementById('form-content');
+            
+            if (step === 1) {
+                // Шаг выбора отрасли с дополнительной логикой
+                const cards = formContent.querySelectorAll('.industry-card');
+                const customInput = document.getElementById('custom-industry');
+                
+                cards.forEach(card => {
+                    card.addEventListener('click', function() {
+                        // Убрать выделение со всех карточек
+                        cards.forEach(c => c.classList.remove('selected'));
+                        // Добавить выделение к выбранной
+                        this.classList.add('selected');
+                        
+                        // Специальная обработка для "Другая отрасль"
+                        if (this.dataset.industry === 'custom') {
+                            if (customInput) {
+                                customInput.style.display = 'block';
+                                customInput.focus();
+                                // Не переходим автоматически, ждем ввода
+                                return;
+                            }
+                        } else {
+                            // Скрываем поле ввода для других вариантов
+                            if (customInput) {
+                                customInput.style.display = 'none';
+                                customInput.value = '';
+                            }
+                        }
+                        
+                        // Автоматический переход к следующему шагу через 1 секунду
+                        setTimeout(() => {
+                            if (currentStep < totalSteps) {
+                                showStep(currentStep + 1);
+                            }
+                        }, 1000);
+                    });
+                });
+                
+                // Обработчик для поля ввода
+                if (customInput) {
+                    customInput.addEventListener('keypress', function(e) {
+                        if (e.key === 'Enter' && this.value.trim()) {
+                            // Переход к следующему шагу при нажатии Enter
+                            setTimeout(() => {
+                                if (currentStep < totalSteps) {
+                                    showStep(currentStep + 1);
+                                }
+                            }, 500);
+                        }
+                    });
+                    
+                    customInput.addEventListener('blur', function() {
+                        if (this.value.trim()) {
+                            // Переход к следующему шагу при потере фокуса
+                            setTimeout(() => {
+                                if (currentStep < totalSteps) {
+                                    showStep(currentStep + 1);
+                                }
+                            }, 500);
+                        }
+                    });
+                }
+                
+            } else if (step === 2 || step === 4) {
+                // Шаги с карточками (размер бизнеса и команда)
+                const cards = formContent.querySelectorAll('.industry-card');
+                cards.forEach(card => {
+                    card.addEventListener('click', function() {
+                        // Убрать выделение со всех карточек
+                        cards.forEach(c => c.classList.remove('selected'));
+                        // Добавить выделение к выбранной
+                        this.classList.add('selected');
+                        
+                        // Автоматический переход к следующему шагу через 1 секунду
+                        setTimeout(() => {
+                            if (currentStep < totalSteps) {
+                                showStep(currentStep + 1);
+                            }
+                        }, 1000);
+                    });
+                });
+            } else if (step === 3) {
+                // Шаг с ползунком бюджета
+                const slider = document.getElementById('budget-slider');
+                const valueDisplay = document.getElementById('budget-value');
+                
+                if (slider && valueDisplay) {
+                    slider.addEventListener('input', function() {
+                        const value = parseInt(this.value);
+                        valueDisplay.textContent = value.toLocaleString() + ' ₽';
+                    });
+                }
+            } else if (step === 5) {
+                // Шаг с инструментами маркетинга
+                const toolCards = formContent.querySelectorAll('.tool-card');
+                toolCards.forEach(card => {
+                    card.addEventListener('click', function(e) {
+                        // Не переключаем чекбокс если кликнули на сам чекбокс
+                        if (e.target.type === 'checkbox') return;
+                        
+                        const checkbox = this.querySelector('input[type="checkbox"]');
+                        checkbox.checked = !checkbox.checked;
+                        
+                        // Обновляем стили
+                        if (checkbox.checked) {
+                            this.style.borderColor = '#8B4513';
+                            this.style.background = '#f0f0f0';
+                        } else {
+                            this.style.borderColor = '#ddd';
+                            this.style.background = 'white';
+                        }
+                    });
+                });
+            }
+        }
+        
+        // Показать результаты
+        function showResults() {
+            const formContent = document.getElementById('form-content');
+            formContent.innerHTML = `
+                <div class="step active">
+                    <h3>Ваши результаты</h3>
+                    <div style="text-align: center; padding: 40px;">
+                        <div style="font-size: 48px; font-weight: bold; color: #8B4513; margin: 20px 0;">
+                            ₽450,000
+                        </div>
+                        <p style="font-size: 18px; color: #666;">Ваша потенциальная экономия в месяц</p>
+                        <div style="margin: 30px 0;">
+                            <p>Получите детальный отчет с рекомендациями</p>
+                            <button class="start-button" onclick="alert('Отчет отправлен на email!')">
+                                Получить отчет
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            `;
+        }
+    </script>
+</body>
+</html> 
