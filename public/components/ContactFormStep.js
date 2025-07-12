@@ -8,6 +8,7 @@
 
 class ContactFormStep {
   constructor(container, options = {}) {
+    console.log('[ContactFormStep] constructor вызван, container:', container, 'options:', options);
     if (!container || !(container instanceof HTMLElement)) {
       throw new Error('ContactFormStep: container должен быть DOM элементом');
     }
@@ -47,6 +48,7 @@ class ContactFormStep {
    * Рендеринг компонента
    */
   render() {
+    console.log('[ContactFormStep] render вызван, formData:', this.formData, 'calculationResults:', this.calculationResults);
     this.container.innerHTML = `
       <div class="calculator-step active">
         <div class="results-section mb-8">
@@ -398,6 +400,7 @@ class ContactFormStep {
    * Обновление с данными формы
    */
   updateWithFormData(formData) {
+    console.log('[ContactFormStep] updateWithFormData вызван, formData:', formData);
     this.formData = formData;
     this.calculationResults = this.calculateResults();
     this.updateResultsUI();
@@ -407,7 +410,7 @@ class ContactFormStep {
    * Расчет результатов
    */
   calculateResults() {
-    console.log('[ContactFormStep] calculateResults input:', this.formData);
+    console.log('[ContactFormStep] calculateResults вызван, formData:', this.formData);
     if (!this.formData) return null;
 
     const currentCosts = this.calculateCurrentCosts();

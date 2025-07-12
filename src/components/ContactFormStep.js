@@ -37,6 +37,7 @@ class ContactFormStep {
     try {
       this.render();
       this.attachEventListeners();
+      this.updateWithAppState(); // Получаем данные из AppState
       this.trackEvent('step_6_viewed');
     } catch (error) {
       this.handleError('INIT_ERROR', error);
@@ -398,9 +399,21 @@ class ContactFormStep {
    * Обновление с данными формы
    */
   updateWithFormData(formData) {
+    console.log('[ContactFormStep] updateWithFormData вызван, formData:', formData);
     this.formData = formData;
     this.calculationResults = this.calculateResults();
     this.updateResultsUI();
+  }
+
+  /**
+   * Обновление с данными из AppState
+   */
+  updateWithAppState() {
+    if (window.app?.appState) {
+      const formData = window.app.appState.getFormDataForComponents();
+      console.log('[ContactFormStep] updateWithAppState, formData:', formData);
+      this.updateWithFormData(formData);
+    }
   }
 
   /**
@@ -429,18 +442,34 @@ class ContactFormStep {
    * Расчет текущих затрат
    */
   calculateCurrentCosts() {
-    const budget = this.formData?.marketingBudget?.budget || 0;
-    const team = this.formData?.marketingTeam?.monthlyCost || 0;
-    const tools = this.formData?.marketingTools?.totalCost || 0;
-    return budget + team + tools;
+    console.log('[ContactFormStep] calculateCurrentCosts, formData:', this.formData);
+    
+    // Получаем данные из разных возможных форматов
+    const budget = this.formData?.marketingBudget?.budget || 
+                   this.formData?.marketingBudget?.monthly || 
+                   this.formData?.budget || 0;
+    
+    const team = this.formData?.marketingTeam?.monthlyCost || 
+                 this.formData?.marketingTeam?.cost || 0;
+    
+    const tools = this.formData?.marketingTools?.estimatedMonthlyCost || 
+                  this.formData?.marketingTools?.totalCost || 0;
+    
+    const total = budget + team + tools;
+    console.log('[ContactFormStep] calculateCurrentCosts result:', { budget, team, tools, total });
+    
+    return total;
   }
 
   /**
    * Расчет затрат Steamphony
    */
   calculateSteamphonyCosts() {
-    const tools = this.formData?.marketingTools?.totalCost || 0;
-    return Math.round(tools * 0.7); // 30% оптимизация
+    const tools = this.formData?.marketingTools?.estimatedMonthlyCost || 
+                  this.formData?.marketingTools?.totalCost || 0;
+    const steamphonyCost = Math.round(tools * 0.7); // 30% оптимизация
+    console.log('[ContactFormStep] calculateSteamphonyCosts:', { tools, steamphonyCost });
+    return steamphonyCost;
   }
 
   /**

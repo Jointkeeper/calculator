@@ -140,6 +140,7 @@ class MarketingToolsStep {
             <input type="checkbox" 
                    value="${tool.id}" 
                    data-category="${categoryId}"
+                   name="marketingTools"
                    ${isSelected ? 'checked' : ''}
                    class="sr-only">
           </div>
@@ -191,6 +192,11 @@ class MarketingToolsStep {
     this.updateCategoryCounters();
     this.updateNextButtonState();
     
+    // Автосохранение в AppState
+    const marketingToolsData = this.prepareMarketingToolsData();
+    if (window.app && window.app.appState) {
+      window.app.appState.setFormField('marketingTools', marketingToolsData.marketingTools);
+    }
     // Вызываем колбэк
     this.onSelect({
       selectedTools: Array.from(this.selectedTools),
@@ -306,7 +312,7 @@ class MarketingToolsStep {
 
   saveDataToApp(marketingToolsData) {
     if (window.app?.appState) {
-      window.app.appState.updateField('marketingTools', marketingToolsData.marketingTools);
+      window.app.appState.setFormField('marketingTools', marketingToolsData.marketingTools);
     }
   }
 

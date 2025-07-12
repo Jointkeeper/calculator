@@ -525,6 +525,7 @@ class StepManager {
      * Показать результаты
      */
     showResults() {
+        console.log('[StepManager] showResults вызван');
         // Получаем контейнер и экземпляр ContactFormStep
         const formContent = document.getElementById('form-content');
         if (!formContent) return;
@@ -550,28 +551,19 @@ class StepManager {
 
         // Получаем данные формы и рассчитываем результаты
         const formData = this.appState.getFormData();
-        console.log('[StepManager] formData при показе результатов:', formData);
+        console.log('[StepManager] formData из AppState:', formData);
         
         // Явно вызываем updateWithFormData для обновления данных и расчета
         if (typeof contactFormStep.updateWithFormData === 'function') {
             console.log('[StepManager] Вызываю updateWithFormData с данными:', formData);
             contactFormStep.updateWithFormData(formData);
         } else {
-            console.log('[StepManager] updateWithFormData не найден, устанавливаю данные вручную');
+            console.log('[StepManager] updateWithFormData не найден, устанавливаю данные вручную:', formData);
             contactFormStep.formData = formData;
             contactFormStep.calculationResults = contactFormStep.calculateResults();
-        }
-        
-        // Явно вызываем render для обновления UI
-        if (typeof contactFormStep.render === 'function') {
-            console.log('[StepManager] Вызываю render для обновления UI');
-            contactFormStep.render();
-        }
-        
-        // Явно вызываем updateResultsUI для обновления результатов
-        if (typeof contactFormStep.updateResultsUI === 'function') {
-            console.log('[StepManager] Вызываю updateResultsUI');
-            contactFormStep.updateResultsUI();
+            if (typeof contactFormStep.updateResultsUI === 'function') {
+                contactFormStep.updateResultsUI();
+            }
         }
     }
 

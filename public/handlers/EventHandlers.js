@@ -110,10 +110,14 @@ class EventHandlers {
         const field = input.name || input.dataset.field;
         
         // Обновление состояния
-        if (this.appState && typeof this.appState.setFormField === 'function') {
-            this.appState.setFormField(field, value);
+        if (field) {
+            if (this.appState && typeof this.appState.setFormField === 'function') {
+                this.appState.setFormField(field, value);
+            } else {
+                console.warn('AppState.setFormField не найден');
+            }
         } else {
-            console.warn('AppState.setFormField не найден');
+            console.warn('Попытка вызвать setFormField с undefined field!', input);
         }
         // Валидация в реальном времени
         this.validateField(input);
@@ -127,10 +131,14 @@ class EventHandlers {
         const field = select.name || select.dataset.field;
         
         // Обновление состояния
-        if (this.appState && typeof this.appState.setFormField === 'function') {
-            this.appState.setFormField(field, value);
+        if (field) {
+            if (this.appState && typeof this.appState.setFormField === 'function') {
+                this.appState.setFormField(field, value);
+            } else {
+                console.warn('AppState.setFormField не найден');
+            }
         } else {
-            console.warn('AppState.setFormField не найден');
+            console.warn('Попытка вызвать setFormField с undefined field!', select);
         }
         // Специальная обработка для индустрии
         if (field === 'industry') {

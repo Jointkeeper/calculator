@@ -77,6 +77,23 @@ export class AppState {
   }
 
   /**
+   * Получить данные формы для совместимости с компонентами
+   */
+  getFormDataForComponents() {
+    return {
+      industry: this.formData.industry,
+      businessSize: this.formData.businessSize,
+      marketingBudget: this.formData.marketingBudget,
+      marketingTeam: this.formData.marketingTeam,
+      marketingTools: this.formData.marketingTools,
+      // Добавляем совместимость с разными форматами данных
+      budget: this.formData.marketingBudget?.budget || this.formData.marketingBudget?.monthly || 0,
+      team: this.formData.marketingTeam?.teamId || this.formData.marketingTeam?.size || '1',
+      tools: this.formData.marketingTools?.selected || this.formData.marketingTools || []
+    };
+  }
+
+  /**
    * Обновить данные формы
    */
   updateFormData(newData) {
@@ -90,6 +107,13 @@ export class AppState {
   setFormField(field, value) {
     this.formData[field] = value;
     this.dispatchStateChange('formField', { field, value });
+  }
+
+  /**
+   * Обновить конкретное поле формы (алиас для setFormField)
+   */
+  updateField(field, value) {
+    this.setFormField(field, value);
   }
 
   /**

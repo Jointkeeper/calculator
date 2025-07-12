@@ -769,7 +769,7 @@ class ComponentManager {
         // Создаем экземпляр настоящего класса ContactFormStep
         const contactFormStep = new ContactFormStep(formContent);
         this.components.set('contactFormStep', contactFormStep);
-        console.log('✅ ContactFormStep инициализирован (реальный класс)');
+        console.log('[ComponentManager] contactFormStep создан:', contactFormStep);
     }
 
     setupContactEventHandlers() {

@@ -121,12 +121,7 @@ class StepManager {
                 const componentManager = window.app?.componentManager;
                 if (componentManager) {
                     componentManager.showComponent(componentName);
-                    console.log(`✅ Показан компонент: ${componentName} для шага ${step}`);
-                } else {
-                    console.warn('❌ ComponentManager не найден');
                 }
-            } else {
-                console.warn(`❌ Компонент для шага ${step} не найден`);
             }
             
             this.currentStep = step;

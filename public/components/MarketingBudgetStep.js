@@ -131,12 +131,7 @@ class MarketingBudgetStep {
 
         <div class="budget-selection mb-8">
           <div class="budget-slider-container">
-            <input type="range" 
-                   class="custom-input budget-slider" 
-                   min="${budgetRange.min}" 
-                   max="${budgetRange.max}" 
-                   value="${budgetRange.recommended}" 
-                   step="${budgetRange.step}">
+            <input type="range" id="budget-slider" name="marketingBudget" min="${budgetRange.min}" max="${budgetRange.max}" value="${budgetRange.recommended}" step="${budgetRange.step}" class="w-full">
             <div class="slider-fill"></div>
             <div class="slider-tooltip"></div>
           </div>
@@ -217,6 +212,11 @@ class MarketingBudgetStep {
   handleSliderChange(event) {
     const value = parseInt(event.target.value);
     this.selectBudget(value);
+    // Автосохранение в AppState
+    const budgetData = this.prepareBudgetData();
+    if (window.app && window.app.appState) {
+      window.app.appState.setFormField('marketingBudget', budgetData);
+    }
   }
 
   /**
@@ -393,7 +393,7 @@ class MarketingBudgetStep {
    */
   saveDataToApp(budgetData) {
     if (window.app && window.app.appState) {
-      window.app.appState.updateField('marketingBudget', budgetData);
+      window.app.appState.setFormField('marketingBudget', budgetData);
     }
   }
 
@@ -486,70 +486,4 @@ class MarketingBudgetStep {
           <h3>Ошибка</h3>
           <p>${message}</p>
         </div>
-      `;
-      errorContainer.style.display = 'block';
-    }
-  }
-
-  /**
-   * Показ компонента
-   */
-  show() {
-    this.container.style.display = 'block';
-  }
-
-  /**
-   * Скрытие компонента
-   */
-  hide() {
-    this.container.style.display = 'none';
-  }
-
-  /**
-   * Получение выбранного бюджета
-   */
-  getSelectedBudget() {
-    return this.selectedBudget;
-  }
-
-  /**
-   * Установка бюджета
-   */
-  setSelectedBudget(budgetValue) {
-    this.selectBudget(budgetValue);
-  }
-
-  /**
-   * Сброс компонента
-   */
-  reset() {
-    this.selectedBudget = null;
-    const slider = this.container.querySelector('.budget-slider');
-    if (slider) {
-      const budgetRange = this.getCurrentBudgetRange();
-      slider.value = budgetRange.recommended;
-      this.updateBudgetDisplay(budgetRange.recommended);
-      this.updateSliderFill();
-    }
-    
-    const savingsPreview = this.container.querySelector('.savings-preview');
-    if (savingsPreview) {
-      savingsPreview.style.display = 'none';
-    }
-  }
-
-  /**
-   * Уничтожение компонента
-   */
-  destroy() {
-    try {
-      document.removeEventListener('keydown', this.handleKeydown);
-      this.container.innerHTML = '';
-      this.isRendered = false;
-    } catch (error) {
-      console.error('Ошибка уничтожения MarketingBudgetStep:', error);
-    }
-  }
-}
-
-export default MarketingBudgetStep; 
+      `

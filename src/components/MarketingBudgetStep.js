@@ -133,6 +133,7 @@ class MarketingBudgetStep {
           <div class="budget-slider-container">
             <input type="range" 
                    class="custom-input budget-slider" 
+                   name="marketingBudget"
                    min="${budgetRange.min}" 
                    max="${budgetRange.max}" 
                    value="${budgetRange.recommended}" 

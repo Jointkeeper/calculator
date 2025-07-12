@@ -73,7 +73,9 @@ export class AppState {
    * Получить данные формы
    */
   getFormData() {
-    return { ...this.formData };
+    const data = { ...this.formData };
+    console.log('[AppState] getFormData:', data);
+    return data;
   }
 
   /**
@@ -81,6 +83,7 @@ export class AppState {
    */
   updateFormData(newData) {
     this.formData = { ...this.formData, ...newData };
+    console.log('[AppState] updateFormData:', this.formData);
     this.dispatchStateChange('formData', this.formData);
   }
 
@@ -89,6 +92,7 @@ export class AppState {
    */
   setFormField(field, value) {
     this.formData[field] = value;
+    console.log('[AppState] setFormField:', field, value, 'formData:', this.formData);
     this.dispatchStateChange('formField', { field, value });
   }
 

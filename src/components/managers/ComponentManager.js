@@ -169,14 +169,6 @@ class ComponentManager {
                 // Переход к следующему шагу через StepManager
                 if (window.app && window.app.stepManager) {
                     window.app.stepManager.nextStep();
-                } else {
-                    console.warn('StepManager не найден, используем прямой переход');
-                    // Прямой переход к следующему шагу
-                    const currentStep = window.app?.componentManager?.appState?.getCurrentStep() || 1;
-                    const nextStep = Math.min(currentStep + 1, 6);
-                    if (window.app?.componentManager?.appState) {
-                        window.app.componentManager.appState.setCurrentStep(nextStep);
-                    }
                 }
             });
         });
@@ -246,21 +238,9 @@ class ComponentManager {
                 // Добавляем выделение к выбранной карточке
                 card.classList.add('border-steamphony-blue', 'bg-blue-50');
                 
-                // Сохраняем выбор в AppState
-                if (window.app && window.app.componentManager) {
-                    window.app.componentManager.appState.updateField('businessSize', size);
-                }
-                
-                // Переход к следующему шагу
-                if (window.app && window.app.stepManager) {
-                    window.app.stepManager.nextStep();
-                } else {
-                    console.warn('StepManager не найден, используем прямой переход');
-                    const currentStep = window.app?.componentManager?.appState?.getCurrentStep() || 2;
-                    const nextStep = Math.min(currentStep + 1, 6);
-                    if (window.app?.componentManager?.appState) {
-                        window.app.componentManager.appState.setCurrentStep(nextStep);
-                    }
+                if (window.app && window.app.eventHandler) {
+                    window.app.eventHandler.handleBusinessSizeSelect(size);
+                    window.app.eventHandler.handleBusinessSizeNext({ size });
                 }
             });
         });
@@ -312,8 +292,8 @@ class ComponentManager {
             const navButtons = document.createElement('div');
             navButtons.className = 'nav-buttons';
             navButtons.innerHTML = `
-                <button class="nav-button secondary" onclick="window.app.stepManager.previousStep()">Назад</button>
-                <button class="nav-button primary" onclick="window.app.stepManager.nextStep()">Далее</button>
+                <button class="nav-button secondary" onclick="window.app.eventHandler.handleMarketingBudgetBack()">Назад</button>
+                <button class="nav-button primary" onclick="window.app.eventHandler.handleMarketingBudgetNext({ budget: ${slider.value} })">Далее</button>
             `;
             formContent.appendChild(navButtons);
         }
@@ -370,21 +350,9 @@ class ComponentManager {
                 teamCards.forEach(c => c.classList.remove('border-steamphony-blue', 'bg-blue-50'));
                 card.classList.add('border-steamphony-blue', 'bg-blue-50');
                 
-                // Сохраняем выбор в AppState
-                if (window.app && window.app.componentManager) {
-                    window.app.componentManager.appState.updateField('team', team);
-                }
-                
-                // Переход к следующему шагу
-                if (window.app && window.app.stepManager) {
-                    window.app.stepManager.nextStep();
-                } else {
-                    console.warn('StepManager не найден, используем прямой переход');
-                    const currentStep = window.app?.componentManager?.appState?.getCurrentStep() || 4;
-                    const nextStep = Math.min(currentStep + 1, 6);
-                    if (window.app?.componentManager?.appState) {
-                        window.app.componentManager.appState.setCurrentStep(nextStep);
-                    }
+                if (window.app && window.app.eventHandler) {
+                    window.app.eventHandler.handleMarketingTeamSelect({ team });
+                    window.app.eventHandler.handleMarketingTeamNext({ team });
                 }
             });
         });
@@ -434,8 +402,8 @@ class ComponentManager {
         const navButtons = document.createElement('div');
         navButtons.className = 'nav-buttons';
         navButtons.innerHTML = `
-            <button class="nav-button secondary" onclick="window.app.stepManager.previousStep()">Назад</button>
-            <button class="nav-button primary" onclick="window.app.stepManager.nextStep()">Далее</button>
+            <button class="nav-button secondary" onclick="window.app.eventHandler.handleMarketingToolsBack()">Назад</button>
+            <button class="nav-button primary" onclick="window.app.eventHandler.handleMarketingToolsNext({ tools: this.getSelectedTools() })">Далее</button>
         `;
         formContent.appendChild(navButtons);
     }
@@ -471,8 +439,8 @@ class ComponentManager {
         const navButtons = document.createElement('div');
         navButtons.className = 'nav-buttons';
         navButtons.innerHTML = `
-            <button class="nav-button secondary" onclick="window.app.stepManager.previousStep()">Назад</button>
-            <button class="nav-button primary" onclick="window.app.stepManager.onCalculatorComplete()">Получить результаты</button>
+            <button class="nav-button secondary" onclick="window.app.eventHandler.handleContactFormBack()">Назад</button>
+            <button class="nav-button primary" onclick="window.app.eventHandler.handleContactFormSubmit(this.getContactData())">Получить результаты</button>
         `;
         formContent.appendChild(navButtons);
     }
