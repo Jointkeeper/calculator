@@ -78,43 +78,41 @@ class MarketingTeamStep {
     if (this.isRendered) return;
 
     this.container.innerHTML = `
-      <div class="step-content marketing-team-step">
-        <div class="step-header">
-          <h2>Ваша маркетинговая команда</h2>
-          <p>Выберите, как сейчас организован ваш маркетинг</p>
-        </div>
+      <div class="calculator-step active">
+        <h2 class="step-title">Ваша маркетинговая команда</h2>
+        <p class="step-description">Выберите, как сейчас организован ваш маркетинг</p>
 
-        <div class="team-options">
+        <div class="options-grid">
           ${this.renderTeamOptions()}
         </div>
 
-        <div class="gap-analysis" style="display: none;">
-          <h3>Анализ возможностей</h3>
-          <div class="analysis-grid">
-            <div class="current-state">
-              <h4>Текущее состояние</h4>
+        <div class="gap-analysis mt-8" style="display: none;">
+          <h3 class="text-lg font-semibold text-steamphony-primary mb-4">Анализ возможностей</h3>
+          <div class="analysis-grid grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
+            <div class="current-state p-4 bg-gray-50 rounded-lg">
+              <h4 class="font-medium text-gray-900 mb-3">Текущее состояние</h4>
               <div class="metrics"></div>
             </div>
-            <div class="steamphony-state">
-              <h4>С Steamphony</h4>
+            <div class="steamphony-state p-4 bg-steamphony-light rounded-lg">
+              <h4 class="font-medium text-steamphony-primary mb-3">С Steamphony</h4>
               <div class="metrics"></div>
             </div>
           </div>
           
-          <div class="value-propositions">
-            <h4>Ваши выгоды</h4>
-            <div class="props-grid"></div>
+          <div class="value-propositions mb-6">
+            <h4 class="font-medium text-steamphony-primary mb-3">Ваши выгоды</h4>
+            <div class="props-grid grid grid-cols-1 md:grid-cols-3 gap-4"></div>
           </div>
           
           <div class="recommendations">
-            <h4>Рекомендации</h4>
+            <h4 class="font-medium text-steamphony-primary mb-3">Рекомендации</h4>
             <div class="recs-list"></div>
           </div>
         </div>
 
         <div class="step-navigation">
-          <button type="button" class="btn btn-secondary back-btn">Назад</button>
-          <button type="button" class="btn btn-primary next-btn" disabled>Далее</button>
+          <button type="button" class="nav-button secondary back-btn">Назад</button>
+          <button type="button" class="nav-button primary next-btn" disabled>Далее</button>
         </div>
       </div>
     `;
@@ -127,38 +125,35 @@ class MarketingTeamStep {
    */
   renderTeamOptions() {
     return Object.values(TEAM_OPTIONS).map(team => `
-      <div class="team-option" data-team-id="${team.id}">
-        <div class="team-header">
-          <h3>${team.title}</h3>
-          <p class="subtitle">${team.subtitle}</p>
-        </div>
-        
-        <div class="team-description">
-          <p>${team.description}</p>
-        </div>
-        
-        <div class="team-metrics">
-          <div class="metric cost ${getCostClass(team.monthlyCost)}">
-            <span class="label">Стоимость:</span>
-            <span class="value">${formatTeamCost(team.monthlyCost)}</span>
+      <button class="option-button" data-team-id="${team.id}">
+        <div class="option-content">
+          <h3 class="option-title">${team.title}</h3>
+          <p class="text-sm text-steamphony-secondary mb-2">${team.subtitle}</p>
+          <p class="option-description">${team.description}</p>
+          
+          <div class="team-metrics mt-4 space-y-2">
+            <div class="metric flex justify-between items-center">
+              <span class="text-sm text-gray-600">Стоимость:</span>
+              <span class="font-medium ${getCostClass(team.monthlyCost)}">${formatTeamCost(team.monthlyCost)}</span>
+            </div>
+            <div class="metric flex justify-between items-center">
+              <span class="text-sm text-gray-600">Время управления:</span>
+              <span class="font-medium text-steamphony-primary">${team.timeInvestment}</span>
+            </div>
+            <div class="metric flex justify-between items-center">
+              <span class="text-sm text-gray-600">Риск:</span>
+              <span class="font-medium text-steamphony-primary">${this.translateRiskLevel(team.riskLevel)}</span>
+            </div>
           </div>
-          <div class="metric time">
-            <span class="label">Время управления:</span>
-            <span class="value">${team.timeInvestment}</span>
-          </div>
-          <div class="metric risk">
-            <span class="label">Риск:</span>
-            <span class="value">${this.translateRiskLevel(team.riskLevel)}</span>
+          
+          <div class="team-pain-points mt-4">
+            <h4 class="text-sm font-medium text-gray-900 mb-2">Основные проблемы:</h4>
+            <ul class="text-sm text-gray-600 space-y-1">
+              ${team.painPoints.map(point => `<li>• ${point}</li>`).join('')}
+            </ul>
           </div>
         </div>
-        
-        <div class="team-pain-points">
-          <h4>Основные проблемы:</h4>
-          <ul>
-            ${team.painPoints.map(point => `<li>${point}</li>`).join('')}
-          </ul>
-        </div>
-      </div>
+      </button>
     `).join('');
   }
 
@@ -166,7 +161,7 @@ class MarketingTeamStep {
    * Прикрепление обработчиков событий
    */
   attachEventListeners() {
-    const teamOptions = this.container.querySelectorAll('.team-option');
+    const teamOptions = this.container.querySelectorAll('.option-button');
     const nextBtn = this.container.querySelector('.next-btn');
     const backBtn = this.container.querySelector('.back-btn');
 
@@ -188,7 +183,7 @@ class MarketingTeamStep {
     const teamId = teamOption.dataset.teamId;
 
     // Убираем выделение со всех опций
-    this.container.querySelectorAll('.team-option').forEach(option => {
+    this.container.querySelectorAll('.option-button').forEach(option => {
       option.classList.remove('selected');
     });
 
@@ -483,7 +478,7 @@ class MarketingTeamStep {
     this.selectedTeamSetup = null;
     this.gapAnalysis = null;
     
-    this.container.querySelectorAll('.team-option').forEach(option => {
+    this.container.querySelectorAll('.option-button').forEach(option => {
       option.classList.remove('selected');
     });
     

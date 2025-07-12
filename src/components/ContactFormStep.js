@@ -48,20 +48,20 @@ class ContactFormStep {
    */
   render() {
     this.container.innerHTML = `
-      <div class="contact-form-step">
-        <div class="results-section">
+      <div class="calculator-step active">
+        <div class="results-section mb-8">
           ${this.renderResultsSection()}
         </div>
         
-        <div class="contact-section">
+        <div class="contact-section mb-8">
           ${this.renderContactSection()}
         </div>
         
-        <div class="urgency-section">
-          <div class="urgency-message">
-            <span class="urgency-icon">🔥</span>
-            <span class="urgency-text">Только 3 бесплатных консультации в этом месяце</span>
-            <span class="urgency-counter">Осталось: 2 места</span>
+        <div class="urgency-section p-4 bg-gradient-to-r from-steamphony-coral to-steamphony-accent rounded-lg text-white text-center">
+          <div class="urgency-message flex items-center justify-center space-x-2">
+            <span class="urgency-icon text-xl">🔥</span>
+            <span class="urgency-text font-medium">Только 3 бесплатных консультации в этом месяце</span>
+            <span class="urgency-counter bg-white text-steamphony-coral px-2 py-1 rounded-full text-sm font-bold">Осталось: 2 места</span>
           </div>
         </div>
       </div>
@@ -75,44 +75,44 @@ class ContactFormStep {
    */
   renderResultsSection() {
     return `
-      <div class="results-header">
-        <h2>Ваши результаты</h2>
-        <p>Вот что мы можем для вас сделать</p>
+      <div class="results-header text-center mb-6">
+        <h2 class="step-title">Ваши результаты</h2>
+        <p class="step-description">Вот что мы можем для вас сделать</p>
       </div>
       
-      <div class="results-grid">
-        <div class="result-card savings">
-          <div class="result-icon">💰</div>
+      <div class="results-grid grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+        <div class="result-card p-6 bg-white rounded-lg border border-gray-200 text-center">
+          <div class="result-icon text-3xl mb-3">💰</div>
           <div class="result-content">
-            <h3>Экономия</h3>
-            <div class="result-value" id="savings-value">$0/мес</div>
-            <div class="result-description">Потенциальная экономия с Steamphony</div>
+            <h3 class="font-semibold text-steamphony-primary mb-2">Экономия</h3>
+            <div class="result-value text-2xl font-bold text-green-600 mb-2" id="savings-value">$0/мес</div>
+            <div class="result-description text-sm text-gray-600">Потенциальная экономия с Steamphony</div>
           </div>
         </div>
         
-        <div class="result-card roi">
-          <div class="result-icon">📈</div>
+        <div class="result-card p-6 bg-white rounded-lg border border-gray-200 text-center">
+          <div class="result-icon text-3xl mb-3">📈</div>
           <div class="result-content">
-            <h3>ROI</h3>
-            <div class="result-value" id="roi-value">0%</div>
-            <div class="result-description">Возврат инвестиций</div>
+            <h3 class="font-semibold text-steamphony-primary mb-2">ROI</h3>
+            <div class="result-value text-2xl font-bold text-steamphony-secondary mb-2" id="roi-value">0%</div>
+            <div class="result-description text-sm text-gray-600">Возврат инвестиций</div>
           </div>
         </div>
         
-        <div class="result-card timeline">
-          <div class="result-icon">⏱️</div>
+        <div class="result-card p-6 bg-white rounded-lg border border-gray-200 text-center">
+          <div class="result-icon text-3xl mb-3">⏱️</div>
           <div class="result-content">
-            <h3>Срок окупаемости</h3>
-            <div class="result-value" id="payback-value">0 мес</div>
-            <div class="result-description">Время до полной окупаемости</div>
+            <h3 class="font-semibold text-steamphony-primary mb-2">Срок окупаемости</h3>
+            <div class="result-value text-2xl font-bold text-steamphony-accent mb-2" id="payback-value">0 мес</div>
+            <div class="result-description text-sm text-gray-600">Время до полной окупаемости</div>
           </div>
         </div>
       </div>
       
       <div class="recommendations">
-        <h3>Наши рекомендации</h3>
-        <div class="recs-list" id="recommendations-list">
-          <div class="rec-item">Загрузка рекомендаций...</div>
+        <h3 class="text-lg font-semibold text-steamphony-primary mb-4">Наши рекомендации</h3>
+        <div class="recs-list space-y-3" id="recommendations-list">
+          <div class="rec-item p-3 bg-steamphony-light rounded-lg text-sm">Загрузка рекомендаций...</div>
         </div>
       </div>
     `;
@@ -123,44 +123,48 @@ class ContactFormStep {
    */
   renderContactSection() {
     return `
-      <div class="contact-header">
-        <h2>Получите персональный отчет</h2>
-        <p>Оставьте контакты для получения детального анализа</p>
+      <div class="contact-header text-center mb-6">
+        <h2 class="step-title">Получите персональный отчет</h2>
+        <p class="step-description">Оставьте контакты для получения детального анализа</p>
       </div>
       
       <form class="contact-form" id="contact-form">
-        <div class="form-group">
-          <label for="name">Имя *</label>
-          <input type="text" id="name" name="name" required>
-          <div class="error-message" id="name-error"></div>
+        <div class="form-row">
+          <div class="form-group">
+            <label for="name" class="form-label">Имя *</label>
+            <input type="text" id="name" name="name" class="form-input" required>
+            <div class="error-message text-red-500 text-sm mt-1" id="name-error"></div>
+          </div>
+          
+          <div class="form-group">
+            <label for="email" class="form-label">Email *</label>
+            <input type="email" id="email" name="email" class="form-input" required>
+            <div class="error-message text-red-500 text-sm mt-1" id="email-error"></div>
+          </div>
+        </div>
+        
+        <div class="form-row">
+          <div class="form-group">
+            <label for="phone" class="form-label">Телефон</label>
+            <input type="tel" id="phone" name="phone" class="form-input">
+            <div class="error-message text-red-500 text-sm mt-1" id="phone-error"></div>
+          </div>
+          
+          <div class="form-group">
+            <label for="company" class="form-label">Компания</label>
+            <input type="text" id="company" name="company" class="form-input">
+            <div class="error-message text-red-500 text-sm mt-1" id="company-error"></div>
+          </div>
         </div>
         
         <div class="form-group">
-          <label for="email">Email *</label>
-          <input type="email" id="email" name="email" required>
-          <div class="error-message" id="email-error"></div>
+          <label for="message" class="form-label">Дополнительная информация</label>
+          <textarea id="message" name="message" rows="3" class="form-input"></textarea>
+          <div class="error-message text-red-500 text-sm mt-1" id="message-error"></div>
         </div>
         
-        <div class="form-group">
-          <label for="phone">Телефон</label>
-          <input type="tel" id="phone" name="phone">
-          <div class="error-message" id="phone-error"></div>
-        </div>
-        
-        <div class="form-group">
-          <label for="company">Компания</label>
-          <input type="text" id="company" name="company">
-          <div class="error-message" id="company-error"></div>
-        </div>
-        
-        <div class="form-group">
-          <label for="message">Дополнительная информация</label>
-          <textarea id="message" name="message" rows="3"></textarea>
-          <div class="error-message" id="message-error"></div>
-        </div>
-        
-        <div class="form-actions">
-          <button type="submit" class="btn btn-primary submit-btn" disabled>
+        <div class="form-actions text-center mt-6">
+          <button type="submit" class="nav-button primary submit-btn" disabled>
             Получить отчет
           </button>
         </div>
@@ -478,7 +482,7 @@ class ContactFormStep {
 
     if (recommendationsElement) {
       recommendationsElement.innerHTML = recommendations.map(rec => 
-        `<div class="rec-item">• ${rec}</div>`
+        `<div class="rec-item p-3 bg-steamphony-light rounded-lg text-sm">• ${rec}</div>`
       ).join('');
     }
   }

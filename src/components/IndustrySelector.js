@@ -61,22 +61,20 @@ class IndustrySelector {
    */
   render() {
     this.container.innerHTML = `
-      <div class="industry-selector">
-        <div class="selector-header">
-          <h2>Выберите вашу отрасль</h2>
-          <p>Это поможет нам дать более точные рекомендации</p>
-        </div>
+      <div class="calculator-step active">
+        <h2 class="step-title">Выберите вашу отрасль</h2>
+        <p class="step-description">Это поможет нам дать более точные рекомендации</p>
 
         ${this.options.enableSearch ? this.renderSearch() : ''}
 
         ${this.options.showPopularSection ? this.renderPopularSection() : ''}
 
-        <div class="industries-grid">
+        <div class="options-grid">
           ${this.renderIndustryCards()}
         </div>
 
         <div class="step-navigation">
-          <button type="button" class="btn btn-primary next-btn" disabled>Далее</button>
+          <button type="button" class="nav-button primary next-btn" disabled>Далее</button>
         </div>
       </div>
     `;
@@ -89,10 +87,10 @@ class IndustrySelector {
    */
   renderSearch() {
     return `
-      <div class="search-container">
+      <div class="search-container mb-8">
         <div class="search-input-wrapper">
           <input type="text" 
-                 class="search-input" 
+                 class="custom-input" 
                  placeholder="Поиск отрасли..."
                  aria-label="Поиск отрасли">
           <button type="button" class="search-clear" style="display: none;">✕</button>
@@ -110,9 +108,9 @@ class IndustrySelector {
     if (popularIndustries.length === 0) return '';
 
     return `
-      <div class="popular-section">
-        <h3>Популярные отрасли</h3>
-        <div class="popular-grid">
+      <div class="popular-section mb-8">
+        <h3 class="text-lg font-semibold text-steamphony-primary mb-4">Популярные отрасли</h3>
+        <div class="options-grid">
           ${popularIndustries.map(industry => this.renderIndustryCard(industry, true)).join('')}
         </div>
       </div>
@@ -125,9 +123,9 @@ class IndustrySelector {
   renderIndustryCards() {
     if (this.filteredIndustries.length === 0) {
       return `
-        <div class="no-results">
-          <p>По вашему запросу ничего не найдено</p>
-          <button type="button" class="btn btn-secondary clear-search">Очистить поиск</button>
+        <div class="no-results text-center">
+          <p class="text-gray-600 mb-4">По вашему запросу ничего не найдено</p>
+          <button type="button" class="nav-button secondary clear-search">Очистить поиск</button>
         </div>
       `;
     }
@@ -140,22 +138,21 @@ class IndustrySelector {
    */
   renderIndustryCard(industry, isPopular = false) {
     const isSelected = this.selectedIndustry?.key === industry.key;
-    const cardClass = `industry-card ${isPopular ? 'popular' : ''} ${isSelected ? 'selected' : ''}`;
+    const cardClass = `option-button ${isPopular ? 'popular' : ''} ${isSelected ? 'selected' : ''}`;
     
     return `
-      <div class="${cardClass}" 
+      <button class="${cardClass}" 
            data-industry-key="${industry.key}" 
            tabindex="0" 
            role="button" 
            aria-label="Выбрать ${industry.displayName}">
-        <div class="card-icon">${industry.icon}</div>
+        <div class="card-icon text-2xl mb-3">${industry.icon}</div>
         <div class="card-content">
-          <h3 class="card-title">${industry.displayName}</h3>
-          <p class="card-description">${industry.description}</p>
-          <p class="card-examples">${industry.examples}</p>
+          <h3 class="option-title">${industry.displayName}</h3>
+          <p class="option-description">${industry.description}</p>
+          <p class="text-sm text-gray-500 mt-2">${industry.examples}</p>
         </div>
-        ${isSelected ? '<div class="selection-indicator">✓</div>' : ''}
-      </div>
+      </button>
     `;
   }
 
@@ -163,10 +160,10 @@ class IndustrySelector {
    * Прикрепление обработчиков событий
    */
   attachEventListeners() {
-    const searchInput = this.container.querySelector('.search-input');
+    const searchInput = this.container.querySelector('.custom-input');
     const searchClear = this.container.querySelector('.search-clear');
     const clearSearch = this.container.querySelector('.clear-search');
-    const industryCards = this.container.querySelectorAll('.industry-card');
+    const industryCards = this.container.querySelectorAll('.option-button');
     const nextBtn = this.container.querySelector('.next-btn');
 
     if (searchInput) {
@@ -253,7 +250,7 @@ class IndustrySelector {
    * Обновление отображения отраслей
    */
   updateIndustriesDisplay() {
-    const industriesGrid = this.container.querySelector('.industries-grid');
+    const industriesGrid = this.container.querySelector('.options-grid');
     if (industriesGrid) {
       industriesGrid.innerHTML = this.renderIndustryCards();
       this.reattachCardListeners();
@@ -264,7 +261,7 @@ class IndustrySelector {
    * Повторное прикрепление обработчиков карточек
    */
   reattachCardListeners() {
-    const industryCards = this.container.querySelectorAll('.industry-card');
+    const industryCards = this.container.querySelectorAll('.option-button');
     industryCards.forEach(card => {
       card.addEventListener('click', this.handleCardClick);
       card.addEventListener('keydown', this.handleKeydown);
@@ -275,7 +272,7 @@ class IndustrySelector {
    * Очистка поиска
    */
   clearSearch() {
-    const searchInput = this.container.querySelector('.search-input');
+    const searchInput = this.container.querySelector('.custom-input');
     if (searchInput) {
       searchInput.value = '';
       this.searchTerm = '';
@@ -304,7 +301,7 @@ class IndustrySelector {
    */
   handleKeydown(event) {
     if (event.key === 'Enter') {
-      if (event.target.classList.contains('industry-card')) {
+      if (event.target.classList.contains('option-button')) {
         const industryKey = event.target.dataset.industryKey;
         this.selectIndustry(industryKey);
       } else if (this.selectedIndustry) {
@@ -333,22 +330,14 @@ class IndustrySelector {
    * Обновление состояния выбора
    */
   updateSelectionState() {
-    const industryCards = this.container.querySelectorAll('.industry-card');
+    const industryCards = this.container.querySelectorAll('.option-button');
     
     industryCards.forEach(card => {
       const isSelected = card.dataset.industryKey === this.selectedIndustry?.key;
       card.classList.toggle('selected', isSelected);
       
-      const indicator = card.querySelector('.selection-indicator');
-      if (isSelected) {
-        if (!indicator) {
-          card.insertAdjacentHTML('beforeend', '<div class="selection-indicator">✓</div>');
-        }
-      } else {
-        if (indicator) {
-          indicator.remove();
-        }
-      }
+      // The selection indicator is now part of the card's HTML structure
+      // No need to manually add/remove it here.
     });
   }
 
@@ -533,7 +522,7 @@ class IndustrySelector {
     this.searchTerm = '';
     this.filteredIndustries = this.industries;
     
-    const searchInput = this.container.querySelector('.search-input');
+    const searchInput = this.container.querySelector('.custom-input');
     if (searchInput) {
       searchInput.value = '';
     }

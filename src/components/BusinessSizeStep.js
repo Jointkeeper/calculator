@@ -110,19 +110,17 @@ class BusinessSizeStep {
     const industryTitle = this.getIndustryTitle();
     
     this.container.innerHTML = `
-      <div class="business-size-step">
-        <div class="step-header">
-          <h2>Размер вашего бизнеса</h2>
-          <p>${industryTitle}</p>
-        </div>
+      <div class="calculator-step active">
+        <h2 class="step-title">Размер вашего бизнеса</h2>
+        <p class="step-description">${industryTitle}</p>
 
-        <div class="size-options">
+        <div class="options-grid">
           ${this.renderSizeOptions(sizeOptions)}
         </div>
 
         <div class="step-navigation">
-          <button type="button" class="btn btn-secondary back-btn">Назад</button>
-          <button type="button" class="btn btn-primary next-btn" disabled>Далее</button>
+          <button type="button" class="nav-button secondary back-btn">Назад</button>
+          <button type="button" class="nav-button primary next-btn" disabled>Далее</button>
         </div>
       </div>
     `;
@@ -135,27 +133,27 @@ class BusinessSizeStep {
    */
   renderSizeOptions(options) {
     return options.map(option => `
-      <div class="size-option" data-size-value="${option.value}">
-        <div class="size-header">
-          <h3>${option.label}</h3>
-          <p class="size-description">${option.description}</p>
+      <button class="option-button" data-size-value="${option.value}">
+        <div class="option-content">
+          <h3 class="option-title">${option.label}</h3>
+          <p class="option-description">${option.description}</p>
+          
+          <div class="size-metrics mt-4">
+            <div class="metric flex justify-between items-center mb-2">
+              <span class="text-sm text-gray-600">Сотрудники:</span>
+              <span class="font-medium text-steamphony-primary">${option.employeesCount}</span>
+            </div>
+            <div class="metric flex justify-between items-center mb-2">
+              <span class="text-sm text-gray-600">Средний доход:</span>
+              <span class="font-medium text-steamphony-primary">${this.formatCurrency(option.avgRevenue)}/год</span>
+            </div>
+            <div class="metric flex justify-between items-center">
+              <span class="text-sm text-gray-600">Множитель:</span>
+              <span class="font-medium text-steamphony-primary">${option.multiplier}x</span>
+            </div>
+          </div>
         </div>
-        
-        <div class="size-metrics">
-          <div class="metric">
-            <span class="label">Сотрудники:</span>
-            <span class="value">${option.employeesCount}</span>
-          </div>
-          <div class="metric">
-            <span class="label">Средний доход:</span>
-            <span class="value">${this.formatCurrency(option.avgRevenue)}/год</span>
-          </div>
-          <div class="metric">
-            <span class="label">Множитель:</span>
-            <span class="value">${option.multiplier}x</span>
-          </div>
-        </div>
-      </div>
+      </button>
     `).join('');
   }
 
@@ -163,7 +161,7 @@ class BusinessSizeStep {
    * Прикрепление обработчиков событий
    */
   attachEventListeners() {
-    const sizeOptions = this.container.querySelectorAll('.size-option');
+    const sizeOptions = this.container.querySelectorAll('.option-button');
     const nextBtn = this.container.querySelector('.next-btn');
     const backBtn = this.container.querySelector('.back-btn');
 
@@ -185,7 +183,7 @@ class BusinessSizeStep {
     const sizeValue = sizeOption.dataset.sizeValue;
 
     // Убираем выделение со всех опций
-    this.container.querySelectorAll('.size-option').forEach(option => {
+    this.container.querySelectorAll('.option-button').forEach(option => {
       option.classList.remove('selected');
     });
 
@@ -217,7 +215,7 @@ class BusinessSizeStep {
    * Навигация стрелками
    */
   navigateWithArrows(isDown) {
-    const sizeOptions = Array.from(this.container.querySelectorAll('.size-option'));
+    const sizeOptions = Array.from(this.container.querySelectorAll('.option-button'));
     const currentIndex = sizeOptions.findIndex(option => option.classList.contains('selected'));
     
     let nextIndex;
@@ -443,7 +441,7 @@ class BusinessSizeStep {
   reset() {
     this.selectedSize = null;
     
-    this.container.querySelectorAll('.size-option').forEach(option => {
+    this.container.querySelectorAll('.option-button').forEach(option => {
       option.classList.remove('selected');
     });
     

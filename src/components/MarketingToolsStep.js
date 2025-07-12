@@ -63,34 +63,28 @@ class MarketingToolsStep {
     const availableTools = this.getAvailableTools();
     
     this.container.innerHTML = `
-      <div class="marketing-tools-step">
-        <div class="step-header">
-          <h2>Маркетинговые инструменты</h2>
-          <p>Выберите инструменты, которые используете или планируете использовать</p>
-        </div>
+      <div class="calculator-step active">
+        <h2 class="step-title">Маркетинговые инструменты</h2>
+        <p class="step-description">Выберите инструменты, которые используете или планируете использовать</p>
 
         <div class="tools-container">
           ${this.renderToolsByCategory(availableTools)}
         </div>
 
-        <div class="selection-summary" id="selection-summary" style="display: none;">
-          <h3>Выбранные инструменты</h3>
-          <div class="summary-content">
-            <span id="summary-count">0 инструментов</span>
+        <div class="selection-summary mt-8 p-4 bg-steamphony-light rounded-lg" id="selection-summary" style="display: none;">
+          <h3 class="text-lg font-semibold text-steamphony-primary mb-3">Выбранные инструменты</h3>
+          <div class="summary-content flex justify-between items-center">
+            <span id="summary-count" class="font-medium text-steamphony-primary">0 инструментов</span>
             <span id="summary-cost" class="cost-info">
-              <span class="cost-label">Стоимость:</span>
-              <span class="cost-amount">0 ₽/месяц</span>
+              <span class="cost-label text-sm text-gray-600">Стоимость:</span>
+              <span class="cost-amount font-medium text-steamphony-primary ml-2">0 ₽/месяц</span>
             </span>
           </div>
         </div>
 
-        <div class="step-actions">
-          <button type="button" class="btn btn-secondary" id="back-btn">
-            ← Назад
-          </button>
-          <button type="button" class="btn btn-primary" id="next-btn" disabled>
-            Далее →
-          </button>
+        <div class="step-navigation">
+          <button type="button" class="nav-button secondary" id="back-btn">Назад</button>
+          <button type="button" class="nav-button primary" id="next-btn" disabled>Далее</button>
         </div>
       </div>
     `;
@@ -108,15 +102,15 @@ class MarketingToolsStep {
       
       if (tools.length > 0) {
         html += `
-          <div class="tool-category" data-category="${categoryId}">
-            <div class="category-header">
-              <h3>${category.icon} ${category.title}</h3>
-              <p>${category.description}</p>
-              <div class="category-counter" id="counter-${categoryId}">
-                Выбрано: <span class="selected-count">0</span>
+          <div class="tool-category mb-8" data-category="${categoryId}">
+            <div class="category-header mb-4">
+              <h3 class="text-lg font-semibold text-steamphony-primary mb-2">${category.icon} ${category.title}</h3>
+              <p class="text-gray-600 mb-2">${category.description}</p>
+              <div class="category-counter text-sm text-steamphony-secondary" id="counter-${categoryId}">
+                Выбрано: <span class="selected-count font-medium">0</span>
               </div>
             </div>
-            <div class="tools-grid">
+            <div class="multiple-choice">
               ${tools.map(tool => this.renderToolCheckbox(categoryId, tool)).join('')}
             </div>
           </div>
@@ -132,23 +126,25 @@ class MarketingToolsStep {
     const costInfo = COST_TYPES[tool.cost];
     
     return `
-      <div class="tool-item ${isSelected ? 'selected' : ''}" data-tool-id="${tool.id}">
-        <label class="tool-checkbox">
-          <input type="checkbox" 
-                 value="${tool.id}" 
-                 data-category="${categoryId}"
-                 ${isSelected ? 'checked' : ''}>
-          <span class="checkmark"></span>
-        </label>
-        <div class="tool-info">
-          <div class="tool-name">${tool.name}</div>
-          <div class="tool-description">${tool.description}</div>
-          <div class="tool-meta">
-            <span class="cost-badge cost-${costInfo.color}">${costInfo.label}</span>
-            <span class="popularity">${tool.popularity}% используют</span>
+      <button class="option-button ${isSelected ? 'selected' : ''}" data-tool-id="${tool.id}">
+        <div class="option-content">
+          <div class="flex items-start justify-between">
+            <div class="flex-1">
+              <h3 class="option-title">${tool.name}</h3>
+              <p class="option-description">${tool.description}</p>
+              <div class="tool-meta mt-2 flex items-center space-x-3">
+                <span class="cost-badge px-2 py-1 text-xs rounded-full ${costInfo.color === 'green' ? 'bg-green-100 text-green-800' : costInfo.color === 'yellow' ? 'bg-yellow-100 text-yellow-800' : 'bg-red-100 text-red-800'}">${costInfo.label}</span>
+                <span class="text-sm text-gray-500">${tool.popularity}% используют</span>
+              </div>
+            </div>
+            <input type="checkbox" 
+                   value="${tool.id}" 
+                   data-category="${categoryId}"
+                   ${isSelected ? 'checked' : ''}
+                   class="sr-only">
           </div>
         </div>
-      </div>
+      </button>
     `;
   }
 

@@ -125,16 +125,14 @@ class MarketingBudgetStep {
     const industryTitle = this.getIndustryTitle();
     
     this.container.innerHTML = `
-      <div class="marketing-budget-step">
-        <div class="step-header">
-          <h2>Ваш маркетинговый бюджет</h2>
-          <p>Сколько ${industryTitle} тратит на маркетинг ежемесячно?</p>
-        </div>
+      <div class="calculator-step active">
+        <h2 class="step-title">Ваш маркетинговый бюджет</h2>
+        <p class="step-description">Сколько ${industryTitle} тратит на маркетинг ежемесячно?</p>
 
-        <div class="budget-selection">
+        <div class="budget-selection mb-8">
           <div class="budget-slider-container">
             <input type="range" 
-                   class="budget-slider" 
+                   class="custom-input budget-slider" 
                    min="${budgetRange.min}" 
                    max="${budgetRange.max}" 
                    value="${budgetRange.recommended}" 
@@ -143,25 +141,25 @@ class MarketingBudgetStep {
             <div class="slider-tooltip"></div>
           </div>
           
-          <div class="budget-display">
-            <span class="budget-value">${this.formatCurrency(budgetRange.recommended)}</span>
-            <span class="budget-period">/месяц</span>
+          <div class="budget-display text-center mt-4">
+            <span class="text-3xl font-bold text-steamphony-primary budget-value">${this.formatCurrency(budgetRange.recommended)}</span>
+            <span class="text-lg text-gray-600 budget-period">/месяц</span>
           </div>
         </div>
 
-        <div class="budget-options">
+        <div class="options-grid">
           ${this.renderBudgetOptions(budgetRange.ranges)}
         </div>
 
-        <div class="savings-preview" style="display: none;">
-          <h3>Потенциальная экономия с Steamphony</h3>
-          <div class="savings-amount"></div>
-          <div class="savings-breakdown"></div>
+        <div class="savings-preview mt-8" style="display: none;">
+          <h3 class="text-lg font-semibold text-steamphony-primary mb-4">Потенциальная экономия с Steamphony</h3>
+          <div class="savings-amount text-2xl font-bold text-green-600 mb-2"></div>
+          <div class="savings-breakdown text-sm text-gray-600"></div>
         </div>
 
         <div class="step-navigation">
-          <button type="button" class="btn btn-secondary back-btn">Назад</button>
-          <button type="button" class="btn btn-primary next-btn">Далее</button>
+          <button type="button" class="nav-button secondary back-btn">Назад</button>
+          <button type="button" class="nav-button primary next-btn">Далее</button>
         </div>
       </div>
     `;
@@ -174,11 +172,15 @@ class MarketingBudgetStep {
    */
   renderBudgetOptions(ranges) {
     return ranges.map(range => `
-      <div class="budget-option" data-value="${range.value}">
-        <div class="budget-range">${range.range}</div>
-        <div class="budget-label">${range.label}</div>
-        <div class="budget-effectiveness">Эффективность: ${Math.round(range.effectiveness * 100)}%</div>
-      </div>
+      <button class="option-button" data-value="${range.value}">
+        <div class="option-content">
+          <h3 class="option-title">${range.range}</h3>
+          <p class="option-description">${range.label}</p>
+          <div class="text-sm text-steamphony-secondary mt-2">
+            Эффективность: ${Math.round(range.effectiveness * 100)}%
+          </div>
+        </div>
+      </button>
     `).join('');
   }
 
@@ -187,7 +189,7 @@ class MarketingBudgetStep {
    */
   attachEventListeners() {
     const slider = this.container.querySelector('.budget-slider');
-    const budgetOptions = this.container.querySelectorAll('.budget-option');
+    const budgetOptions = this.container.querySelectorAll('.option-button');
     const nextBtn = this.container.querySelector('.next-btn');
     const backBtn = this.container.querySelector('.back-btn');
 
