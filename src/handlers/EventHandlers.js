@@ -109,8 +109,17 @@ class EventHandlers {
         const value = input.value;
         const field = input.name || input.dataset.field;
         
-        // Обновление состояния
-        this.appState.updateField(field, value);
+        // Проверяем, что поле определено перед обновлением
+        if (field) {
+            // Обновление состояния
+            this.appState.updateField(field, value);
+        } else {
+            console.warn('EventHandlers: попытка обновить поле с undefined именем', {
+                input: input,
+                name: input.name,
+                dataset: input.dataset
+            });
+        }
         
         // Валидация в реальном времени
         this.validateField(input);
@@ -124,12 +133,21 @@ class EventHandlers {
         const value = select.value;
         const field = select.name || select.dataset.field;
         
-        // Обновление состояния
-        this.appState.updateField(field, value);
-        
-        // Специальная обработка для индустрии
-        if (field === 'industry') {
-            this.handleIndustryChange(value);
+        // Проверяем, что поле определено перед обновлением
+        if (field) {
+            // Обновление состояния
+            this.appState.updateField(field, value);
+            
+            // Специальная обработка для индустрии
+            if (field === 'industry') {
+                this.handleIndustryChange(value);
+            }
+        } else {
+            console.warn('EventHandlers: попытка обновить select с undefined именем', {
+                select: select,
+                name: select.name,
+                dataset: select.dataset
+            });
         }
         
         // Автосохранение
