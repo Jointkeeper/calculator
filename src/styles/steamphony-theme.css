@@ -17,6 +17,16 @@
   --color-success: #10B981;
   --color-warning: #F59E0B;
   --color-error: #EF4444;
+  
+  /* Accessibility Colors - High Contrast */
+  --color-success-dark: #059669;
+  --color-warning-dark: #D97706;
+  --color-error-dark: #DC2626;
+  
+  /* Text Colors for Accessibility */
+  --text-primary: #1F2937;
+  --text-secondary: #6B7280;
+  --text-muted: #9CA3AF;
 
   /* Layout & Spacing */
   --space-unit: 8px;
@@ -34,7 +44,7 @@
   --transition-slow: 0.6s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
-/* Keyframes */
+/* Performance-optimized keyframes */
 @keyframes rotate {
   from { transform: rotate(0deg); }
   to { transform: rotate(360deg); }
@@ -49,6 +59,32 @@
 @keyframes shimmer {
   0% { transform: translateX(-100%); }
   100% { transform: translateX(100%); }
+}
+
+/* Performance optimizations */
+.calculator-widget {
+  will-change: transform;
+  contain: layout style paint;
+}
+
+.progress-fill {
+  will-change: width;
+  contain: layout style;
+}
+
+.option-button {
+  will-change: transform, box-shadow;
+  contain: layout style;
+}
+
+/* Critical CSS for above-the-fold content */
+.widget-header {
+  contain: layout style paint;
+}
+
+.widget-logo-icon {
+  will-change: transform;
+  contain: layout style;
 }
 
 /* Base styles for calculator widget (glassmorphism) */
@@ -210,11 +246,25 @@
   display: inline-flex;
   align-items: center;
   gap: 8px;
+  min-height: 44px; /* Touch target accessibility */
+  will-change: transform, box-shadow; /* Performance optimization */
 }
+
 .start-button:hover, .nav-button.primary:hover {
   transform: translateY(-3px) scale(1.02);
   box-shadow: 0 15px 40px rgba(139, 69, 19, 0.4);
 }
+
+.start-button:focus, .nav-button.primary:focus {
+  outline: none;
+  box-shadow: 0 0 0 3px rgba(139, 69, 19, 0.3), 0 15px 40px rgba(139, 69, 19, 0.4);
+}
+
+.start-button:active, .nav-button.primary:active {
+  transform: translateY(-1px) scale(0.98);
+  transition: all var(--transition-fast);
+}
+
 .nav-button.secondary {
   background: transparent;
   color: var(--steamphony-secondary);
@@ -225,15 +275,52 @@
   font-weight: 500;
   cursor: pointer;
   transition: all var(--transition-medium);
+  min-height: 44px; /* Touch target accessibility */
+  will-change: transform, background-color; /* Performance optimization */
 }
+
 .nav-button.secondary:hover {
   background: var(--steamphony-secondary);
   color: white;
+  transform: translateY(-2px);
+  box-shadow: 0 8px 25px rgba(153, 102, 204, 0.3);
 }
+
+.nav-button.secondary:focus {
+  outline: none;
+  box-shadow: 0 0 0 3px rgba(153, 102, 204, 0.3), 0 8px 25px rgba(153, 102, 204, 0.3);
+}
+
+.nav-button.secondary:active {
+  transform: translateY(0);
+  transition: all var(--transition-fast);
+}
+
 .nav-button:disabled {
   opacity: 0.5;
   cursor: not-allowed;
   transform: none !important;
+  box-shadow: none !important;
+}
+
+/* Loading state for buttons */
+.nav-button.loading {
+  position: relative;
+  color: transparent;
+}
+
+.nav-button.loading::after {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 20px;
+  height: 20px;
+  margin: -10px 0 0 -10px;
+  border: 2px solid transparent;
+  border-top: 2px solid currentColor;
+  border-radius: 50%;
+  animation: rotate 1s linear infinite;
 }
 
 /* Step Content */
@@ -246,13 +333,13 @@
 .step-title {
   font-size: 24px;
   font-weight: 600;
-  color: var(--steamphony-primary);
+  color: var(--text-primary);
   margin-bottom: 16px;
   text-align: center;
 }
 .step-description {
   font-size: 16px;
-  color: #6B7280;
+  color: var(--text-secondary);
   margin-bottom: 32px;
   text-align: center;
   line-height: 1.5;
@@ -301,12 +388,12 @@
 .option-title {
   font-size: 16px;
   font-weight: 600;
-  color: var(--steamphony-primary);
+  color: var(--text-primary);
   margin-bottom: 4px;
 }
 .option-description {
   font-size: 14px;
-  color: #6B7280;
+  color: var(--text-secondary);
 }
 
 /* Utility classes */
@@ -364,7 +451,7 @@
 .form-label {
   font-size: 14px;
   font-weight: 600;
-  color: var(--steamphony-primary);
+  color: var(--text-primary);
   margin-bottom: 8px;
 }
 .form-input {
@@ -382,7 +469,7 @@
 }
 .form-note {
   font-size: 12px;
-  color: #9CA3AF;
+  color: var(--text-muted);
   margin-top: 4px;
 }
 
@@ -446,6 +533,7 @@
 }
 
 /* Responsive */
+/* Mobile Optimizations */
 @media (max-width: 768px) {
   .widget-content { padding: 32px 24px; }
   .form-row { grid-template-columns: 1fr; }
@@ -454,4 +542,88 @@
   .start-title { font-size: 24px; }
   .start-button { padding: 16px 32px; font-size: 16px; }
   .results-screen .trust-grid { grid-template-columns: 1fr; }
+  
+  /* Enhanced mobile button styles */
+  .nav-button.primary, .nav-button.secondary {
+    min-height: 48px; /* Larger touch targets on mobile */
+    padding: 14px 24px;
+    font-size: 16px;
+  }
+  
+  /* Mobile-specific hover states */
+  @media (hover: hover) {
+    .nav-button.primary:hover, .nav-button.secondary:hover {
+      transform: translateY(-2px);
+    }
+  }
+  
+  /* Touch device optimizations */
+  .option-button {
+    padding: 16px 20px;
+    min-height: 60px;
+  }
+  
+  /* Mobile scroll behavior */
+  .calculator-widget {
+    overscroll-behavior: contain;
+  }
+}
+
+/* High contrast mode support */
+@media (prefers-contrast: high) {
+  .nav-button.primary {
+    border: 2px solid var(--steamphony-primary);
+  }
+  
+  .nav-button.secondary {
+    border-width: 3px;
+  }
+  
+  .option-button {
+    border-width: 2px;
+  }
+}
+
+/* Reduced motion support */
+@media (prefers-reduced-motion: reduce) {
+  .nav-button.primary, .nav-button.secondary, .option-button {
+    transition: none;
+  }
+  
+  .nav-button.primary:hover, .nav-button.secondary:hover {
+    transform: none;
+  }
+  
+  .progress-fill::after {
+    animation: none;
+  }
+  
+  .widget-header::before {
+    animation: none;
+  }
+  
+  .widget-logo-icon {
+    animation: none;
+  }
+}
+
+/* Safari-specific optimizations */
+@supports (-webkit-backdrop-filter: blur(20px)) {
+  .calculator-widget {
+    -webkit-backdrop-filter: blur(20px);
+  }
+}
+
+/* Firefox-specific optimizations */
+@supports (backdrop-filter: blur(20px)) {
+  .calculator-widget {
+    backdrop-filter: blur(20px);
+  }
+}
+
+/* Fallback for browsers without backdrop-filter */
+@supports not (backdrop-filter: blur(20px)) {
+  .calculator-widget {
+    background: rgba(255, 255, 255, 0.98);
+  }
 } 
