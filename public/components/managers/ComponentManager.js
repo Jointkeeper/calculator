@@ -332,11 +332,11 @@ class ComponentManager {
                 // Сохраняем выбор в AppState
                 const appState = window.app?.componentManager?.appState;
                 console.log('window.app.componentManager.appState:', appState);
-                if (typeof appState?.updateField === 'function') {
+                if (typeof appState?.setFormField === 'function') {
                     const title = card.querySelector('h4')?.textContent || industry;
-                    appState.updateField('industry', { key: industry, title });
+                    appState.setFormField('industry', { key: industry, title });
                 } else {
-                    console.error('❌ appState.updateField не функция!', appState);
+                    console.error('❌ appState.setFormField не функция!', appState);
                 }
                 
                 // Переход к следующему шагу через StepManager
@@ -361,13 +361,13 @@ class ComponentManager {
                     // Сохраняем кастомную отрасль
                     const appState = window.app?.componentManager?.appState;
                     console.log('window.app.componentManager.appState:', appState);
-                    if (typeof appState?.updateField === 'function') {
-                        appState.updateField('industry', { 
+                    if (typeof appState?.setFormField === 'function') {
+                        appState.setFormField('industry', { 
                             key: 'custom', 
                             title: this.value.trim() 
                         });
                     } else {
-                        console.error('❌ appState.updateField не функция!', appState);
+                        console.error('❌ appState.setFormField не функция!', appState);
                     }
                     
                     // Переход к следующему шагу при нажатии Enter
@@ -384,13 +384,13 @@ class ComponentManager {
                     // Сохраняем кастомную отрасль
                     const appState = window.app?.componentManager?.appState;
                     console.log('window.app.componentManager.appState:', appState);
-                    if (typeof appState?.updateField === 'function') {
-                        appState.updateField('industry', { 
+                    if (typeof appState?.setFormField === 'function') {
+                        appState.setFormField('industry', { 
                             key: 'custom', 
                             title: this.value.trim() 
                         });
                     } else {
-                        console.error('❌ appState.updateField не функция!', appState);
+                        console.error('❌ appState.setFormField не функция!', appState);
                     }
                     
                     // Переход к следующему шагу при потере фокуса
@@ -470,7 +470,7 @@ class ComponentManager {
                 
                 // Сохраняем выбор в AppState
                 if (window.app && window.app.componentManager) {
-                    window.app.componentManager.appState.updateField('businessSize', size);
+                    window.app.componentManager.appState.setFormField('businessSize', size);
                 }
                 
                 // Переход к следующему шагу
@@ -594,7 +594,7 @@ class ComponentManager {
                 
                 // Сохраняем выбор в AppState
                 if (window.app && window.app.componentManager) {
-                    window.app.componentManager.appState.updateField('team', team);
+                    window.app.componentManager.appState.setFormField('team', team);
                 }
                 
                 // Переход к следующему шагу
@@ -744,7 +744,7 @@ class ComponentManager {
                 if (window.app && window.app.componentManager) {
                     const selectedTools = Array.from(formContent.querySelectorAll('input[type="checkbox"]:checked'))
                         .map(cb => cb.value);
-                    window.app.componentManager.appState.updateField('tools', selectedTools);
+                    window.app.componentManager.appState.setFormField('tools', selectedTools);
                 }
             });
         });
