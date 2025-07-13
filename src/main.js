@@ -63,6 +63,9 @@ class App {
       // Инициализация через AppInitializer
       await this.initializer.initialize();
       
+      // Инициализация обработчиков событий для production-дизайна
+      this.initializeProductionHandlers();
+      
       // Глобальный доступ для тестирования
       if (typeof window !== 'undefined') {
         window.app = this;
@@ -71,6 +74,133 @@ class App {
     } catch (error) {
       console.error('App: Ошибка инициализации компонентов:', error);
       this.handleInitializationError(error);
+    }
+  }
+
+  /**
+   * Инициализация обработчиков для production-дизайна
+   * @private
+   */
+  initializeProductionHandlers() {
+    // Обработчик кнопки "Начать расчет"
+    const startButton = document.getElementById('start-calculator-btn');
+    if (startButton) {
+      startButton.addEventListener('click', () => {
+        this.showStep(1);
+      });
+    }
+
+    // Обработчики для опций (если они есть на странице)
+    document.addEventListener('click', (e) => {
+      if (e.target.closest('.option-button')) {
+        const optionButton = e.target.closest('.option-button');
+        this.selectOption(optionButton);
+      }
+    });
+  }
+
+  /**
+   * Показать шаг калькулятора
+   */
+  showStep(stepNumber) {
+    const startScreen = document.getElementById('start-screen');
+    const progressBar = document.getElementById('progress-bar');
+    const calculatorContent = document.getElementById('calculator-content');
+    
+    if (startScreen) {
+      startScreen.style.display = 'none';
+    }
+    
+    if (progressBar) {
+      progressBar.classList.add('visible');
+    }
+    
+    if (calculatorContent) {
+      calculatorContent.classList.remove('hidden');
+    }
+    
+    // Обновить прогресс
+    this.updateProgress(stepNumber - 1, 6);
+    
+    // Показать соответствующий шаг через UIManager
+    this.uiManager.showStep(stepNumber);
+  }
+
+  /**
+   * Выбрать опцию
+   */
+  selectOption(element) {
+    // Убрать выделение с соседних элементов
+    const parent = element.parentNode;
+    if (parent) {
+      parent.querySelectorAll('.option-button').forEach(btn => {
+        btn.classList.remove('selected');
+      });
+    }
+    // Добавить выделение к выбранному элементу
+    element.classList.add('selected');
+  }
+
+  /**
+   * Переключить опцию (для множественного выбора)
+   */
+  toggleOption(element) {
+    element.classList.toggle('selected');
+  }
+
+  /**
+   * Обновить прогресс
+   */
+  updateProgress(currentStep, totalSteps) {
+    const progressPercentage = ((currentStep + 1) / totalSteps) * 100;
+    
+    const stepIndicator = document.querySelector('.step-indicator');
+    const progressPercentageEl = document.querySelector('.progress-percentage');
+    const progressFill = document.querySelector('.progress-fill');
+    const dots = document.querySelectorAll('.step-dot');
+    
+    if (stepIndicator) {
+      stepIndicator.textContent = `Шаг ${currentStep + 1} из ${totalSteps}`;
+    }
+    
+    if (progressPercentageEl) {
+      progressPercentageEl.textContent = `${Math.round(progressPercentage)}% завершено`;
+    }
+    
+    if (progressFill) {
+      progressFill.style.width = `${progressPercentage}%`;
+    }
+    
+    dots.forEach((dot, index) => {
+      dot.classList.remove('active', 'completed');
+      if (index === currentStep) {
+        dot.classList.add('active');
+      } else if (index < currentStep) {
+        dot.classList.add('completed');
+      }
+    });
+  }
+
+  /**
+   * Показать результаты
+   */
+  showResults() {
+    // Скрыть все шаги
+    const allSteps = document.querySelectorAll('.calculator-step');
+    allSteps.forEach(step => {
+      step.classList.remove('active');
+    });
+    
+    // Скрыть прогресс-бар
+    const progressBar = document.getElementById('progress-bar');
+    if (progressBar) {
+      progressBar.classList.remove('visible');
+    }
+    
+    // Показать экран результатов
+    const resultsScreen = document.getElementById('results-screen');
+    if (resultsScreen) {
+      resultsScreen.style.display = 'block';
     }
   }
 

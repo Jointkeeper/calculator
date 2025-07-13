@@ -110,7 +110,61 @@ class UIManager {
      * Показать шаг
      */
     showStep(step) {
-        this.stepManager.showStep(step);
+        try {
+            // Скрыть все шаги
+            const allSteps = document.querySelectorAll('.calculator-step');
+            allSteps.forEach(stepEl => {
+                stepEl.classList.remove('active');
+            });
+
+            // Показать нужный шаг
+            const targetStep = document.getElementById(`step-${step}`);
+            if (targetStep) {
+                targetStep.classList.add('active');
+                
+                // Обновить прогресс
+                this.updateProgress(step - 1, 6);
+                
+                console.log(`📋 Показан шаг ${step}`);
+            } else {
+                console.warn(`⚠️ Шаг ${step} не найден`);
+            }
+        } catch (error) {
+            console.error('❌ Ошибка показа шага:', error);
+        }
+    }
+
+    /**
+     * Обновить прогресс
+     */
+    updateProgress(currentStep, totalSteps) {
+        const progressPercentage = ((currentStep + 1) / totalSteps) * 100;
+        
+        const stepIndicator = document.querySelector('.step-indicator');
+        const progressPercentageEl = document.querySelector('.progress-percentage');
+        const progressFill = document.querySelector('.progress-fill');
+        const dots = document.querySelectorAll('.step-dot');
+        
+        if (stepIndicator) {
+            stepIndicator.textContent = `Шаг ${currentStep + 1} из ${totalSteps}`;
+        }
+        
+        if (progressPercentageEl) {
+            progressPercentageEl.textContent = `${Math.round(progressPercentage)}% завершено`;
+        }
+        
+        if (progressFill) {
+            progressFill.style.width = `${progressPercentage}%`;
+        }
+        
+        dots.forEach((dot, index) => {
+            dot.classList.remove('active', 'completed');
+            if (index === currentStep) {
+                dot.classList.add('active');
+            } else if (index < currentStep) {
+                dot.classList.add('completed');
+            }
+        });
     }
 
     /**

@@ -1,0 +1,247 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Тест потока данных - Steamphony Calculator</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+            background: #f5f5f5;
+        }
+        .test-section {
+            background: white;
+            padding: 20px;
+            margin: 20px 0;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        .test-result {
+            padding: 10px;
+            margin: 10px 0;
+            border-radius: 4px;
+            font-family: monospace;
+        }
+        .success { background: #d4edda; color: #155724; }
+        .error { background: #f8d7da; color: #721c24; }
+        .info { background: #d1ecf1; color: #0c5460; }
+        button {
+            background: #007bff;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 4px;
+            cursor: pointer;
+            margin: 5px;
+        }
+        button:hover { background: #0056b3; }
+        pre {
+            background: #f8f9fa;
+            padding: 10px;
+            border-radius: 4px;
+            overflow-x: auto;
+        }
+    </style>
+</head>
+<body>
+    <h1>🧪 Тест потока данных - Steamphony Calculator</h1>
+    
+    <div class="test-section">
+        <h2>1. Проверка AppState</h2>
+        <button onclick="testAppState()">Тест AppState</button>
+        <div id="appstate-result"></div>
+    </div>
+
+    <div class="test-section">
+        <h2>2. Тест сохранения данных</h2>
+        <button onclick="testDataSaving()">Тест сохранения</button>
+        <div id="saving-result"></div>
+    </div>
+
+    <div class="test-section">
+        <h2>3. Тест расчета результатов</h2>
+        <button onclick="testCalculation()">Тест расчета</button>
+        <div id="calculation-result"></div>
+    </div>
+
+    <div class="test-section">
+        <h2>4. Полный тест потока данных</h2>
+        <button onclick="testFullFlow()">Полный тест</button>
+        <div id="fullflow-result"></div>
+    </div>
+
+    <script type="module">
+        // Импортируем модули
+        import { AppState } from './src/core/AppState.js';
+        import { calculator } from './src/core/Calculator.js';
+
+        // Глобальные переменные для тестов
+        window.testAppState = function() {
+            const resultDiv = document.getElementById('appstate-result');
+            try {
+                const appState = AppState.getInstance();
+                
+                // Тест базовой функциональности
+                appState.updateField('industry', { key: 'restaurant', title: 'Ресторан' });
+                appState.updateField('businessSize', { key: 'medium', title: 'Средний' });
+                appState.updateField('marketingBudget', { budget: 500000, monthly: 500000 });
+                appState.updateField('marketingTeam', { teamId: 'freelancer', monthlyCost: 80000 });
+                appState.updateField('marketingTools', { 
+                    selected: ['seo', 'ppc'], 
+                    estimatedMonthlyCost: 120000 
+                });
+
+                const formData = appState.getFormDataForComponents();
+                
+                resultDiv.innerHTML = `
+                    <div class="test-result success">
+                        ✅ AppState работает корректно
+                    </div>
+                    <pre>${JSON.stringify(formData, null, 2)}</pre>
+                `;
+            } catch (error) {
+                resultDiv.innerHTML = `
+                    <div class="test-result error">
+                        ❌ Ошибка AppState: ${error.message}
+                    </div>
+                `;
+            }
+        };
+
+        window.testDataSaving = function() {
+            const resultDiv = document.getElementById('saving-result');
+            try {
+                const appState = AppState.getInstance();
+                
+                // Симулируем данные от компонентов
+                const testData = {
+                    industry: { key: 'restaurant', title: 'Ресторанный бизнес' },
+                    businessSize: { key: 'medium', title: 'Средний бизнес' },
+                    marketingBudget: { budget: 300000, monthly: 300000 },
+                    marketingTeam: { teamId: 'agency', monthlyCost: 150000 },
+                    marketingTools: { 
+                        selected: ['seo', 'ppc', 'social'], 
+                        estimatedMonthlyCost: 180000 
+                    }
+                };
+
+                // Сохраняем данные
+                Object.entries(testData).forEach(([key, value]) => {
+                    appState.updateField(key, value);
+                });
+
+                const savedData = appState.getFormDataForComponents();
+                
+                resultDiv.innerHTML = `
+                    <div class="test-result success">
+                        ✅ Данные сохранены корректно
+                    </div>
+                    <pre>${JSON.stringify(savedData, null, 2)}</pre>
+                `;
+            } catch (error) {
+                resultDiv.innerHTML = `
+                    <div class="test-result error">
+                        ❌ Ошибка сохранения: ${error.message}
+                    </div>
+                `;
+            }
+        };
+
+        window.testCalculation = function() {
+            const resultDiv = document.getElementById('calculation-result');
+            try {
+                const appState = AppState.getInstance();
+                const formData = appState.getFormDataForComponents();
+                
+                // Тестируем расчет
+                const currentCosts = formData.budget + (formData.marketingTeam?.monthlyCost || 0) + (formData.marketingTools?.estimatedMonthlyCost || 0);
+                const steamphonyCosts = Math.round((formData.marketingTools?.estimatedMonthlyCost || 0) * 0.7);
+                const savings = Math.max(currentCosts - steamphonyCosts, 0);
+                const roi = steamphonyCosts > 0 ? Math.round((savings / steamphonyCosts) * 100) : 0;
+                
+                resultDiv.innerHTML = `
+                    <div class="test-result success">
+                        ✅ Расчет выполнен корректно
+                    </div>
+                    <div class="test-result info">
+                        <strong>Результаты расчета:</strong><br>
+                        Текущие затраты: ${currentCosts.toLocaleString()} ₽/мес<br>
+                        Затраты Steamphony: ${steamphonyCosts.toLocaleString()} ₽/мес<br>
+                        Экономия: ${savings.toLocaleString()} ₽/мес<br>
+                        ROI: ${roi}%
+                    </div>
+                `;
+            } catch (error) {
+                resultDiv.innerHTML = `
+                    <div class="test-result error">
+                        ❌ Ошибка расчета: ${error.message}
+                    </div>
+                `;
+            }
+        };
+
+        window.testFullFlow = function() {
+            const resultDiv = document.getElementById('fullflow-result');
+            try {
+                const appState = AppState.getInstance();
+                
+                // Полный тест потока данных
+                console.log('🧪 Начинаем полный тест потока данных...');
+                
+                // 1. Сохраняем данные от всех компонентов
+                appState.updateField('industry', { key: 'restaurant', title: 'Ресторанный бизнес' });
+                appState.updateField('businessSize', { key: 'large', title: 'Крупный бизнес' });
+                appState.updateField('marketingBudget', { budget: 800000, monthly: 800000 });
+                appState.updateField('marketingTeam', { teamId: 'inhouse', monthlyCost: 250000 });
+                appState.updateField('marketingTools', { 
+                    selected: ['seo', 'ppc', 'social', 'email', 'analytics'], 
+                    estimatedMonthlyCost: 300000 
+                });
+
+                // 2. Получаем данные для расчета
+                const formData = appState.getFormDataForComponents();
+                
+                // 3. Выполняем расчет
+                const currentCosts = formData.budget + (formData.marketingTeam?.monthlyCost || 0) + (formData.marketingTools?.estimatedMonthlyCost || 0);
+                const steamphonyCosts = Math.round((formData.marketingTools?.estimatedMonthlyCost || 0) * 0.7);
+                const savings = Math.max(currentCosts - steamphonyCosts, 0);
+                const roi = steamphonyCosts > 0 ? Math.round((savings / steamphonyCosts) * 100) : 0;
+                const payback = steamphonyCosts > 0 ? Math.round(steamphonyCosts / savings) : 0;
+
+                resultDiv.innerHTML = `
+                    <div class="test-result success">
+                        ✅ Полный тест потока данных пройден успешно!
+                    </div>
+                    <div class="test-result info">
+                        <strong>Финальные результаты:</strong><br>
+                        💰 Экономия: ${savings.toLocaleString()} ₽/мес<br>
+                        📈 ROI: ${roi}%<br>
+                        ⏱️ Срок окупаемости: ${payback} мес<br>
+                        🏭 Отрасль: ${formData.industry?.title}<br>
+                        📊 Размер: ${formData.businessSize?.title}<br>
+                        💵 Бюджет: ${formData.budget?.toLocaleString()} ₽/мес
+                    </div>
+                    <pre>${JSON.stringify(formData, null, 2)}</pre>
+                `;
+                
+                console.log('✅ Полный тест завершен успешно!');
+            } catch (error) {
+                resultDiv.innerHTML = `
+                    <div class="test-result error">
+                        ❌ Ошибка полного теста: ${error.message}
+                    </div>
+                `;
+                console.error('❌ Ошибка полного теста:', error);
+            }
+        };
+
+        // Инициализация при загрузке страницы
+        document.addEventListener('DOMContentLoaded', function() {
+            console.log('🧪 Тестовая страница загружена');
+        });
+    </script>
+</body>
+</html> 
